@@ -1,0 +1,18 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "candidate_pool"
+    },
+    {
+      "path": "demo_pending.jsonl",
+      "role": "candidate_pool_without_review"
+    },
+    {
+      "path": "20_quality_report.json",
+      "role": "upstream_quality_report"
+    }
+  ]
+}

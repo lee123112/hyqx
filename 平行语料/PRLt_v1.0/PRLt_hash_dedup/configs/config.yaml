@@ -1,0 +1,31 @@
+# 算子8：哈希去重配置
+operator:
+  name: parallel_pair_deduplication
+  version: v1.0.0
+
+# 去重键：hash(规范化源文 + "\x1f" + 规范化目标文)。
+# sha256 为默认；md5 仅为兼容，不建议新任务使用。
+hash_algorithm: sha256
+
+# 键计算前的 Unicode 归一化形式：NFC（默认）/NFD/NFKC/NFKD/none。
+# 只影响去重键，不改写输出记录中的原文。
+unicode_normalization: NFC
+
+# 是否对规范化文本做 Unicode casefold（大小写等价）。
+casefold: true
+
+# 是否把连续空白折叠为单个空格并裁剪首尾。
+collapse_whitespace: true
+
+# 保留首次出现；重复记录写入 07_duplicates.jsonl。
+# 本版本仅支持 true，配置为 false 会返回结构化失败。
+keep_first: true
+
+# 去重状态（seen 字典）上限；超过上限明确失败，不静默截断去重范围。
+max_tracked_pairs: 5000000
+
+# 本节点只对 source/target 建键，配置成其他字段会直接报错。
+text_fields: [source, target]
+
+# 上游算子已完成编码归一，本节点要求严格 UTF-8。
+input_encodings: [utf-8]

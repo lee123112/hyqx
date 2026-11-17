@@ -1,0 +1,50 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "media/alpha_64x64.png",
+      "role": "media"
+    },
+    {
+      "path": "media/aud_001.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/blur_checker_512.png",
+      "role": "media"
+    },
+    {
+      "path": "media/corrupt.png",
+      "role": "media"
+    },
+    {
+      "path": "media/exif_rot_90.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/sharp_checker_512.png",
+      "role": "media"
+    },
+    {
+      "path": "media/small_64x32.png",
+      "role": "media"
+    },
+    {
+      "path": "media/vid_001.mp4",
+      "role": "media"
+    },
+    {
+      "path": "media/wide_1600x800.png",
+      "role": "media"
+    },
+    {
+      "path": "media/zero.png",
+      "role": "media"
+    }
+  ]
+}

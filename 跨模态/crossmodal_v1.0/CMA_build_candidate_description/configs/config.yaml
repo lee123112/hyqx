@@ -1,0 +1,33 @@
+operator: candidate_description
+operator_version: v1.0.0
+
+description:
+  # 表1冻结：描述来源优先级，只读不可重排，不得把文件名/标签加入
+  priority:
+    - caption        # 图注
+    - alt            # Alt
+    - title          # 标题
+    - subtitle       # 字幕
+    - transcript     # 语音转写
+    - manual         # 人工补写
+  # 最短 5（范围 5-20），短于该长度视为没有描述，顺延下一来源
+  # [v4.2] §4.9 接口二规范名 min_chars 作为别名接受（归一为 min_length）
+  min_length: 5
+  # 最长 500（范围 100-500），超过截断到 500 并在日志写明
+  # [v4.2] §4.9 接口二规范名 max_chars 作为别名接受（归一为 max_length）
+  max_length: 500
+  # 文件名与分类标签不得写入描述字段
+  forbid_filename: true
+  forbid_tags: true
+  # [v1.0.1] 描述质量：词数下限（0-50）。少于该词数标 description_quality=short；
+  # 若记录自带同源候选图注（metadata.alt_candidates），先换成其中最长的一条有效候选。
+  # 拉丁文本按单词计，中文按汉字计；只影响标注与择优，不改来源优先级。
+  min_words: 6
+  prefer_longer_alternate: true
+  # 语音转写负载别名：默认关闭。开启后「语音转写」来源额外读取 #08 的
+  # transcription.text / transcription.paragraphs（round9 复核：短音频 ASR 乱码
+  # 的记录会从待人工补写进入评分流程，由 #13 按 CER 正确隔离）。
+  include_transcription_payload: false
+
+io:
+  output_root: output

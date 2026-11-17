@@ -1,0 +1,11 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "records"
+    }
+  ],
+  "note": "算子 22 样例：12 行输入（10 条记录 + 1 坏行 + 1 空行），无外网依赖"
+}

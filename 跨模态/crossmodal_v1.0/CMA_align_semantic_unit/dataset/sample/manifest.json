@@ -1,0 +1,89 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "04_images/demo_07_a1_en.png",
+      "role": "media"
+    },
+    {
+      "path": "media/original/demo_07_a1_en.png",
+      "role": "media"
+    },
+    {
+      "path": "04_images/demo_07_a2_en.png",
+      "role": "media"
+    },
+    {
+      "path": "04_images/demo_07_v2_en.png",
+      "role": "media"
+    },
+    {
+      "path": "media/original/demo_07_v1.mp4",
+      "role": "media"
+    },
+    {
+      "path": "media/original/demo_07_v2.mp4",
+      "role": "media"
+    },
+    {
+      "path": "media/original/demo_07_v1.wav",
+      "role": "media"
+    },
+    {
+      "path": "05_frames/demo_07_v1/frame_000000_000000000.png",
+      "role": "media"
+    },
+    {
+      "path": "05_frames/demo_07_v1/frame_000001_004000000.png",
+      "role": "media"
+    },
+    {
+      "path": "05_frames/demo_07_v1/frame_000002_008000000.png",
+      "role": "media"
+    },
+    {
+      "path": "05_frames/demo_07_v2/frame_000000_000000000.png",
+      "role": "media"
+    },
+    {
+      "path": "05_frames/demo_07_v2/frame_000001_006000000.png",
+      "role": "media"
+    },
+    {
+      "path": "06_audio/demo_07_v1.wav",
+      "role": "media"
+    },
+    {
+      "path": "06_audio/segments/demo_07_v1_0000.wav",
+      "role": "media"
+    },
+    {
+      "path": "06_audio/segments/demo_07_v1_0001.wav",
+      "role": "media"
+    },
+    {
+      "path": "06_audio/demo_07_v2.wav",
+      "role": "media"
+    },
+    {
+      "path": "03_rejects.jsonl",
+      "role": "sidecar"
+    },
+    {
+      "path": "README.md",
+      "role": "sidecar"
+    },
+    {
+      "path": "make_sample.py",
+      "role": "sidecar"
+    }
+  ],
+  "input_source": "fixture",
+  "operator": "multimodal_preprocessing",
+  "notes": "fixture 由 dataset/make_sample.py 生成；占位 mp4 仅用于验证搬运"
+}

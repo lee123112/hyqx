@@ -1,0 +1,17 @@
+{
+  "format": "crossmodal-delivery-version-v1",
+  "operator": "delivery_package",
+  "operator_number": 23,
+  "operator_version": "v1.0.0",
+  "dataset_version": "v1.0.0-demo",
+  "enabled_routes": [
+    "image_text",
+    "audio_text",
+    "video_text"
+  ],
+  "annotation_granularity": "whole",
+  "status": "待发布",
+  "version_state": "pending_release",
+  "packaged_records": 3,
+  "isolation_excluded_from_package": true
+}

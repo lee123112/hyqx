@@ -1,0 +1,56 @@
+[
+  {
+    "operator": "data_selection",
+    "operator_version": "v1.0.0",
+    "uniqueId": "demoS2_f1",
+    "stageId": "S1",
+    "runId": "run001",
+    "status": "success",
+    "startedAt": "2026-10-02T09:00:00+08:00",
+    "finishedAt": "2026-10-02T09:01:00+08:00",
+    "config": {
+      "business": {
+        "max_select_per_source": 8
+      }
+    },
+    "statistics": {
+      "input": 8,
+      "output": 8,
+      "rejected": 0,
+      "not_applicable": 0
+    },
+    "artifacts": [
+      {
+        "path": "01_raw_index.jsonl",
+        "role": "main"
+      }
+    ]
+  },
+  {
+    "operator": "text_cleaning",
+    "operator_version": "v1.0.0",
+    "uniqueId": "demoS2_f1",
+    "stageId": "S2",
+    "runId": "run001",
+    "status": "success",
+    "startedAt": "2026-10-02T09:20:00+08:00",
+    "finishedAt": "2026-10-02T09:21:00+08:00",
+    "config": {
+      "business": {
+        "normalize_unicode": true
+      }
+    },
+    "statistics": {
+      "input": 8,
+      "output": 8,
+      "rejected": 0,
+      "not_applicable": 1
+    },
+    "artifacts": [
+      {
+        "path": "03_text_cleaned.jsonl",
+        "role": "main"
+      }
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+operator_version: v1.0.3
+model_name: Qwen3.5-2B
+model_version: Qwen3.5-2B
+# 相对路径按算子包根目录解析（不依赖进程 CWD）；交付包内即 ../models/Qwen3.5-2B。
+model_path: ../models/Qwen3.5-2B
+transform_types: [active_passive, split, merge]
+max_candidates_per_input: 1
+# CPU 无 GPU 加速：单条生成约 1.5 s/token，超时放宽到 900s（仅 HTTP 服务路径使用）。
+model_timeout_seconds: 900
+model_service_url: null
+# 批处理快路径（common/augmentation_fastpath.chat_json_batch）：默认开启，
+# 否则 run_records 走单条贪心路径（无 JSON 修复、无重试）。
+gen_batch_size: 4
+gen_num_beams: 1
+# Qwen3.5-2B 本地 CPU 解码慢：单条 JSON 长度受此上限约束（禁止悄悄放大）。
+gen_max_new_tokens: 128
+gen_json_repair: true
+# 失败重试：先采样 0.7，仍失败升温到 0.9（束搜索确定性，原样重试必失败）。
+gen_retry_sample: true
+gen_retry_temperature: 0.7
+gen_retry_escalate: true
+gen_retry_temperature_escalated: 0.9

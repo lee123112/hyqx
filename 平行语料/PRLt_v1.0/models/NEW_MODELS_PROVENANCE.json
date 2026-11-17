@@ -1,0 +1,105 @@
+{
+  "format": "prlt-new-models-provenance-v1",
+  "generated_at": "2026-10-31T19:05:00+08:00",
+  "generated_by": "lead (DSH agent)",
+  "note": "正式版模型清单与实测 SHA256。权重由 ModelScope 官方仓库下载，SHA256 为本机下载后实测值；mdeberta-v3-base/tokenizer.json 由 transformers 4.41 从同目录 spm.model 转换生成（Windows 中文路径下 sentencepiece 直接加载 spm.model 会失败，改用 fast tokenizer）。",
+  "source": {
+    "endpoint": "https://modelscope.cn",
+    "download_tool": "modelscope 1.37.1",
+    "revision": "master"
+  },
+  "models": [
+    {
+      "id": "Qwen/Qwen3-Embedding-0.6B",
+      "local_dir": "Qwen3-Embedding-0.6B",
+      "purpose": ["API09 句子级对齐", "API14 语义等价检测", "API11 领域识别与筛选（嵌入编码器）"],
+      "params": "0.6B",
+      "embedding_dim": 1024,
+      "context_length": 32768,
+      "loader": "sentence_transformers.SentenceTransformer（或 transformers AutoModel，last-token pooling）",
+      "required_files": {
+        "model.safetensors": {
+          "size": 1191586416,
+          "sha256": "0437e45c94563b09e13cb7a64478fc406947a93cb34a7e05870fc8dcd48e23fd"
+        },
+        "config.json": {
+          "size": 727,
+          "sha256": "b5bf1f51fc45be473a54718cef92448d90a1be001bf9b9a44b8c7f10a19feaa9"
+        },
+        "tokenizer.json": {
+          "size": 11423705,
+          "sha256": "def76fb086971c7867b829c23a26261e38d9d74e02139253b38aeb9df8b4b50a"
+        }
+      }
+    },
+    {
+      "id": "microsoft/mdeberta-v3-base",
+      "local_dir": "mdeberta-v3-base",
+      "purpose": ["API10 子句/短语级对齐（跨语言语义编码）"],
+      "params": "278M（86M 骨干 + 190M 嵌入层），隐藏维 768",
+      "loader": "transformers AutoModel + AutoTokenizer（fast tokenizer，mean pooling）",
+      "download_scope": "仅推理必需文件；未下载 tf_model.h5 / pytorch_model.generator.bin / configuration.json",
+      "required_files": {
+        "pytorch_model.bin": {
+          "size": 1332809049,
+          "sha256": "6f89419baf0f1aaad5cab7d53901e36a8c1af8f6b4ab58b15db9af32df656ead"
+        },
+        "config.json": {
+          "size": 579,
+          "sha256": "bcffcd343dc5efa5ef2d5a58d2b405eed108f01cc45b48d0a907b333ec41801f"
+        },
+        "spm.model": {
+          "size": 4305025,
+          "sha256": "13c8d666d62a7bc4ac8f040aab68e942c861f93303156cc28f5c7e885d86d6e3"
+        },
+        "tokenizer.json": {
+          "size": 16331374,
+          "sha256": "5e26ec8cd2234df8edcc6e8c207b66b3162360f9fdc46ee4526a440d0d9d0bb9",
+          "derived": "由 spm.model 经 transformers 4.41.2 DebertaV2TokenizerFast 转换生成"
+        }
+      }
+    },
+    {
+      "id": "Qwen/Qwen3.5-2B",
+      "local_dir": "Qwen3.5-2B",
+      "purpose": ["API15 译文流畅度检测", "API22 句式变换"],
+      "params": "2B（多模态后训练模型，文本可用）",
+      "loader": "transformers AutoModelForImageTextToText + AutoTokenizer.apply_chat_template（text-only）",
+      "requirements_note": "需要 transformers>=5.22（qwen3_5 架构）与 torch>=2.6；CPU 推理可用但较慢，生产建议 GPU。",
+      "required_files": {
+        "model.safetensors-00001-of-00001.safetensors": {
+          "size": 4548221488,
+          "sha256": "aa33250c4fc64891ddfaba3a314fd9542ea371843c387178b425fbcc5ed680b1"
+        },
+        "config.json": {
+          "size": 2908,
+          "sha256": "ed1c1723241f23f7f4e23430759cbd7dcfb4103cbdfe052bfe7626b57c2615b4"
+        },
+        "tokenizer.json": {
+          "size": 12807982,
+          "sha256": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42"
+        }
+      }
+    }
+  ],
+  "api_models": [
+    {
+      "id": "Qwen/Qwen3.5-9B",
+      "provider": "硅基流动 SiliconFlow",
+      "base_url": "https://api.siliconflow.cn/v1",
+      "chat_endpoint": "https://api.siliconflow.cn/v1/chat/completions",
+      "purpose": ["API20 回译增强", "API23 跨语言合成"],
+      "auth_env": "SILICONFLOW_API_KEY",
+      "note": "不落盘权重；无 key/网络失败时结构化失败，不伪造译文。"
+    }
+  ],
+  "legacy_models": [
+    {"local_dir": "labse", "previous": "API09", "status": "已退役（不在默认链路加载）"},
+    {"local_dir": "xlm-roberta-base", "previous": "API10", "status": "已退役（不在默认链路加载）"},
+    {"local_dir": "bge-m3-safetensors", "previous": "API14", "status": "已退役（不在默认链路加载）"},
+    {"local_dir": "bge-m3", "previous": "API14 备份", "status": "已退役（不在默认链路加载）"},
+    {"local_dir": "Qwen2.5-1.5B-Instruct", "previous": "API15/API22", "status": "已退役（不在默认链路加载）"},
+    {"local_dir": "nllb-200-distilled-600M", "previous": "API20/API23", "status": "已退役（不在默认链路加载）"},
+    {"local_dir": "bge-domain-prototype", "previous": "API11", "status": "已退役（不在默认链路加载）"}
+  ]
+}

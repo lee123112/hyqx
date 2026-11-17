@@ -1,0 +1,40 @@
+name: op-pretrain-parallel-corpus
+
+services:
+  op-pretrain-parallel-corpus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: op-pretrain-parallel-corpus:20261031
+    container_name: op-pretrain-parallel-corpus
+    restart: unless-stopped
+    ports:
+      - "17006:6291"
+    environment:
+      PORT: "6291"
+      OPERATOR_POOL_ROOT: /var/lib/pretrain-parallel-corpus
+      OBJECT_STORE_DIR: /var/lib/pretrain-parallel-corpus/object_store
+      SILICONFLOW_BASE_URL: "${SILICONFLOW_BASE_URL:-}"
+      SILICONFLOW_API_KEY: "${SILICONFLOW_API_KEY:-}"
+      MODEL_SERVICE_LABSE_URL: "${MODEL_SERVICE_LABSE_URL:-}"
+      MODEL_SERVICE_XLMR_URL: "${MODEL_SERVICE_XLMR_URL:-}"
+      MODEL_SERVICE_BGE_M3_URL: "${MODEL_SERVICE_BGE_M3_URL:-}"
+      MODEL_SERVICE_QWEN_URL: "${MODEL_SERVICE_QWEN_URL:-}"
+      MODEL_SERVICE_DOMAIN_URL: "${MODEL_SERVICE_DOMAIN_URL:-}"
+      MODEL_SERVICE_TIMEOUT_SECONDS: "${MODEL_SERVICE_TIMEOUT_SECONDS:-120}"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+    volumes:
+      - /data/webapp/idg/数据工程产线算子/operator-output/op-pretrain-parallel-corpus:/var/lib/pretrain-parallel-corpus
+      - ./models:/opt/pretrain-parallel-corpus/models:ro
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:6291/health', timeout=5)\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"

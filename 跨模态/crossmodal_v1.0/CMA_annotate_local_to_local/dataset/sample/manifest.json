@@ -1,0 +1,47 @@
+{
+  "format": "crossmodal-sample-manifest-v1",
+  "operator": "phrase_region_annotation",
+  "operator_number": 18,
+  "generated_by": "dataset/sample/make_sample.py",
+  "note": "全部媒体均为脚本合成的真实可解码 PNG；不含任何外部下载数据",
+  "datasets": [
+    {
+      "path": "demo.jsonl",
+      "route": "enabled=false",
+      "description": "默认路线样例：原样放行，不产生细粒度对应",
+      "records": 10,
+      "bad_lines": 2,
+      "blank_lines": 1
+    },
+    {
+      "path": "demo_enabled.jsonl",
+      "route": "enabled=true",
+      "description": "开启路线样例：覆盖预填/待人工/样本隔离/原始隔离",
+      "records": 9,
+      "bad_lines": 0,
+      "blank_lines": 0
+    }
+  ],
+  "media": [
+    {
+      "path": "media/broken.png",
+      "size": 25,
+      "sha256": "154b9417eea1b7acf77b35408445da7c6a23ac6684925824f58ef83401e9c6ae"
+    },
+    {
+      "path": "media/shot_001.png",
+      "size": 156,
+      "sha256": "a89c77abbcf3345a5a44b24212064d173a82c4f845275bf6e48790d3ab2165b3"
+    },
+    {
+      "path": "media/shot_002.png",
+      "size": 156,
+      "sha256": "83856b1a124ef4077823ee333f0565961f670b721ab18e77849a633b07ae7d29"
+    },
+    {
+      "path": "media/shot_003.png",
+      "size": 156,
+      "sha256": "38c2ce4cb197fc0bb1a6ea8bf8be368ff733af579f596546c2010b546d22f1a2"
+    }
+  ]
+}

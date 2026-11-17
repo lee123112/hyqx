@@ -1,0 +1,90 @@
+# 跨模态算子池 · Kubernetes 联调部署清单（Deployment + Service）
+#
+# 使用前只需改两处：
+#   1) Deployment 里的 image：换成实际镜像地址（如 harbor.xxx.com/xxx/opcrossmodalpool:1.0.0）
+#   2) metadata.namespace：换成目标命名空间（本文件默认 default）
+# 然后：kubectl apply -f opcrossmodalpool.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opcrossmodalpool
+  namespace: default
+  labels:
+    app: opcrossmodalpool
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate            # 产物目录是单写，滚动更新容易双实例互踩
+  selector:
+    matchLabels:
+      app: opcrossmodalpool
+  template:
+    metadata:
+      labels:
+        app: opcrossmodalpool
+    spec:
+      containers:
+        - name: opcrossmodalpool
+          image: opcrossmodalpool:1.0.0          # ← 改成实际镜像地址（含 registry/repo:tag）
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8100
+          env:
+            - name: OUTPUT_DIR
+              value: "/data/output"
+            - name: EXPECT_CPU
+              value: "1"                     # 纯 CPU 交付：验收脚本断言无 CUDA
+            - name: TZ
+              value: "Asia/Shanghai"
+            # 容器 CPU limit 较小时建议同时限制推理线程，避免 OpenMP 超额争抢：
+            # - name: OMP_NUM_THREADS
+            #   value: "8"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8100
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8100
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "8"
+              memory: "8Gi"
+          volumeMounts:
+            - name: output
+              mountPath: /data/output
+      volumes:
+        - name: output
+          # 生产建议换成 PVC（产物要持久化）：
+          # persistentVolumeClaim:
+          #   claimName: opcrossmodalpool-output
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opcrossmodalpool
+  namespace: default
+  labels:
+    app: opcrossmodalpool
+spec:
+  type: ClusterIP
+  selector:
+    app: opcrossmodalpool
+  ports:
+    - name: http
+      port: 17059              # 对外（集群内）端口，与 docker compose 的 HOST_PORT 一致
+      targetPort: 8100         # 容器内 uvicorn 端口
+      protocol: TCP

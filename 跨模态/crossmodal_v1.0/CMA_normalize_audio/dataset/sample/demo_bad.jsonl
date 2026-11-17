@@ -1,0 +1,5 @@
+{"sample_id": "as_dup", "audio": "media/aud_sine_8000_mono_05s.wav"}
+{"sample_id": "as_dup", "audio": "media/aud_sine_8000_mono_05s.wav"}
+{不是合法 JSON
+["数组不是对象"]
+{"text": {"content": "缺少 sample_id"}}

@@ -1,0 +1,70 @@
+{
+  "dictionary_version": "cilin-v3-m75-curated",
+  "dictionary_path": "configs/general_synonyms.json",
+  "adopted_at": "2026-10-21T17:13:40+08:00",
+  "status": "temporary_adopted_pending_business_review",
+  "operator": "PRLt_synonym_substitution（算子22）",
+  "operator_version": "v1.1.0",
+  "entries": 1100,
+  "sha256": "5a4e58b3a65a729d93affce5a35f32651fdb6791608e7750176dd33443e99ac2",
+  "language": "zh（默认词库当前仅中文词条；原 v1 中的英文词条随旧版备份在 general_synonyms-v1.json）",
+  "source": {
+    "name": "哈工大同义词词林（扩展版）V3",
+    "package": "pip cilin==0.0.3",
+    "package_home": "https://github.com/liao961120/cilin",
+    "data_file": "site-packages/cilin/data/cilin_tree.json",
+    "data_reference": "https://github.com/yaleimeng/Final_word_Similarity/tree/master/cilin/V3",
+    "data_license": "UNKNOWN（词林数据为研究用途；原版版权：上海辞书出版社/梅家驹；商用需授权）",
+    "package_license": "MIT（仅包代码）",
+    "parsed_at": "2026-10-21",
+    "parse_rule": "只取 8 位编码 '=' 同义组（9988 组 / 45335 词）；'#' 同类与 '@' 相关组丢弃"
+  },
+  "selection": {
+    "variant": "candidate_cilin-w2v-m75",
+    "source_entries": 1102,
+    "rule": "词林同义组 + synonyms 3.25.1 词向量（旧版 3.10.2 MIT words.vector）相似度 >=0.75 排序选词；strict 词性（同长度/同粗词性）",
+    "build_tool": "PRLt/tools/build_cilin_synonyms.py",
+    "evidence": "prlt_test/runs/aug22_lexicons_20261021/",
+    "evaluation": {
+      "sample": "24 条（aug22_synv2_20261021/input_sample.jsonl）",
+      "output_rate": "12/24 = 50.0%（精筛前 m75）",
+      "word_audit": "随机 40 词对明显错误 0/40",
+      "unacceptable_before_curation": [
+        "造成→导致",
+        "盈利→利润"
+      ],
+      "curated_result": {
+        "sample": "24 条（aug22_synv2_20261021/input_sample.jsonl）",
+        "output_rate": "12/24 = 50.0%",
+        "reviewed_diffs": "12 处逐条人工复核，0 处不可接受；边界项：机构→部门、现在→今天、愿意→希望、痛苦→伤痛",
+        "excluded_pair_hits": 0,
+        "predict_contract": "4 条命中样本 /predict 四字段 contract OK（output 4 / reject 0）",
+        "chain_aug4": "run200_models7 增强演示 4 条样本 0/4 命中（诚实失败，覆盖取决于语料用词）",
+        "evidence": "prlt_test/runs/aug22_cilin_adopt_20261021/eval_default.md"
+      }
+    }
+  },
+  "curation": {
+    "removed": [
+      {
+        "original": "造成",
+        "replacement": "导致",
+        "reason": "语境搭配错误：‘给中俄两强导致的痛苦’；由 a4 24 条样本评审判定不可接受"
+      },
+      {
+        "original": "盈利",
+        "replacement": "利润",
+        "reason": "语义错误：‘非盈利下属机构’→‘非利润下属机构’；评审判定不可接受"
+      }
+    ],
+    "result": "1100 条；已知不可接受替换已剔除，其余保留 a4 评审的边界项（如 现在→今天、愿意→希望）"
+  },
+  "previous_version": {
+    "dictionary_version": "general-v1",
+    "entries": 10,
+    "sha256": "cb5bbd50b70ce650fb000ed3dd314b943d41c013c8a306e1be778a668a9d212b",
+    "backup_path": "configs/general_synonyms-v1.json",
+    "rollback": "把 configs/general_synonyms-v1.json 复制回 configs/general_synonyms.json 并还原 config.yaml/processor.py 的版本号即可"
+  },
+  "usage_note": "候选增强仍为 pending_qc / delivery_eligible=false，必须回流 14–18；词库商用许可未确认，交付前需业务/法务确认，不得把词林数据打包进交付物（仅词表 JSON 随算子配置）。"
+}

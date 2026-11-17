@@ -1,0 +1,52 @@
+# 算子 25「管理人工复核任务」部署配置
+# 对应表1 #25（第 7 环节「人工抽检复核」，stageId=S7；V4.2 §4.25 修正原 S5）
+#
+# 分层：
+#   - operator.* / stage_id 属于**部署身份**，不接受 /predict 覆盖；
+#   - 其余为**业务参数**，其中 trigger / max_review_count / eligible /
+#     repeat_spot_check 是表1 冻结值，配置层只做校验（必须为手动触发、必须为 2 次、
+#     必须恰为三类样本、必须不重复 #24 抽样），不提供放开开关；
+#   - enabled / auto_dispatch / manual_platform_available / require_reviewer_identity /
+#     allow_degraded 可由 /predict 的 config 或 CLI --override 覆盖。
+operator:
+  name: manual_review_task_management
+  label: 管理人工复核任务
+  number: 25
+  version: v1.0.0
+stage_id: S7
+
+# 表1 #25「手动触发；可选」：默认关闭，必须显式开启才会生成派单任务
+enabled: false
+
+# 表1 冻结：只支持手动触发
+trigger: manual
+
+# 表1 冻结：同一条最多复核 2 次，超过不再派单（第 3 次锁定，不再自动回流）
+max_review_count: 2
+
+# 表1 冻结：仅三类样本生成本算子任务
+eligible:
+  - uncertain
+  - sampling_dispute
+  - returned
+
+# 表1 冻结：不重复 #24 抽样（只消费 #24 的异议/存疑，不重新抽样）
+repeat_spot_check: false
+
+# 触发后是否真的生成派单任务；关闭时只登记队列统计，不派单、不改记录结论
+auto_dispatch: true
+
+# 人工复核平台是否已接入。未接入（false）时派单状态只能是 waiting_manual，
+# 队列记录保持待人工，绝不假定「平台已受理」或「人工已确认」
+manual_platform_available: false
+
+# 人工结论必须携带复核人身份，否则按待人工处理
+require_reviewer_identity: true
+
+# 允许显式降级（人工平台未接入时继续并标记 status=waiting_manual）
+allow_degraded: false
+
+# 阶段末传输格式（表1 / DEVELOPMENT_PLAN §3）
+transport:
+  format: crossmodal-files-v1
+  max_response_bytes: 67108864

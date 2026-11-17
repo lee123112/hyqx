@@ -1,0 +1,13 @@
+# 表1 v4.1：兜底默认关闭；业务范围由schema严格限制。
+operator:
+  name: audio_standardization
+  version: v1.1.0
+stage_id: S2
+sample_rate: 16000
+channels: 1
+pcm_bits: 16
+max_duration_seconds: 60
+ffmpeg_path: ffmpeg
+ffprobe_path: ffprobe
+process_timeout_seconds: 30
+enabled: false

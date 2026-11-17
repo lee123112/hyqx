@@ -1,0 +1,17 @@
+.git/
+.env
+.env.*
+!.env.example
+.venv/
+**/__pycache__/
+**/*.pyc
+**/node_modules/
+runtime/
+**/*.log
+交付验收.json
+交付文件清单.json
+frontend/
+docs/
+deploy/
+docker-compose.yml
+README.md

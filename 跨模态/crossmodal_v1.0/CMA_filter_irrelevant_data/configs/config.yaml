@@ -1,0 +1,10 @@
+operator: data_prescreen
+operator_version: v1.1.0
+enabled: true
+
+prescreen:
+  # 表1：只比较已有标题/Alt/图注/描述；文件名和标签不参与
+  video_audio_max_duration_diff_seconds: 7.0 # 规格建议 1–5 秒；2026-10-22 试验值 7（业务方要求），代码允许 1–10，待业务确认后定稿
+
+io:
+  output_root: output

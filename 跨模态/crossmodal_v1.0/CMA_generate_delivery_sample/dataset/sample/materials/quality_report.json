@@ -1,0 +1,15 @@
+{
+  "format": "crossmodal-quality-report-v1",
+  "operator": "alignment_qc",
+  "report_id": "qr-demo-0001",
+  "status": "written_back",
+  "written_back": true,
+  "checks": {
+    "openable": true,
+    "records_match_manifest": true
+  },
+  "writeback": {
+    "completed": true,
+    "operator": "#24"
+  }
+}

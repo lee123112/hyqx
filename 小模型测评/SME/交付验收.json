@@ -1,0 +1,233 @@
+{
+  "date": "2026-11-12",
+  "release": "SME-2026.11.12-server",
+  "scope": "Delivered files; real Uvicorn HTTP on 17024 with isolated Windows Python3.11 runtime. Docker/Linux/Nginx execution NOT performed.",
+  "entryContainer": "op-pre-eva",
+  "httpPort": 17024,
+  "internalBackendContainer": "op-pre-eva-backend",
+  "dockerExecution": "not_available_on_build_host",
+  "composeAndProxyStaticChecks": "passed",
+  "shellSyntax": "validated separately with Git Bash -n",
+  "operators": 5,
+  "apiKeyGuard": "passed",
+  "freshDatabaseTaskCount": 0,
+  "businessImports": 9,
+  "total": 12,
+  "passed": 12,
+  "failed": 0,
+  "textEngineBackend": "operator-private BERT; SME_TEXT_FAST=0",
+  "privateClipForward": "passed",
+  "privateModelFiles": 47,
+  "sourceCopiesHashMatched": 213,
+  "inputZips": 12,
+  "trainingModelPaths": "operator-private defaults; no absolute model fields",
+  "downloadAndRemove": "all 12 output ZIPs verified after removeFile",
+  "forbiddenFiles": [],
+  "durationSeconds": 164.312,
+  "results": [
+    {
+      "caseId": "import-benchmark",
+      "uniqueId": "HANDOFF-import-benchmark-f854ff2a",
+      "method": "导入已有指标",
+      "type": "benchmark",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 10
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-import-benchmark-f854ff2a",
+      "rowsIn": 2,
+      "rowsOut": 2,
+      "durationSeconds": 0.375
+    },
+    {
+      "caseId": "import-image",
+      "uniqueId": "HANDOFF-import-image-252841ad",
+      "method": "导入已有指标",
+      "type": "image",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 13
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-import-image-252841ad",
+      "rowsIn": 3,
+      "rowsOut": 3,
+      "durationSeconds": 0.5
+    },
+    {
+      "caseId": "import-text",
+      "uniqueId": "HANDOFF-import-text-d3594e90",
+      "method": "导入已有指标",
+      "type": "text",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 10
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-import-text-d3594e90",
+      "rowsIn": 3,
+      "rowsOut": 3,
+      "durationSeconds": 0.39
+    },
+    {
+      "caseId": "import-video",
+      "uniqueId": "HANDOFF-import-video-a57fdc08",
+      "method": "导入已有指标",
+      "type": "video",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 12
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-import-video-a57fdc08",
+      "rowsIn": 2,
+      "rowsOut": 2,
+      "durationSeconds": 0.485
+    },
+    {
+      "caseId": "import-audio",
+      "uniqueId": "HANDOFF-import-audio-87dbcc2d",
+      "method": "导入已有指标",
+      "type": "audio",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 18
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-import-audio-87dbcc2d",
+      "rowsIn": 8,
+      "rowsOut": 8,
+      "durationSeconds": 1.047
+    },
+    {
+      "caseId": "engine-image",
+      "uniqueId": "HANDOFF-engine-image-0aadfbec",
+      "method": "引擎测量",
+      "type": "image",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 13
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-engine-image-0aadfbec",
+      "rowsIn": 3,
+      "rowsOut": 3,
+      "durationSeconds": 0.843
+    },
+    {
+      "caseId": "engine-text",
+      "uniqueId": "HANDOFF-engine-text-ab95175c",
+      "method": "引擎测量",
+      "type": "text",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 10
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-engine-text-ab95175c",
+      "rowsIn": 6,
+      "rowsOut": 1,
+      "durationSeconds": 22.922
+    },
+    {
+      "caseId": "engine-video",
+      "uniqueId": "HANDOFF-engine-video-52385ac5",
+      "method": "引擎测量",
+      "type": "video",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 12
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-engine-video-52385ac5",
+      "rowsIn": 2,
+      "rowsOut": 2,
+      "durationSeconds": 1.172
+    },
+    {
+      "caseId": "engine-audio",
+      "uniqueId": "HANDOFF-engine-audio-67804751",
+      "method": "引擎测量",
+      "type": "audio",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 18
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-engine-audio-67804751",
+      "rowsIn": 8,
+      "rowsOut": 8,
+      "durationSeconds": 25.047
+    },
+    {
+      "caseId": "training-text",
+      "uniqueId": "HANDOFF-training-text-133902a9",
+      "method": "训练对比协议",
+      "type": "text",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 15
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-training-text-133902a9",
+      "rowsIn": 4,
+      "rowsOut": 4,
+      "durationSeconds": 8.391
+    },
+    {
+      "caseId": "training-image",
+      "uniqueId": "HANDOFF-training-image-6c0a8b6d",
+      "method": "训练对比协议",
+      "type": "image",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 71
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-training-image-6c0a8b6d",
+      "rowsIn": 20,
+      "rowsOut": 20,
+      "durationSeconds": 6.125
+    },
+    {
+      "caseId": "training-audio",
+      "uniqueId": "HANDOFF-training-audio-5f51e5bb",
+      "method": "训练对比协议",
+      "type": "audio",
+      "status": "passed",
+      "outputVerification": {
+        "crc": "passed",
+        "memberHashes": "passed",
+        "files": 20
+      },
+      "workspaceRemoved": true,
+      "taskId": "HANDOFF-training-audio-5f51e5bb",
+      "rowsIn": 2,
+      "rowsOut": 2,
+      "durationSeconds": 14.203
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+# 03 噪声混音加扰（avp_mix_noise）
+# 所有阈值/系数必须来自本文件，processor.py 里不得出现魔法数字。
+
+operator:
+  id: avp_mix_noise
+  name: 噪声混音加扰
+  tag: 噪声混音
+  version: v1.0.0
+  number: 3
+
+io:
+  # 输入接口：02 算子的标准语料表（也接受目录，自动找同名文件）
+  input_filename: "002_std.jsonl"
+  # 混音产物目录（相对 ctx.out_dir）
+  output_subdir: "003_audio"
+  max_listed: 200
+
+audio:
+  # 「全静音」判定阈值（RMS）；静音语音不参与混音，计入 rejects
+  silence_rms: 0.00001
+
+mix:
+  # 加扰维度白名单：只做噪声 / 环境音；口音不是加扰维度，不在此列
+  allowed_dimensions: ["noise", "env"]
+  # 素材根目录（相对算子包根目录）：weight/assets/<dimension>/<取值>.wav
+  assets_root: "weight/assets"
+  asset_ext: ".wav"
+  # SNR 区间允许范围（dB）：params.snr_db 必须落在其中；业务只做区间不越界
+  snr_min_db: -5.0
+  snr_max_db: 40.0
+  # 目标 SNR 随机取值的保留小数位
+  snr_decimals: 1
+  # 实测 SNR 与目标 SNR 的误差上限（dB）；超过即记为违规，批次 partial
+  max_snr_error_db: 0.5
+  # per_value 缺省：false = 每条样本随机取一个取值
+  per_value_default: false
+  default_seed: 20261102

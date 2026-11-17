@@ -1,0 +1,22 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "records"
+    },
+    {
+      "path": "materials/quality_report.json",
+      "role": "materials"
+    },
+    {
+      "path": "materials/sampling_conclusion.json",
+      "role": "materials"
+    },
+    {
+      "path": "materials/isolation_list.jsonl",
+      "role": "materials"
+    }
+  ]
+}

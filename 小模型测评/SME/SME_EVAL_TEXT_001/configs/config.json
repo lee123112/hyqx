@@ -1,0 +1,49 @@
+{
+  "operatorId": "SME_eval_text",
+  "package": "SME_EVAL_TEXT_001",
+  "type": "text",
+  "config": {
+    "thresholds": {
+      "accuracy": 80,
+      "f1": 80,
+      "lossCv": 0.2
+    },
+    "weights": [
+      25,
+      25,
+      20,
+      15,
+      15
+    ],
+    "grades": {
+      "AA": 95,
+      "A": 85,
+      "B": 70
+    },
+    "highValue": false
+  },
+  "engine": {
+    "module": "app.engines.text.TextEngine",
+    "mode": "demo|measured"
+  },
+  "protocol": {
+    "proxyModel": "bert-base-chinese",
+    "parameters": "102M",
+    "trainingTask": "masked-language-model",
+    "maskRate": 0.15,
+    "maskScheme": "80/10/10",
+    "learningRate": 2e-05,
+    "downstream": {
+      "tnews": "accuracy",
+      "cluener": "entityF1",
+      "afqmc": "accuracy"
+    },
+    "dataRule": "D_ours/D_ref 同 token 预算；任务 train 与固定评测集 E 不重叠"
+  },
+  "modelAssets": {
+    "root": "models",
+    "manifest": "models/manifest.json",
+    "packaged": true,
+    "sharedWeightRequired": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "media/pass_ok.png",
+      "role": "image"
+    },
+    {
+      "path": "media/pass_ok.wav",
+      "role": "audio"
+    },
+    {
+      "path": "media/origin_broken.png",
+      "role": "image"
+    },
+    {
+      "path": "media/sample_bad.png",
+      "role": "image"
+    }
+  ],
+  "notes": "算子 21 样例：模拟上游标签/工序/动作/去向/时间/批次/重跑次数台账"
+}

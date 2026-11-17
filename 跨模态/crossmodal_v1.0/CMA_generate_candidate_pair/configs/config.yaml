@@ -1,0 +1,22 @@
+# 算子 #11 生成候选配对 配置（表1 v4.1 第 11 行口径）
+# 表1 明确：本工具默认开启且不可关闭，面板上不出现模型选项。
+operator: generate_candidate_pairs
+operator_version: v1.0.0
+stage_id: S3
+
+pairing:
+  # 【模板上的总开关】默认开，不能关（置 false 会被配置校验拒绝）
+  enabled: true
+  # 1. 优先用什么配对：同一个来源编号(source) / 时间重叠(time_overlap) / 关键词至少2个相同(keywords)
+  #    系统按「来源 → 时间 → 关键词」顺序尝试，配上就停，不同时用三套证据
+  priority: source
+  # 2. 关键词至少相同几个：默认 2，可选 2–5；只在前两级都配不上时才用
+  keyword_min_overlap: 2
+  # 三级证据的时间重叠下限（秒）；时间差必须为正且达到该下限才算时间重叠
+  time_min_overlap_seconds: 0.0
+  # 单个播种记录一次最多拆分出多少条一对一（安全上限，超出部分进异常清单，不静默丢弃）
+  max_pairs_per_group: 200
+
+io:
+  # CLI 默认输出根目录；HTTP 由 OUTPUT_DIR 覆盖
+  output_root: output

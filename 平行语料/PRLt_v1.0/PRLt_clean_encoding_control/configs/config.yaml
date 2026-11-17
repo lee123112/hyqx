@@ -1,0 +1,10 @@
+# 算子3：编码与控制字符清理配置
+operator:
+  name: encoding_cleanup
+  version: v1.0.0
+
+# 按顺序尝试，禁止 replacement 解码，避免静默伪造文本
+input_encodings: [utf-8, gb18030, gbk]
+
+# 清理 C0/C1/DEL 控制字符，保留制表符、换行和回车
+remove_control_chars: true

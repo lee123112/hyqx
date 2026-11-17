@@ -1,0 +1,61 @@
+# 算子 #17 标注局部对整体 —— 运行配置
+# 口径来源：DEVELOPMENT_PLAN.md 第 1/3 节 + 表1 #17 行 + TECHNICAL_DESIGN.md。
+# `operator.settings` 是表1 冻结设置的留档（不参与运行期决策，仅供审计比对）。
+
+operator:
+  number: 17
+  name: 标注局部对整体
+  version: v1.0.0
+  settings:
+    - "enabled=false"
+    - "detector_backend=auto"
+    - "model=YOLOv8n"
+    - "classes=general"
+    - "video_timestamp_source=transcript"
+
+# 表1「流程环节：3 数据加工」→ 阶段 S3（与 demo 既有 S3 算子一致）
+stage_id: S3
+
+# 表1 #17：默认关闭。关闭时不加载模型、不产生任何框或时间戳、不隔离，样本原样透传。
+enabled: false
+
+# 表1 #17：模型/后端 = YOLOv8n（仅通用类别预填；不得部署 Grounding DINO、不训练专用检测模型）
+detector_backend: auto
+model_name: YOLOv8n
+
+detector:
+  # 只从本地路径加载权重，绝不联网下载。
+  # 相对路径按 MODEL_ROOT 解析（默认算子本地 weight，即 <本算子目录>/weight，
+  # 见 weight/README.md）；可写文件 YOLOv8n/yolov8n.pt，也可写目录 YOLOv8n/（自动取其中的 yolov8n.pt）。
+  # null = 本地未配置权重 → 按 allow_degraded 显式降级（零框、全部待人工）。
+  weights: YOLOv8n/yolov8n.pt
+  device: cpu
+  conf_threshold: 0.25
+  iou_threshold: 0.45
+  max_boxes: 50
+  image_size: 640
+  # 表1 冻结：只预填官方通用类别；专用设备不预填，由标注员手画。
+  general_classes_only: true
+
+# 模型/权重不可用时的处置：
+#   true  = 显式降级（detector.degraded=true、零框、记录进入 pending_manual_review）
+#   false = 显式失败（返回 code=1，不产出任何结果）
+allow_degraded: true
+
+# 输入为「已有整体对齐结论」的样本；整体对齐给出否定结论时本算子判 not_applicable（留样本池、不隔离）。
+require_whole_aligned: true
+
+# 表1 冻结：音视频沿用转写起止时间预填。
+video_timestamp_source: transcript
+
+# 截断与上限（只影响截断长度与容量上限，不改变判定口径）
+max_text_chars: 500
+max_time_ranges: 50
+max_images_per_record: 4
+# 无图视频：每条记录最多对多少张 #6 关键帧做通用类别检测（框带 frame_path 供 #18 裁图）。
+# 0 不允许；超出部分记 frames_over_limit，不隔离记录。
+max_frames_per_record: 5
+
+transport:
+  format: crossmodal-files-v1
+  max_response_bytes: 67108864

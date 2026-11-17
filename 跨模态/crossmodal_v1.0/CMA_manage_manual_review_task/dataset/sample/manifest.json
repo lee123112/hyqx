@@ -1,0 +1,14 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "review_queue_with_conclusions"
+    },
+    {
+      "path": "demo_pending.jsonl",
+      "role": "review_queue_without_conclusions"
+    }
+  ]
+}

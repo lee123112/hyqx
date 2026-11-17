@@ -1,0 +1,8 @@
+﻿{
+    "source":  "G:\\HYQX\\算子\\语音加扰\\音频转文本知识库相似度匹算子\\models\\paraformer-zh",
+    "model":  "SeACoParaformer-large (FunASR)",
+    "modelHub":  "iic/speech_seaco_paraformer_large_asr_nat-zh-cn-16k-common-vocab8404-pytorch",
+    "license":  "Apache License 2.0 (see README.md in this directory)",
+    "copiedAt":  "2026-11-02T17:34:21.8985748+08:00",
+    "note":  "Copied from the local voice-scramble operator; not downloaded during this copy."
+}

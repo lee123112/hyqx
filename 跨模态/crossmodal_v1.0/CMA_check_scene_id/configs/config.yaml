@@ -1,0 +1,33 @@
+# 算子 #02（核验场景编号）部署配置
+# 表1 冻结口径：本算子**无模型、无权重、无外部服务**，纯规则核验。
+# 结构：operator（身份） / stage_id / enabled / 表1 三个页面控件 / 只读冻结项 / transport
+#
+# 可被请求 config 覆盖的业务参数只有三个（表1 页面控件）：
+#   enabled / scene_id_source / min_modalities
+# 其余（operator、stage_id、bind_once、device_control、transport）为只读项，
+# 请求携带同名键会直接配置失败（见 utils/schemas.py）。
+
+operator:
+  name: scene_id_verification      # 算子正式名（英文，落台账与血缘）
+  version: v1.0.0
+
+stage_id: S1                       # 阶段归属：表1 环节「输入核验」（#1–#3）
+
+# ---- 表1 页面控件 1：模板上的总开关（默认关；配对集任务不执行，融合集任务打开）----
+enabled: false
+
+# ---- 表1 页面控件 2：场景编号用谁的 ----
+# platform = 沿用采集平台已有编号（默认显示）
+# generate = 本产线补一个编号（只绑定一次，确定性派生，不复用不重绑）
+scene_id_source: platform
+
+# ---- 表1 页面控件 3：同一场景至少几种模态（默认 2；可选 2–4）----
+min_modalities: 2
+
+# ---- 表1 只读冻结项（请求不可覆盖，改值会直接配置失败）----
+bind_once: true                    # 无编号时补的编号只绑定一次
+device_control: read_only          # 设备并发与故障切换只读采集平台结果，不调度设备
+
+transport:
+  format: crossmodal-files-v1       # demo 阶段传输约定（非甲方正式协议）
+  max_response_bytes: 67108864      # 阶段末文件内容对象字节上限（64MiB）

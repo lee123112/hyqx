@@ -1,0 +1,22 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+PyYAML>=6.0
+python-multipart>=0.0.9
+pytest>=8.0
+httpx>=0.27
+
+# 模型算子在提供本地权重时需要；规则算子不依赖它们。
+# 正式版模型：Qwen3-Embedding-0.6B、mDeBERTa-v3-base、Qwen3.5-2B（本地）；
+# 回译/跨语言合成调用硅基流动 Qwen3.5-9B（仅需网络与 SILICONFLOW_API_KEY）。
+# transformers>=5.22 才能加载 Qwen3.5 的 qwen3_5 架构；torch>=2.6 为 transformers 5 的要求。
+transformers>=5.22,<6
+sentence-transformers>=6.2
+torch>=2.6
+tokenizers>=0.23.1
+safetensors>=0.8.0
+accelerate>=1.10
+# mDeBERTa-v3-base 的 tokenizer 需要 sentencepiece；0.2.2 在 Windows/py3.11 有 DLL 崩溃，锁 0.2.1。
+sentencepiece==0.2.1
+# Qwen3.5 tokenizer 在 transformers 5 下走 tiktoken 词表。
+tiktoken>=0.5

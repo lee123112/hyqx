@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "operator": "SME_EVAL_AUDIO_001",
+  "files": [
+    {
+      "path": "whisper-base/added_tokens.json",
+      "bytes": 34604,
+      "sha256": "9715fd2243b6f06a5858b5e32950d2853f73dd5bc201aafcf76f5082a2d8acd1"
+    },
+    {
+      "path": "whisper-base/config.json",
+      "bytes": 1983,
+      "sha256": "a153c53883a6799b6f056b4a8d1a515c9926d03994682ba88a7616618d7da0c1"
+    },
+    {
+      "path": "whisper-base/generation_config.json",
+      "bytes": 3807,
+      "sha256": "444b3f636d2fff89dd9ecf549e2a085b61f7ff0fa0246d4628bac6a3b8cc9ba4"
+    },
+    {
+      "path": "whisper-base/merges.txt",
+      "bytes": 493869,
+      "sha256": "2df2990a395e35e8dfbc7511e08c12d56018d8d04691e0133e5d63b21e154dc6"
+    },
+    {
+      "path": "whisper-base/model.safetensors",
+      "bytes": 290403936,
+      "sha256": "07cadb9f25677c8d50df603e66a98fbd842cce45047139baeb16e6219a1e807b"
+    },
+    {
+      "path": "whisper-base/normalizer.json",
+      "bytes": 52666,
+      "sha256": "bf1c507dc8724ca9cf9903640dacfb69dae2f00edee4f21ceba106a7392f26dd"
+    },
+    {
+      "path": "whisper-base/preprocessor_config.json",
+      "bytes": 184990,
+      "sha256": "9b5cd03a36fbb8a627c64d98a5b5b126ead95a77720723944487311f0110b666"
+    },
+    {
+      "path": "whisper-base/special_tokens_map.json",
+      "bytes": 2194,
+      "sha256": "e67ae3a0aaa99abcd9f187138e12db1f65c16a14761c50ef10eef2c174a7a691"
+    },
+    {
+      "path": "whisper-base/tokenizer.json",
+      "bytes": 2480466,
+      "sha256": "27fc476bfe7f17299480be2273fc0608e4d5a99aba2ab5dec5374b4482d1a566"
+    },
+    {
+      "path": "whisper-base/tokenizer_config.json",
+      "bytes": 282683,
+      "sha256": "2a4c4281cf9f51ac6ccc406fdc711a087afe6530f671fa7b80953edc498275ce"
+    },
+    {
+      "path": "whisper-base/vocab.json",
+      "bytes": 835550,
+      "sha256": "8f680bba319e01a653d2e8a5dbc17a9157179e0576e6ce74ce0c06356c6e24f9"
+    },
+    {
+      "path": "whisper-small/config.json",
+      "bytes": 1967,
+      "sha256": "e6a2b489da1b5aed65a8eb8d1e7466fa867ad5643a8bc138ba708bd56b2875c4"
+    },
+    {
+      "path": "whisper-small/generation_config.json",
+      "bytes": 3868,
+      "sha256": "71565b8ef50d0bf7a1193ed4bbed195b94e70c18894d81bba2f1233dcec3ab53"
+    },
+    {
+      "path": "whisper-small/merges.txt",
+      "bytes": 493869,
+      "sha256": "2df2990a395e35e8dfbc7511e08c12d56018d8d04691e0133e5d63b21e154dc6"
+    },
+    {
+      "path": "whisper-small/model.safetensors",
+      "bytes": 966995080,
+      "sha256": "1d7734884874f1a1513ed9aa760a4f8e97aaa02fd6d93a3a85d27b2ae9ca596b"
+    },
+    {
+      "path": "whisper-small/normalizer.json",
+      "bytes": 52666,
+      "sha256": "bf1c507dc8724ca9cf9903640dacfb69dae2f00edee4f21ceba106a7392f26dd"
+    },
+    {
+      "path": "whisper-small/preprocessor_config.json",
+      "bytes": 184990,
+      "sha256": "9b5cd03a36fbb8a627c64d98a5b5b126ead95a77720723944487311f0110b666"
+    },
+    {
+      "path": "whisper-small/special_tokens_map.json",
+      "bytes": 2194,
+      "sha256": "e67ae3a0aaa99abcd9f187138e12db1f65c16a14761c50ef10eef2c174a7a691"
+    },
+    {
+      "path": "whisper-small/tokenizer.json",
+      "bytes": 2480466,
+      "sha256": "27fc476bfe7f17299480be2273fc0608e4d5a99aba2ab5dec5374b4482d1a566"
+    },
+    {
+      "path": "whisper-small/tokenizer_config.json",
+      "bytes": 282683,
+      "sha256": "2a4c4281cf9f51ac6ccc406fdc711a087afe6530f671fa7b80953edc498275ce"
+    },
+    {
+      "path": "whisper-small/vocab.json",
+      "bytes": 835550,
+      "sha256": "8f680bba319e01a653d2e8a5dbc17a9157179e0576e6ce74ce0c06356c6e24f9"
+    },
+    {
+      "path": "paraformer-zh/.mdl",
+      "bytes": 99,
+      "sha256": "a4bd8eb91a3e3c0dcf257a82573c2f1f8f35187c97dc702f6847e7eaaa6c4e8a"
+    },
+    {
+      "path": "paraformer-zh/.msc",
+      "bytes": 967,
+      "sha256": "c1dd10e5f9df3b590bda0b75a181b54ca0832859dae748a36c7070d1b33ff72d"
+    },
+    {
+      "path": "paraformer-zh/.mv",
+      "bytes": 36,
+      "sha256": "8585e30db06991cfd21efcbf73e0dc4d9157cea09c4e759ee38febaf8fc6f18f"
+    },
+    {
+      "path": "paraformer-zh/am.mvn",
+      "bytes": 11203,
+      "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+    },
+    {
+      "path": "paraformer-zh/asr_example_hotword.wav",
+      "bytes": 253642,
+      "sha256": "51792bc95be33075c1a8abb9afb76ad9f72943e84cd723cc8825b2678799b004"
+    },
+    {
+      "path": "paraformer-zh/config.yaml",
+      "bytes": 3477,
+      "sha256": "6602efa95e4c7248e1d1030f7ff454a3c9af0f57c335ed87f35260cd7faec35d"
+    },
+    {
+      "path": "paraformer-zh/configuration.json",
+      "bytes": 478,
+      "sha256": "1acac324430b5a4680ef5ee2947575443ab2039a92c8a0551665f6bc9a606b41"
+    },
+    {
+      "path": "paraformer-zh/example/asr_example.wav",
+      "bytes": 144770,
+      "sha256": "2ffa478de2cd570dd54e8762008cd6bbde9871fd79757f1cdbbec7d6b7b49274"
+    },
+    {
+      "path": "paraformer-zh/example/hotword.txt",
+      "bytes": 7,
+      "sha256": "c16dbde81120bb4be3a3a0838ec692da0ab4f0b6503aea9348bf318186e5a452"
+    },
+    {
+      "path": "paraformer-zh/fig/res.png",
+      "bytes": 196655,
+      "sha256": "1f59ebc6a86733896b2b84110e2aae5625754382762bf1324e017d89a152c2fb"
+    },
+    {
+      "path": "paraformer-zh/fig/seaco.png",
+      "bytes": 170780,
+      "sha256": "6886864eb6bcc6487a17111b5e3353bd72e7c78fda98c27cf47faa35eafbdcaf"
+    },
+    {
+      "path": "paraformer-zh/model.pt",
+      "bytes": 989763045,
+      "sha256": "3d491689244ec5dfbf9170ef3827c358aa10f1f20e42a7c59e15e688647946d1"
+    },
+    {
+      "path": "paraformer-zh/README.md",
+      "bytes": 12899,
+      "sha256": "44723036963d5611d6ae0aa4eea82ba491a794cfc146cd004271a0bf27254d8d"
+    },
+    {
+      "path": "paraformer-zh/seg_dict",
+      "bytes": 8287834,
+      "sha256": "59a2ef803a3f1648ad03a2e1480db1c1ee0c0d7dc4ef4dbd16cea33944329022"
+    },
+    {
+      "path": "paraformer-zh/SOURCE.json",
+      "bytes": 497,
+      "sha256": "9e4445236b7024e48594e48655d08d91b1d27a4ddaacd4ddab041cf192854c99"
+    },
+    {
+      "path": "paraformer-zh/tokens.json",
+      "bytes": 93676,
+      "sha256": "2b20c2b12572d682afff84ce1c8d560f67b8b32a4c1f21567411d141ed352127"
+    }
+  ]
+}

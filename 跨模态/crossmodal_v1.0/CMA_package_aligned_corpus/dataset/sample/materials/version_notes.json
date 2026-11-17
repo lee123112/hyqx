@@ -1,0 +1,13 @@
+{
+  "format": "crossmodal-version-notes-v1",
+  "dataset_version": "v1.0.0",
+  "created_at": "2026-10-08",
+  "enabled_routes": [
+    "image_text",
+    "audio_text",
+    "video_text"
+  ],
+  "annotation_granularity": "whole",
+  "token_template": "<image>…<image> / <audio>…<audio> / <video>…<video>",
+  "notes": "启用路线与标注粒度由本文件声明；交付状态由 23 号算子按『训练文件已生成 + 质量报告已写回 + 抽检已写回』三项只读门禁判定。"
+}

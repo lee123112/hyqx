@@ -1,0 +1,40 @@
+# 算子 10：核对输入对象准入 —— 部署默认配置
+# 表1 只读项（授权要求“必须是可训练”、格式白名单）不能通过 /predict 的 config 改写。
+# 本算子无模型与权重（纯规则准入核对），因此不存在权重路径/后端选择等模型字段。
+operator:
+  name: input_admission
+  version: v1.0.0
+
+# 阶段：表1 第 3 环节“数据加工”（demo 五阶段中属“跨模态数据对齐标注”）
+stage_id: S3
+
+# 表1 参数项 1：至少要有几种模态。默认 2，可填 2 到 4
+min_modalities: 2
+
+# 描述有效性下限：短于该字数视为没有有效描述，退回 #9（对齐表1 #9 默认 5 字）
+min_description_chars: 5
+
+# 描述有效性上限：超出说明 #9 未按 500 字截断，同样退回 #9
+max_description_chars: 500
+
+# 单条允许退回重跑次数上限；达到上限的下一次进入样本隔离库并锁定（规则 §2.3）
+max_return_count: 2
+
+# 表1 #10 要求核对“来源ID、批次号”是否能追溯
+require_source_and_batch: true
+
+# 文件可打开检查模式：
+#   header = 纯 Python 头签名 + 空文件 + 扩展名白名单（默认，无第三方依赖）
+#   decode = 叠加真实解码（Pillow/OpenCV/标准库 wave），只判断能否打开，不做画质评分
+file_check_mode: header
+
+# decode 模式下解码器缺失时是否允许降级为头签名：
+#   false → 结构化失败（不伪造“已解码”）；true → 标记 header_only 并把运行状态置为 degraded
+allow_degraded: false
+
+# 表1 参数项 2：授权要求（下拉框只读，固定“必须是可训练”）
+required_license: 可训练
+# 上游授权字段的等价取值（归一化用，不改变“必须可训练”的口径）
+trainable_license_values:
+  - 可训练
+  - trainable

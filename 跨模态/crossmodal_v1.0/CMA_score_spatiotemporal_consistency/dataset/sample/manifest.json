@@ -1,0 +1,22 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "media/tl_ok.json",
+      "role": "media"
+    },
+    {
+      "path": "media/tl_broken.json",
+      "role": "media"
+    },
+    {
+      "path": "media/subtitles.srt",
+      "role": "media"
+    }
+  ]
+}

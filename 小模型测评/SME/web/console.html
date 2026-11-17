@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小模型测评 · 联调台</title>
+<style>
+  :root{--bg:#f5f7fb;--card:#fff;--line:#dce3ed;--text:#26364d;--muted:#6c7b90;
+        --blue:#2b6cb0;--green:#23875f;--amber:#a66a12;--red:#b03a3a}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font:14px/1.6 -apple-system,BlinkMacSystemFont,"Microsoft YaHei",sans-serif}
+  header{display:flex;align-items:baseline;gap:16px;padding:18px 24px;
+         background:#fff;border-bottom:1px solid var(--line)}
+  header h1{font-size:18px;margin:0}
+  header .muted{color:var(--muted);font-size:12px}
+  main{max-width:1240px;margin:0 auto;padding:18px 24px 60px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;
+         padding:16px;margin-bottom:18px}
+  .panel h2{font-size:15px;margin:0 0 12px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+  .row .spacer{flex:1}
+  button,select,input{border:1px solid var(--line);border-radius:6px;background:#fff;
+        color:var(--text);padding:6px 10px;font:inherit}
+  button{cursor:pointer}
+  button:hover{border-color:var(--blue);color:var(--blue)}
+  button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  button.primary:hover{opacity:.9;color:#fff}
+  button.danger{color:var(--red);border-color:#e3bcbc}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;border-bottom:1px solid var(--line);padding:8px;vertical-align:top}
+  th{background:#f4f6fa;color:var(--muted);font-weight:600}
+  tr.clickable{cursor:pointer}
+  tr.clickable:hover{background:#f8fafc}
+  .tag{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;
+       background:#eef2f8;color:#40506b}
+  .tag.running{background:#e6f0fb;color:var(--blue)}
+  .tag.completed{background:#e7f5ee;color:var(--green)}
+  .tag.paused{background:#fdf3e3;color:var(--amber)}
+  .tag.failed{background:#fbeaea;color:var(--red)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .card{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fcfdff}
+  .muted{color:var(--muted)}
+  pre{background:#0f172a;color:#dbe7ff;border-radius:8px;padding:12px;overflow:auto;
+      max-height:420px;font:12px/1.55 Consolas,"Courier New",monospace;white-space:pre-wrap}
+  .log{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:8px;
+       padding:8px 10px;background:#fbfcfe;font:12px/1.6 Consolas,monospace}
+  .log div{display:flex;gap:10px}
+  .log time{color:var(--muted);white-space:nowrap}
+  .feedback-item{border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+         margin-bottom:10px;background:#fcfdff}
+  textarea{width:100%;min-height:56px;border:1px solid var(--line);border-radius:6px;
+           padding:6px 8px;font:inherit;resize:vertical}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .toast{position:fixed;right:20px;bottom:20px;background:#26364d;color:#fff;
+         padding:10px 16px;border-radius:8px;opacity:0;transition:.25s;pointer-events:none}
+  .toast.show{opacity:1}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>小模型测评 · 联调台</h1>
+  <span class="muted" id="health">正在检查服务…</span>
+</header>
+<main>
+  <section class="panel" id="tasks-panel">
+    <h2>评测任务</h2>
+    <div class="row">
+      <select id="new-type">
+        <option value="text">预训练文本</option>
+        <option value="image">预训练图像</option>
+        <option value="video">预训练视频</option>
+        <option value="audio">预训练语音</option>
+        <option value="benchmark">后训练评测语料</option>
+      </select>
+      <button class="primary" id="create-demo">新建 5 类 Demo 任务</button>
+      <input id="task-keyword" placeholder="按名称或编号搜索">
+      <button id="search-tasks">搜索</button>
+      <span class="spacer"></span>
+      <button id="refresh-tasks">刷新列表</button>
+    </div>
+    <div style="overflow:auto">
+      <table>
+        <thead><tr><th>任务编号</th><th>名称</th><th>类型</th><th>模式</th><th>状态</th>
+          <th>步骤</th><th>问题</th><th>操作</th></tr></thead>
+        <tbody id="task-rows"><tr><td colspan="8" class="muted">加载中…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" id="detail-panel" hidden>
+    <h2>任务详情 <span class="muted" id="detail-id"></span></h2>
+    <div class="row">
+      <button class="primary" id="run-task">开始 / 继续</button>
+      <button id="pause-task">暂停</button>
+      <button id="resume-task">恢复</button>
+      <button id="rerun-task">创建复评</button>
+      <button id="delete-task" class="danger">删除（草稿/失败）</button>
+      <span class="spacer"></span>
+      <button id="report-json">报告 JSON</button>
+      <button id="report-md">报告 Markdown</button>
+      <button id="refresh-detail">刷新详情</button>
+      <button id="close-detail">关闭</button>
+    </div>
+    <div class="grid" id="detail-summary"></div>
+    <h2 style="margin-top:16px">任务 JSON</h2>
+    <pre id="detail-json">请选择任务</pre>
+    <h2>执行日志</h2>
+    <div class="log" id="log-box"><div class="muted">暂无日志</div></div>
+    <h2>报告预览</h2>
+    <pre id="report-box" hidden></pre>
+    <p id="report-empty" class="muted">尚未生成报告。</p>
+    <h2>反馈处理</h2>
+    <div id="feedback-box" class="muted">暂无反馈。</div>
+  </section>
+
+  <section class="panel" id="datasets-panel">
+    <h2>数据集</h2>
+    <div class="row">
+      <select id="dataset-type">
+        <option value="text">text</option><option value="image">image</option>
+        <option value="video">video</option><option value="audio">audio</option>
+        <option value="benchmark">benchmark</option>
+      </select>
+      <input id="dataset-name" placeholder="数据集名称（可选）">
+      <input id="dataset-file" type="file">
+      <button class="primary" id="import-dataset">上传导入</button>
+      <button id="dataset-template">示例清单</button>
+      <span class="spacer"></span>
+      <button id="refresh-datasets">刷新数据集</button>
+    </div>
+    <div style="overflow:auto">
+      <table>
+        <thead><tr><th>编号</th><th>名称</th><th>类型</th><th>类别</th><th>模式</th>
+          <th>样本</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody id="dataset-rows"><tr><td colspan="8" class="muted">加载中…</td></tr></tbody>
+      </table>
+    </div>
+    <pre id="dataset-detail" hidden></pre>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const API = new URLSearchParams(location.search).get("api") || "/api/v1";
+const $ = (id) => document.getElementById(id);
+const state = { tasks: [], currentId: null, logAfter: 0, pollTimer: null, feedback: [] };
+
+function esc(value) {
+  return String(value == null ? "" : value)
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+function toast(message) {
+  const box = $("toast");
+  box.textContent = message;
+  box.classList.add("show");
+  clearTimeout(box._timer);
+  box._timer = setTimeout(() => box.classList.remove("show"), 2600);
+}
+async function request(path, options) {
+  const opts = Object.assign({}, options || {});
+  if (opts.body && !(opts.body instanceof FormData)) {
+    opts.headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
+    if (typeof opts.body !== "string") opts.body = JSON.stringify(opts.body);
+  }
+  const response = await fetch(API + path, opts);
+  let body = null;
+  try { body = await response.json(); } catch (_) { body = null; }
+  if (!response.ok || !body || body.code !== 0) {
+    const message = (body && body.msg) || ("HTTP " + response.status);
+    const code = body && body.data && body.data.errorCode;
+    throw new Error(code ? code + " · " + message : message);
+  }
+  return body.data;
+}
+function statusTag(status) {
+  return '<span class="tag ' + esc(status) + '">' + esc(status) + "</span>";
+}
+
+async function loadHealth() {
+  try {
+    const data = await request("/../health");
+    $("health").textContent = "服务正常 · 算子 " + data.operatorCount + " 个 · 端口 " + data.port;
+  } catch (error) {
+    $("health").textContent = "服务不可用：" + error.message;
+  }
+}
+
+async function loadTasks() {
+  const keyword = $("task-keyword").value.trim();
+  const data = await request("/eval/tasks?page=1&pageSize=100&keyword=" + encodeURIComponent(keyword));
+  state.tasks = data.items;
+  const rows = data.items.map((task) => {
+    const issues = task.issues == null ? "—" : task.issues;
+    return '<tr class="clickable" data-task="' + esc(task.id) + '">' +
+      "<td>" + esc(task.id) + "</td><td>" + esc(task.name) + "</td>" +
+      "<td>" + esc(task.type) + "</td><td>" + esc(task.mode) + "</td>" +
+      "<td>" + statusTag(task.status) + "</td><td>" + esc(task.step) + "</td>" +
+      "<td>" + esc(issues) + "</td>" +
+      '<td><button data-action="run" data-id="' + esc(task.id) + '">运行</button> ' +
+      '<button data-action="view" data-id="' + esc(task.id) + '">详情</button></td></tr>';
+  });
+  $("task-rows").innerHTML = rows.join("") ||
+    '<tr><td colspan="8" class="muted">暂无任务</td></tr>';
+  document.querySelectorAll("#task-rows tr.clickable").forEach((row) => {
+    row.addEventListener("click", (event) => {
+      if (event.target.closest("button")) return;
+      openTask(row.dataset.task);
+    });
+  });
+  document.querySelectorAll("#task-rows button[data-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (button.dataset.action === "view") return openTask(button.dataset.id);
+      await taskAction(button.dataset.id, "run");
+    });
+  });
+}
+
+async function createDemo() {
+  const type = $("new-type").value;
+  const stamp = new Date().toLocaleTimeString("zh-CN", { hour12: false });
+  try {
+    const task = await request("/eval/tasks", {
+      method: "POST",
+      body: { name: type + " Demo · " + stamp, type, mode: "demo",
+              source: { kind: "preset" }, autoRun: true },
+    });
+    toast("已创建 " + task.id);
+    await loadTasks();
+    await openTask(task.id);
+  } catch (error) { toast("创建失败：" + error.message); }
+}
+
+async function openTask(taskId) {
+  state.currentId = taskId;
+  state.logAfter = 0;
+  state.feedback = [];
+  $("detail-panel").hidden = false;
+  $("detail-id").textContent = taskId;
+  $("report-box").hidden = true;
+  $("report-empty").hidden = false;
+  $("log-box").innerHTML = '<div class="muted">加载日志…</div>';
+  await refreshDetail();
+  await loadLogs();
+  await loadFeedback();
+  startPolling();
+}
+
+function stopPolling() {
+  if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+}
+function startPolling() {
+  stopPolling();
+  state.pollTimer = setInterval(async () => {
+    if (!state.currentId) return;
+    try {
+      const task = await request("/eval/tasks/" + encodeURIComponent(state.currentId));
+      if (["running", "paused"].includes(task.status)) {
+        renderDetail(task);
+        await loadLogs();
+      } else {
+        renderDetail(task);
+        stopPolling();
+        await loadTasks();
+      }
+    } catch (_) { stopPolling(); }
+  }, 1500);
+}
+
+async function refreshDetail() {
+  if (!state.currentId) return;
+  try {
+    const task = await request("/eval/tasks/" + encodeURIComponent(state.currentId));
+    renderDetail(task);
+    if (!["running", "paused"].includes(task.status)) stopPolling();
+  } catch (error) { toast("详情加载失败：" + error.message); }
+}
+
+function renderDetail(task) {
+  $("detail-json").textContent = JSON.stringify(task, null, 2);
+  const result = task.result || {};
+  const summary = result.summary || {};
+  const cards = [
+    ["状态", task.status], ["当前步骤", (task.step || 0) + " / 5"],
+    ["样本数", (task.samples || []).length], ["问题样本", summary.issues == null ? "—" : summary.issues],
+    ["达标样本", summary.passed == null ? "—" : summary.passed],
+    ["结论", summary.accepted == null ? "—" : (summary.accepted ? "批次指标达标" : "待优化")],
+    ["完成时间", task.completedAt || "—"], ["错误", task.error || "—"],
+  ];
+  $("detail-summary").innerHTML = cards.map(([label, value]) =>
+    '<div class="card"><div class="muted">' + esc(label) + "</div><strong>" +
+    esc(value) + "</strong></div>").join("");
+  $("run-task").disabled = task.status === "completed";
+  $("pause-task").disabled = task.status !== "running";
+  $("resume-task").disabled = task.status !== "paused";
+  $("rerun-task").disabled = task.status !== "completed";
+  $("delete-task").disabled = !["draft", "failed"].includes(task.status);
+}
+
+async function taskAction(taskId, action) {
+  try {
+    await request("/eval/tasks/" + encodeURIComponent(taskId) + "/" + action, { method: "POST" });
+    toast("操作成功：" + action);
+    if (state.currentId === taskId) {
+      await refreshDetail();
+      await loadLogs();
+      startPolling();
+    }
+    await loadTasks();
+  } catch (error) { toast("操作失败：" + error.message); }
+}
+
+async function deleteTask() {
+  if (!state.currentId) return;
+  if (!confirm("确认删除任务 " + state.currentId + "？")) return;
+  try {
+    await request("/eval/tasks/" + encodeURIComponent(state.currentId), { method: "DELETE" });
+    toast("任务已删除");
+    stopPolling();
+    state.currentId = null;
+    $("detail-panel").hidden = true;
+    await loadTasks();
+  } catch (error) { toast("删除失败：" + error.message); }
+}
+
+async function loadLogs() {
+  if (!state.currentId) return;
+  try {
+    const data = await request("/eval/tasks/" + encodeURIComponent(state.currentId) +
+      "/logs?after=" + state.logAfter);
+    if (data.items.length === 0 && state.logAfter === 0 && !data.lastSeq) {
+      $("log-box").innerHTML = '<div class="muted">暂无日志</div>';
+    }
+    const box = $("log-box");
+    if (data.items.length) {
+      if (state.logAfter === 0) box.innerHTML = "";
+      data.items.forEach((item) => {
+        const row = document.createElement("div");
+        row.innerHTML = "<time>" + esc(item.time) + "</time><span>[" + esc(item.tag) +
+          "] " + esc(item.message) + "</span>";
+        box.appendChild(row);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+    state.logAfter = data.lastSeq || state.logAfter;
+  } catch (error) { $("log-box").innerHTML = '<div class="muted">日志加载失败：' +
+    esc(error.message) + "</div>"; }
+}
+
+async function showReport(format) {
+  if (!state.currentId) return;
+  try {
+    const data = await request("/eval/tasks/" + encodeURIComponent(state.currentId) +
+      "/report?format=" + format);
+    $("report-box").hidden = false;
+    $("report-empty").hidden = true;
+    $("report-box").textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+  } catch (error) { toast("报告生成失败：" + error.message); }
+}
+
+function feedbackCard(item) {
+  const candidates = state.tasks.filter((task) =>
+    task.parentId === state.currentId && task.status === "completed");
+  const options = ['<option value="">暂不复评</option>'].concat(candidates.map((task) =>
+    '<option value="' + esc(task.id) + '"' + (item.verificationId === task.id ? " selected" : "") +
+    ">" + esc(task.name) + " · " + esc(task.mode) + "</option>")).join("");
+  return '<article class="feedback-item" data-feedback="' + esc(item.id) + '">' +
+    "<strong>" + esc(item.id) + "</strong> " + statusTag(item.status) +
+    '<p class="muted">样本 ' + esc(item.sampleId) + " · 回溯步骤 " + esc(item.sourceStep) +
+    " · " + esc(item.issue) + "</p>" +
+    '<p class="muted">建议：' + esc(item.suggestion) + "</p>" +
+    '<div class="two"><label>处理说明<textarea data-field="note">' + esc(item.note) +
+    "</textarea></label><label>调整后参数（JSON）<textarea data-field=\"parameters\">" +
+    esc(JSON.stringify(item.parametersAfter || item.parameters || {}, null, 2)) +
+    "</textarea></label></div>" +
+    '<div class="row" style="margin-top:8px"><label>复评依据 <select data-field="verification">' +
+    options + "</select></label>" +
+    '<span class="spacer"></span><button data-save-feedback="' + esc(item.id) +
+    '">保存处理结果</button></div>' +
+    '<p class="muted" data-error></p></article>';
+}
+
+async function loadFeedback() {
+  if (!state.currentId) return;
+  try {
+    if (state.tasks.length === 0 || !state.tasks.some((task) => task.parentId === state.currentId)) {
+      await loadTasks();
+    }
+    const data = await request("/eval/feedback?taskId=" +
+      encodeURIComponent(state.currentId) + "&pageSize=100");
+    state.feedback = data.items;
+    const box = $("feedback-box");
+    if (!data.items.length) {
+      box.className = "muted";
+      box.innerHTML = "暂无反馈。";
+      return;
+    }
+    box.className = "";
+    box.innerHTML = data.items.map(feedbackCard).join("");
+    box.querySelectorAll("[data-save-feedback]").forEach((button) => {
+      button.addEventListener("click", () => saveFeedback(button.dataset.saveFeedback));
+    });
+  } catch (error) { $("feedback-box").textContent = "反馈加载失败：" + error.message; }
+}
+
+async function saveFeedback(feedbackId) {
+  const card = document.querySelector('[data-feedback="' + feedbackId + '"]');
+  if (!card) return;
+  const note = card.querySelector('[data-field="note"]').value.trim();
+  const parametersText = card.querySelector('[data-field="parameters"]').value.trim();
+  const verificationId = card.querySelector('[data-field="verification"]').value;
+  const errorBox = card.querySelector("[data-error]");
+  errorBox.textContent = "";
+  let parameters = null;
+  try { parameters = JSON.parse(parametersText || "{}"); } catch (_) {
+    errorBox.textContent = "处理参数须为有效的 JSON 对象";
+    return;
+  }
+  try {
+    await request("/eval/feedback/" + encodeURIComponent(feedbackId), {
+      method: "PATCH",
+      body: { note, parametersAfter: parameters, verificationId: verificationId || null },
+    });
+    toast("反馈已保存");
+    await loadFeedback();
+  } catch (error) { errorBox.textContent = error.message; }
+}
+
+async function loadDatasets() {
+  try {
+    const data = await request("/datasets?kind=&type=");
+    const rows = data.items.map((dataset) =>
+      '<tr class="clickable" data-dataset="' + esc(dataset.kind) + "|" + esc(dataset.id) + '">' +
+      "<td>" + esc(dataset.id) + "</td><td>" + esc(dataset.name) + "</td>" +
+      "<td>" + esc(dataset.type) + "</td><td>" + esc(dataset.kind) + "</td>" +
+      "<td>" + esc(dataset.mode) + "</td><td>" + esc(dataset.count) + "</td>" +
+      "<td>" + esc(dataset.status) + "</td>" +
+      '<td><button data-delete-dataset="' + esc(dataset.kind) + "|" + esc(dataset.id) +
+      '">删除</button></td></tr>');
+    $("dataset-rows").innerHTML = rows.join("") ||
+      '<tr><td colspan="8" class="muted">暂无数据集</td></tr>';
+    document.querySelectorAll("#dataset-rows tr.clickable").forEach((row) => {
+      row.addEventListener("click", async (event) => {
+        if (event.target.closest("button")) return;
+        const [kind, id] = row.dataset.dataset.split("|");
+        try {
+          const dataset = await request("/datasets/" + encodeURIComponent(kind) + "/" +
+            encodeURIComponent(id));
+          $("dataset-detail").hidden = false;
+          $("dataset-detail").textContent = JSON.stringify(dataset, null, 2);
+        } catch (error) { toast("数据集加载失败：" + error.message); }
+      });
+    });
+    document.querySelectorAll("[data-delete-dataset]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const [kind, id] = button.dataset.deleteDataset.split("|");
+        if (!confirm("确认删除数据集 " + id + "？")) return;
+        try {
+          await request("/datasets/" + encodeURIComponent(kind) + "/" + encodeURIComponent(id),
+            { method: "DELETE" });
+          toast("数据集已删除");
+          await loadDatasets();
+        } catch (error) { toast("删除失败：" + error.message); }
+      });
+    });
+  } catch (error) {
+    $("dataset-rows").innerHTML = '<tr><td colspan="8" class="muted">加载失败：' +
+      esc(error.message) + "</td></tr>";
+  }
+}
+
+async function importDataset() {
+  const input = $("dataset-file");
+  if (!input.files.length) { toast("请先选择文件"); return; }
+  const form = new FormData();
+  form.append("file", input.files[0]);
+  form.append("type", $("dataset-type").value);
+  const name = $("dataset-name").value.trim();
+  if (name) form.append("name", name);
+  try {
+    const dataset = await request("/datasets/import", { method: "POST", body: form });
+    toast("导入成功：" + dataset.id + " · " + dataset.count + " 条");
+    await loadDatasets();
+  } catch (error) { toast("导入失败：" + error.message); }
+}
+
+async function showDatasetTemplate() {
+  try {
+    const data = await request("/datasets/template?type=" + encodeURIComponent($("dataset-type").value));
+    $("dataset-detail").hidden = false;
+    $("dataset-detail").textContent = JSON.stringify(data, null, 2);
+  } catch (error) { toast("示例加载失败：" + error.message); }
+}
+
+$("create-demo").addEventListener("click", createDemo);
+$("refresh-tasks").addEventListener("click", () => loadTasks().catch((e) => toast(e.message)));
+$("search-tasks").addEventListener("click", () => loadTasks().catch((e) => toast(e.message)));
+$("task-keyword").addEventListener("keydown", (event) => {
+  if (event.key === "Enter") loadTasks().catch((e) => toast(e.message));
+});
+$("refresh-detail").addEventListener("click", refreshDetail);
+$("run-task").addEventListener("click", () => state.currentId && taskAction(state.currentId, "run"));
+$("pause-task").addEventListener("click", () => state.currentId && taskAction(state.currentId, "pause"));
+$("resume-task").addEventListener("click", () => state.currentId && taskAction(state.currentId, "resume"));
+$("rerun-task").addEventListener("click", async () => {
+  if (!state.currentId) return;
+  try {
+    const child = await request("/eval/tasks/" + encodeURIComponent(state.currentId) + "/rerun",
+      { method: "POST", body: { autoRun: true } });
+    toast("已创建复评任务 " + child.id);
+    await loadTasks();
+    await openTask(child.id);
+  } catch (error) { toast("复评创建失败：" + error.message); }
+});
+$("delete-task").addEventListener("click", deleteTask);
+$("report-json").addEventListener("click", () => showReport("json"));
+$("report-md").addEventListener("click", () => showReport("md"));
+$("close-detail").addEventListener("click", () => { stopPolling(); $("detail-panel").hidden = true; });
+$("refresh-datasets").addEventListener("click", loadDatasets);
+$("import-dataset").addEventListener("click", importDataset);
+$("dataset-template").addEventListener("click", showDatasetTemplate);
+
+loadHealth();
+loadTasks().catch((error) => toast("任务加载失败：" + error.message));
+loadDatasets();
+</script>
+</body>
+</html>

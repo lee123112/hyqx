@@ -1,0 +1,7 @@
+{"pair_id": "pair-t11--i11", "decision": "aligned", "reviewer_id": "ann-01", "reviewed_at": "2026-10-07T09:10:00+08:00", "review_task_id": "16-sample_task-pair-t11--i11", "previous_decision": "pending_manual_review", "comment": "人工确认图文整体一致"}
+{"pair_id": "pair-t12--i12", "decision": "不对齐", "reviewer_id": "ann-02", "reviewed_at": "2026-10-07T09:12:00+08:00", "previous_decision": "auto_aligned", "comment": "图文描述与图像内容明显不符"}
+{"pair_id": "pair-t13--i13", "decision": "存疑", "reviewer_id": "ann-03", "reviewed_at": "2026-10-07T09:20:00+08:00", "previous_decision": "auto_aligned", "comment": "需要在 #25 复核"}
+{"pair_id": "pair-t14--i14", "reviewer_id": "ann-04", "reviewed_at": "2026-10-07T09:30:00+08:00", "previous_decision": "pending_manual_review", "new_description": "样例描述 14（人工改写）：一只猫在室内沙发上休息", "comment": "原描述与图像不一致，已补充改写后的描述"}
+{"pair_id": "pair-t99--i99", "decision": "aligned", "reviewer_id": "ann-05", "reviewed_at": "2026-10-07T09:40:00+08:00"}
+{"pair_id": "pair-t11--i11", "decision": "aligned", "reviewed_at": "2026-10-07T09:50:00+08:00"}
+{"pair_id": "pair-t13--i13", "decision": "aligned", "reviewer_id": "ann-03", "reviewed_at": "2026-10-07T09:00:00+08:00"}

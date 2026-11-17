@@ -1,0 +1,194 @@
+# 算子14：语义等价性检测配置
+operator:
+  name: semantic_equivalence
+  version: v1.0.0
+
+# 任务声明的语言方向；记录自带的 source_lang/target_lang 必须与之一致
+source_lang: zh
+target_lang: en
+# 上游默认产物文件名（阶段内实际路径由 /predict 的 inputFile 指定）
+input_file_name: 13_graded.jsonl
+
+# 输入准入：S/A/C 全收（或人工确认合格的记录）。
+# 规范 13 号行：C 级「留在 13_graded.jsonl，下游不放行」——C 级的处置权在算子17
+# 的 grade_not_allowed / delivery_eligible 门禁，本算子只判语义等价，不越权删记录。
+# 此前写 [S, A] 会把 C 级记录以 grade_not_eligible 直接删进 14_rejects.jsonl，
+# 下游再也看不到（本次全链路 83 条 / 9.8%）。
+allowed_grades: [S, A, C]
+grade_fields: [grade, quality_grade]
+allow_manual_confirmed: true
+manual_confirmed_fields: [manual_confirmed, human_confirmed]
+# 缺少等级字段时是否放行；默认拦截，保证交付节点可拒收无等级记录
+allow_missing_grade: false
+
+# 语义等价阈值：只对真实 semantic_score 生效；降级记录不参与该判定
+# [2026-11-02 父句级判定] 0.70 是在「逐子句打分」口径下标定的，换到父句级后整体分数上移
+# （父句语篇更完整），同一阈值会误拦；按 gold 重标定为 0.65：
+#   - gold 标注 equivalent 的父句最低 0.654、p10 0.713 —— 0.70 会拦掉 66.6 条（加权），0.65 一条不拦；
+#   - 模型文档里句级非等价的分数区间是 0.20–0.31，0.65 与之留有 0.34 余量；
+#   - 仍拦下父句分最低的 13/399 句（3.3%），保留检出能力。
+# 注意：gold 目前 0 条 not_equivalent 负例，阈值只能保证「不误拦」，检出率待补负例后重标定。
+threshold: 0.65
+
+# [2026-11-02 短单位豁免] 判定单元的源文去空白后 <= short_unit_max_chars 时，不按 0.65 硬判，
+# 改用 short_unit_threshold=0.50；其余单位仍按 0.65。0 表示关闭。
+# 依据（负例包人工标注，李升阳 2026-11-02）：
+#   - 全链路 399 个父句中 20 字以内占 22%（88 个），拦截率 14.9%，长句只有 3.1%，分数与句长 r=0.26；
+#   - 27 条真实拒绝里 8 条被人工判为等价，其中 6 条是"秘书处的说明/Note by the Secretariat"这类标题；
+#   - 把短阈值放到 0.50 后，这 11 条低分短单位里 5 条回来（真等价），4 条放错（真不等价），
+#     拒绝精确率 57.9% → 87.5%，总错误 8 → 7。
+# 注意：短单位的可判样本只有 9 条，20 字这个切点是按"标题式单位"的概念定的，不是拟合出来的；
+# 想改成 10 字只需改这个值（实测 3/4 正确，样本更小）。
+short_unit_max_chars: 20
+short_unit_threshold: 0.50
+
+# 判定单元：parent=同父句的子句拼成整句打一次分、整句判定（默认）；
+# clause=逐子句判定（旧行为，保留用于对照与回滚）。
+# parent_pair_id 由算子10 写入；缺失时自动退回 clause，不猜父句、不跨句拼接。
+scoring_unit: parent
+parent_fields: [parent_pair_id]
+
+# 本地 Qwen3-Embedding-0.6B 权重（1024 维），路径相对本算子目录；
+# sentence-transformers 加载时强制 local_files_only，禁止回退到远程模型服务。
+model_name: Qwen3-Embedding-0.6B
+model_path: ../models/Qwen3-Embedding-0.6B
+model_service_url: null
+model_timeout_seconds: 30
+# auto=优先模型，不可用按 fallback_policy 处理
+# model=要求模型；rule_degraded=显式规则后端（状态标记 degraded）
+# 当前开发验证默认强制使用本地权重；加载失败时按 fail 结构化失败。
+model_backend: model
+# 模型不可用：rule_degraded=降级并标记 degraded；fail=结构化失败
+fallback_policy: fail
+device: cpu
+batch_size: 32
+# 单条记录模型错误记入异常清单后继续；累计超过上限即整次执行结构化失败
+max_model_errors: 10
+
+# 降级记录去向：waiting_quality=写入通过文件并标记待复核；reject=直接进异常清单
+degraded_policy: waiting_quality
+
+# [2026-11-05 非等价记录去向] mark_and_keep=留在输出流、只打标记（默认）；drop=只写异常清单。
+# 规范 4.14 只授予本算子「判语义等价」的职责，放行/拒付的最终决定权在算子 17 的
+# quality_status / delivery_eligible 门禁；此前默认 drop，基准实测 70 条缺陷段落里
+# 61 条被本算子物理删除，15/16/17 完全看不到这些缺陷（闭环缺口：16 号只评到 9 条）。
+# mark_and_keep 时被拦记录写入输出流并标记：
+#   quality_status=rejected、semantic_status=not_equivalent、review_status=rejected、
+#   delivery_eligible=false、semantic_reject_reasons=[…]；异常清单里的同一条目带
+#   kept_in_output=true，只作审计，不代表记录被删。
+# 下游影响：17 号 status_fields.semantic=[quality_status, semantic_status] 命中 rejected，
+# 且 delivery_eligible=false，记录不会进入交付集；16 号 _merge_review_status 原样保留 rejected。
+# 想回到旧行为（物理删除）：non_equivalent_policy: drop。
+non_equivalent_policy: mark_and_keep
+
+# 规则证据：长度比合理区间与数字一致性（只做真实观测，不拼成分数）
+length_ratio_min: 0.4
+length_ratio_max: 2.5
+number_check: true
+
+# [2026-11-03 数字守卫] 数字一致性从"只打标签"升级为"可单独拦截"。
+# 依据（负例包人工标注，李升阳 2026-11-02/03）：父句级嵌入对局部错误几乎不敏感——
+# 改数字 12 条**全部漏过**（分数中位 0.786，与对照 0.790 无差别），而 number_check
+# 规则 12/12 全部判对并给得出 missing/extra。
+# 口径（三条规则，命中任一即拦）：
+#   1) 缺失：源文有、译文缺，且位数 >= number_guard_min_digits 的数字（含 19xx/20xx 年份）；
+#   2) 计数：位数 >= 该值的数字按出现次数比，源文出现 n 次、译文少于 n 次
+#      （源文两处都写 2015、译文只留一处，存在性比较看不出来）；
+#   3) 序列：源文与译文数字序列个数相同、恰好一个位置不同，该位置就是被改写/替换
+#      （"第4.6条至第4.9条"→"Articles 4.6 to 4.2"这类 1–2 位数字替换，缺失规则拦不住）。
+#      [2026-11-05] 个数不同时再补一条：源文多出一个 1–2 位数字、译文也多出一个 1–2 位数字
+#      （"现年 26 岁"→"33"、"10 月 14 日"→"21"）同样判替换；中文日期数字（9月/2014年/14日）
+#      不参与该口径（译文写成 Sept. 不是漏译）。实测自然语料 1546 条句对未新增误报。
+# 1–2 位小数字只在序列形状完全对齐时才由规则 3 拦；单个小数字缺失仍只打在标签里
+# ——对照 20 条未改动的正确句对里就有 7 条数字不一致
+# （4 条是 1–2 位小数字缺失、2 条是译文多出小数字、1 条是千分位写法），不足以支撑硬拦。
+# 判定范围与归一化（否则真实语料上假拦截太多，实测 34 条降到 7 条）：
+#   - 按整个判定单元比较（父句级=父句拼句），不按子句：数字分散在两个子句里时逐子句比两边都"缺"；
+#   - 940,000 / 940 000 / 全角 ９４０ / 164, 700 归一成同一个数；「251, 252, 254」这种列举不合并；
+#   - 2.639亿 与 263.9 million、320亿 与 32 billion 按折算后的值比较；
+#   - 句首段落编号（"115. 各项举措"）和半截断开的译文片段（"reduced to 4,"）不算缺失。
+# 想恢复"只打标签不拦"：number_guard: false。
+number_guard: true
+number_guard_min_digits: 3
+
+# [2026-11-04 单位/币种守卫] 数字相同、单位或币种不同时直接拦截。
+# 依据（本轮全链路复现）：
+#   - 「3 年」→「3 months」嵌入分 0.7674（短单位阈值 0.50），数字守卫也看不出（都是 3）；
+#   - 「5000 美元」→「5000 euros」嵌入分 0.868，只有算子16 能识别，但 14→15→11 已放行；
+#   - 这两类错误会进入最终交付集，属于必须拦截的"局部改写"。
+# 口径：只比较两侧「数值相同」的成对数量，数字不同交给上面的 number_guard，
+# 不重复报错；1 year == 12 months == 4 quarters 精确相等，2% 容差吸收写法差异。
+# 想只打标签不拦（回滚）：unit_currency_guard: false。
+unit_currency_guard: true
+unit_guard_relative_tolerance: 0.02
+
+# [2026-11-04 否定守卫] 译文出现否定、原文没有否定时直接拦截（zh→en 单方向）。
+# 依据（Fullflow-Effect-Bench-v1 / defect-14-025）：
+#   - 三段否定翻转的嵌入分是 0.7194 / 0.7388 / 0.7854，全部高于 0.65（其中一段拿到 S 级）——
+#     和 11-03「改数字 12 条全部漏过」是同一类局部编辑失灵，数字有守卫，否定此前没有；
+#   - 反方向（原文有否定、译文没有）自然语料误报 17.5%（中文否定常译成肯定式），不判；
+#   - 本方向在 876 个父句单元上误报 6 条（0.68%），构造负例召回 12/18；
+#     误报集中在 no doubt / not only / nothing but / whether or not / No. 5 这类固定搭配，
+#     已在 utils/evidence.py 里屏蔽。
+# negation_guard_min_chars：译文去空白后短于该长度不判（短答句「Yes. / No.」两边都合法）。
+# [2026-11-05] 两边都有否定时的两条补充口径：
+#   - 子句口径：译文「含否定的子句数」多于原文且 >= 2 → negation_clause_added；
+#   - 框架口径：译文出现「It is not true that …」「It is false that …」而原文没有
+#     「不是真的/并非/不实/绝非」这类对应说法 → negation_frame_added
+#     （原文本就带否定时子句口径看不见，defect-14-030:p7 就是这种情况；
+#      自然语料 1554 句对 / 543 个父句单元误报 0 条）。
+# 「并非」按真否定处理（此前被当成假否定词屏蔽，导致「并非如此→It is not true that」
+# 这种正确译文被误拦；自然语料误报 15 → 13）。
+# 想回滚成只打标签：negation_guard: false。
+negation_guard: true
+negation_guard_min_chars: 12
+
+# [2026-11-05 不完整译文守卫] 原文以句末标点收尾、译文却在中途断开 => 直接拦截（漏译）。
+# 依据（Fullflow-Effect-Bench-v1 / defect-14-* clause_drop 15 条）：
+#   - 15 条截断译文的嵌入分 14 条高于 0.65（只译了前半句，前半句译对就撑住整句余弦），
+#     数字/单位/否定守卫都看不见（被删掉的往往是后半句的修饰语）；
+#   - 自然语料 1554 条入口句对里「原文完整、译文无收尾」只有 23 条（1.7%），
+#     其中多数是段末编号/脚注截断，已在 utils/evidence.py 里按收尾形态屏蔽。
+# [2026-11-05] 源文以脚注标记收尾（"帕帕·路易斯·法尔先生(塞内加尔)*"）时按完整句处理：
+# 名录条目本来就以 * / † / ‡ 收尾，不是「没写完」；自然语料 1554 句对 + 543 个父句单元
+# 这类收尾 0 条，不引入误报（defect-14-031:p7 就是靠这条拦下的）。
+# incomplete_target_min_chars：原文去空白后短于该长度不判（标题/标签类单位本来常不带句号）。
+# 想回滚成只打标签：incomplete_target_guard: false。
+incomplete_target_guard: true
+incomplete_target_min_chars: 10
+# [2026-11-05 悬空虚词] 译文以 and / or / of / to / the / with / that / as 这类虚词断在句尾
+# 即判不完整，**不看原文是否带句末标点**：defect-14-026:p9 的原文是「来自西欧和其他国家： [待补]」，
+# 不以 。！？收尾，旧口径直接放弃判定，而译文「From Western European and」显然没写完。
+# 收词口径：只收「出现在句尾就不成立」的词；in / on / at / over / about / by / from 可以合法
+# 做副词或时间短语收尾（"falling over"、"in 2016"），加进来误报 1/543 → 12/543，不收。
+# 实测自然语料（按实现口径跑 guard_incomplete_target，开/关本项对比）：
+# flores_full_3key 543 个判定单元 6 → 6 条拦截、fullflow_holdout_3key 399 个判定单元 13 → 13，
+# 即新增误报 0 / 0（唯一的悬空虚词命中那条本来就已被旧口径拦下）。
+# 想回滚成只判「原文完整、译文没结尾」：incomplete_target_dangling_tail: false。
+incomplete_target_dangling_tail: true
+
+# [2026-11-05 语义判别器 P2] 本地 Qwen3.5-2B 判「译文里有没有原文根本没有的专名/实体」。
+# 依据（Fullflow-Effect-Bench-v1 / defect-14-* entity_substitution 17 条）：
+#   - 缺陷是把原文某个词换成原文不存在的人名（Anderson 等），嵌入分 0.652–0.815 全部过阈值；
+#   - 数字没变、单位没变、否定没变、句子完整 —— 词法层没有任何通用信号（中文译名 ↔ 英文人名
+#     之间没有可查的对照表），只能上模型判别；
+#   - 提示词先让模型为认到的每个名字给出**源文中文片段**，片段必须逐字出现在源文里，
+#     才承认「原文有对应」；只有它明确列为 missing 的专名才判拦。直接列「原文没有的名字」
+#     的第一版召回 17/17 但自然语料误拦 20.7%，改为对账口径后误拦 12/150 = 8.0%、召回 13/17。
+#     剩余 4 条漏检是模型把植入名字认成了原文真实存在的中文名，词法层与判别器都看不见。
+# 口径：只判「译文多出实体 → 拦」，反方向不判；只在语义分与全部规则守卫都放行后才调用，
+# 不可用/解析失败时 rules 为空、状态写进 metadata.semantic_judge_status，绝不用默认值代替判别。
+# [2026-11-05] 解析失败（9/433 = 2.1%，模型把中文词写进 missing 撑爆 96 token）时加严提示重试一次，
+# 重试次数写进汇总日志的 judge 状态（retried）；重试仍失败才记 error。
+# 成本：权重 4.3GB 懒加载，单条约 1.0–1.5s（RTX 4060 / fp16）。
+# 想关掉判别器（回到纯词法层）：semantic_judge: false。
+semantic_judge: true
+semantic_judge_model_path: ../models/Qwen3.5-2B
+semantic_judge_min_chars: 12
+
+# 只校验记录声明语言与配置方向是否一致；真实语言检测仅作为规则证据
+language_check: true
+
+# 本节点要求严格 UTF-8（上游已完成编码归一）
+input_encodings: [utf-8]
+text_fields: [source, target]

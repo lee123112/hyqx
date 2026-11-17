@@ -1,0 +1,113 @@
+# 11 优化建议报告（avp_generate_report）
+# 全部阈值/系数/口径参数必须来自本文件，代码里不得出现魔法数字。
+# 业务硬口径（规范 §11 第 12 条 / 原型《报告中心 · 研发标注》）：
+#   - 报告类型本期只有「优化建议报告」，固定八段（原型标注里的「七段」是笔误）：
+#     结论摘要 / 整体指标 / 分场景表现 / 噪声场景下钻 / 错误形态 / 原因分析 / 优化建议 / 风险与限制；
+#   - 缺哪个输入就在报告里如实写「未接入」，不许编数；
+#   - 三种输出：Markdown、自包含 HTML、PDF。PDF 用 reportlab 的 STSong-Light CID 字体，
+#     不引外部字体文件、不联网、不调 LibreOffice；三种格式同源同数，避免口径漂移；
+#   - 不接大模型。
+
+operator:
+  id: avp_generate_report
+  name: 优化建议报告
+  tag: 报告生成
+  version: v1.0.0
+  number: 11
+
+io:
+  # 输入：目录（递归扫描）或单个 JSON/JSONL；同目录内的 007/008/009 产物会被自动识别
+  input_exts: [".jsonl", ".json"]
+  report_md_filename: "011_report.md"
+  report_html_filename: "011_report.html"
+  report_pdf_filename: "011_report.pdf"
+  meta_filename: "011_report_meta.json"
+  # md / html / pdf 单出；both = md+html；all = 三种全出（默认：报告中心要能直接下载 PDF）
+  formats: ["md", "html", "pdf", "both", "all"]
+  default_format: "all"
+
+pdf:
+  # reportlab 缺失时降级为不出 PDF 并在日志告警，不让整条链失败
+  enabled: true
+
+discovery:
+  # 文件名识别（小写包含匹配，按 eval → attribution → advice 顺序判定）
+  eval_patterns: ["007_eval", "eval_result", "evaluation_result", "eval_results"]
+  attribution_patterns: ["008_attribution", "attribution", "08_attr"]
+  advice_patterns: ["009_advice", "advice", "suggestion"]
+  # 单文件 bundle：一个 JSON 里同时带三份输入
+  bundle_keys:
+    eval: ["eval_results", "evaluation_results", "evals"]
+    attribution: ["attribution", "attr"]
+    advice: ["advice", "advice_doc"]
+  # 评测结果数组的容器键
+  eval_list_keys: ["eval_results", "results", "records", "items"]
+  # 建议列表的容器键
+  suggestion_keys: ["suggestions", "items", "advice_list"]
+
+report:
+  # 固定八段（顺序不可改；params.include_sections 只能裁剪，不能新增或改名）
+  sections:
+    - "结论摘要"
+    - "整体指标"
+    - "分场景表现"
+    - "噪声场景下钻"
+    - "错误形态"
+    - "原因分析"
+    - "优化建议"
+    - "风险与限制"
+  timezone: "Asia/Shanghai"
+  # 本机 Windows 无 tzdata 时的固定偏移兜底（小时）
+  utc_offset_hours: 8
+  datetime_format: "%Y-%m-%d %H:%M"
+  report_date_format: "%Y%m%d"
+  report_no_prefix: "RPT-BENCH"
+  # 报告编号序号：本任务输出目录内从该值开始（跨任务全局序号由报告中心维护，本算子不持久化）
+  report_no_seq_start: 1
+  report_no_seq_width: 3
+  default_title_suffix: "优化建议报告"
+  # 优化建议展示上限（业务口径：每任务 1–3 条）
+  max_suggestions: 3
+  title_max_len: 80
+  report_no_max_len: 60
+  # 指标展示精度
+  percent_decimals: 1
+  # 007 metrics 口径：auto=三项全 ≤1 视为比例(0.076→7.6%)，否则视为百分数(7.6→7.6%)
+  metric_unit: "auto"
+  # 007 dimensions[].ratio 口径：auto=全部 ≤1 按比例，否则按百分数
+  ratio_unit: "auto"
+  # 008 share 口径：auto=≤1 按比例，否则按百分数
+  share_unit: "auto"
+  # 噪声维度名称（用于「噪声场景下钻」）
+  noise_dimensions: ["噪声", "noise"]
+  # 错误形态展示名（字段只增不改名：sub/del/ins/unk）
+  error_types:
+    sub: "替换"
+    del: "删除"
+    ins: "插入"
+    unk: "未识别"
+  # 主因占比告警阈值（比例值，0.35 = 35%）：主因占比达到该值，报告标记「需关注」
+  flag_warn_share: 0.35
+  # 噪声下钻「判断」列阈值（pp）
+  judgement_large_pp: 3.0
+  judgement_medium_pp: 1.0
+  # 风险与限制：子类样本量低于该值时提示结论波动
+  small_sample_threshold: 100
+
+selection:
+  # 多条评测结果时选哪条：latest=按完成时间取最新；first=取第一条
+  eval_pick: "latest"
+
+limits:
+  # 单表最多展示行数（超出在报告里注明截断；统计数不受影响）
+  max_table_rows: 200
+  # 列表类内容最多条数
+  max_list_items: 100
+  # 单个文本单元格最大字符数（防止报告膨胀；超长截断并标注）
+  max_text_len: 400
+
+
+metric_labels:
+  cer: "CER"
+  wer: "WER"
+  ser: "SER"

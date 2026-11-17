@@ -1,0 +1,24 @@
+{
+  "language": "zh",
+  "model": "whisper-large-v3-demo",
+  "segments": [
+    {
+      "id": "seg-0",
+      "start": 0.0,
+      "end": 1.4,
+      "text": "操作员打开设备电源"
+    },
+    {
+      "id": "seg-1",
+      "start": 1.4,
+      "end": 3.2,
+      "text": "操作员检查仪表读数"
+    },
+    {
+      "id": "seg-2",
+      "start": 3.2,
+      "end": 5.0,
+      "text": "设备开始正常运转"
+    }
+  ]
+}

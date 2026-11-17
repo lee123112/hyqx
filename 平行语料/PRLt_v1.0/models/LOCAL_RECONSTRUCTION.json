@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-10-31",
+  "note": "开发侧按接口契约生成的适配器/原型文件清单（正式版）。这些文件不是原厂权重，SHA256 为本机实测值；verify_models.py 仅在 SHA 与本清单一致时以 [LOCAL] 放行。旧版模型的本地重建件（Qwen2.5 adapter、BGE 领域分类器、bge-m3 转换件）已随旧模型退役，仅保留在 PROVENANCE.json 中追溯。",
+  "files": {
+    "models/Qwen3-Embedding-0.6B/domain_adapter.py": {
+      "sha256": "403e4edad832a4c85296925bd81ac02cecdfd79908d4d7d3644e0599bbdf3bb0",
+      "reason": "开发侧生成件：API11 领域识别 zero-shot 原型适配器（种子描述嵌入 + 温度 softmax，非人工 Gold）"
+    },
+    "models/Qwen3-Embedding-0.6B/domain_prototypes.npz": {
+      "sha256": "a1d37ee63be102eb89520609afb09e7ab7235ceab5bea8781e8e68dfa0075482",
+      "reason": "开发侧生成件：7 标签 × 1024 维领域原型（由种子描述经 Qwen3-Embedding 编码；可重建）"
+    },
+    "models/Qwen3.5-2B/adapter.py": {
+      "sha256": "696754499965fd0228de82a6eceffc5445a65a63d69bd5d4004a44d202a004c3",
+      "reason": "开发侧生成件：API15 流畅度适配器（Qwen3.5-2B 本地推理 + 严格 JSON 解析，不伪造分数）"
+    }
+  }
+}

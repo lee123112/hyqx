@@ -1,0 +1,38 @@
+services:
+  backend:
+    container_name: op-pre-eva-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Namespaced variables intentionally ignore old PIP_INDEX_URL/TORCH_INDEX_URL in .env.
+        PYTHON_IMAGE: "${SME_BUILD_PYTHON_IMAGE:-m.daocloud.io/docker.io/library/python:3.11-slim}"
+        APT_MIRROR: "${SME_BUILD_APT_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian}"
+        APT_SECURITY_MIRROR: "${SME_BUILD_APT_SECURITY_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian-security}"
+        PIP_INDEX_URL: "${SME_BUILD_PIP_INDEX_URL:-https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple}"
+        TORCH_INDEX_URL: "${SME_BUILD_TORCH_INDEX_URL:-https://mirrors.nju.edu.cn/pytorch/whl/cpu}"
+        TORCH_VERSION: "${SME_BUILD_TORCH_VERSION:-2.15.0+cpu}"
+        TORCHVISION_VERSION: "${SME_BUILD_TORCHVISION_VERSION:-0.29.2+cpu}"
+    image: sme-backend:2026.11.14-cn
+    ports:
+      - "${SME_HTTP_PORT:-17024}:6289"
+    environment:
+      SME_DATA_DIR: /app/data
+      SME_WORKSPACE_DIR: /app/data/workspace
+      SME_DB_PATH: /app/data/evaluation.db
+      SME_DATASET_DIR: /app/dataset
+      SME_API_KEY: "${SME_API_KEY:-}"
+      SME_CORS_ORIGINS: "${SME_CORS_ORIGINS:-http://localhost:17024,http://127.0.0.1:17024}"
+      SME_TEXT_MODEL_PATH: /app/SME_EVAL_TEXT_001/models/bert-base-chinese
+      SME_WHISPER_MODEL: /app/SME_EVAL_AUDIO_001/models/whisper-base
+      SME_CLIP_MODEL: /app/SME_EVAL_VIDEO_001/models/clip/ViT-L-14.pt
+      SME_TEXT_TIMEOUT_SECONDS: "${SME_TEXT_TIMEOUT_SECONDS:-600}"
+      SME_MAX_UPLOAD_MB: "${SME_MAX_UPLOAD_MB:-200}"
+      SME_MAX_WORKERS: "${SME_MAX_WORKERS:-1}"
+      OMP_NUM_THREADS: "${OMP_NUM_THREADS:-4}"
+      MKL_NUM_THREADS: "${MKL_NUM_THREADS:-4}"
+    volumes:
+      - ./runtime:/app/data
+      - ./dataset:/app/dataset:ro
+    restart: unless-stopped
+

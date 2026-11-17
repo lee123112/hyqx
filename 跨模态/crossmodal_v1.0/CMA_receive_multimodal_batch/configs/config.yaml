@@ -1,0 +1,67 @@
+# 算子 01「接入多模态批次」部署配置
+# 对应表1 #01（第 1 环节「输入核验」，stageId=S1，阶段首算子）
+#
+# 分层：
+#   - operator.* / stage_id / transport 属于**部署身份**，不接受 /predict 覆盖；
+#   - allowed_license / sources / file_formats 是表1 **冻结值**，配置层只做校验
+#     （必须恰为「可训练」、五类来源、四组格式白名单），不提供放开开关；
+#   - enabled / file_check_mode / dedupe / check_source_modality 可由 /predict 的
+#     config 或 CLI --override 覆盖。
+operator:
+  name: multimodal_batch_intake
+  label: 接入多模态批次
+  number: 1
+  version: v1.0.0
+stage_id: S1
+
+# 表1 #01「总开关」默认开启；关闭则本环节不跑（只产出空台账，status=disabled）
+enabled: true
+
+# 文件可读性检查模式：
+#   whitelist 只校验格式白名单，不打开文件；
+#   header（默认）能定位到本地文件时校验非空 + 文件头签名，远端链接只登记链接；
+#   strict 必须能定位并打开本地文件，否则进原始隔离区（原始文件-无法解析）。
+file_check_mode: header
+
+# 同一 sample_id + 文件链接重复登记时只保留首次，其余退回补登记
+dedupe: true
+
+# 「来源产线模态与文件模态一致性」校验。表1 #01 未明确要求，默认关闭；
+# 开启后：文本产线只收文本、图像产线只收图像、音频产线只收音频、视频产线只收视频，
+# 采集平台批次不限制模态。属待主 agent 决策口径，见 DEVELOPMENT_STATUS.md。
+check_source_modality: false
+
+# 表1 冻结：只有「可训练」可以进入加工（待确认/不可训练/无法确认 → 样本隔离库）
+allowed_license: 可训练
+
+# 表1 冻结：数据从哪里来（下拉框，不能手填别的）
+sources:
+  - collection_platform
+  - text_pipeline
+  - image_pipeline
+  - audio_pipeline
+  - video_pipeline
+
+# 表1 冻结：允许的文件格式（多行文本，只读）
+file_formats:
+  text:
+    - txt
+    - json
+    - csv
+  image:
+    - jpg
+    - png
+    - webp
+  audio:
+    - wav
+    - mp3
+    - flac
+  video:
+    - mp4
+    - mov
+    - avi
+
+# 阶段末传输格式（表1 / DEVELOPMENT_PLAN §4）
+transport:
+  format: crossmodal-files-v1
+  max_response_bytes: 67108864

@@ -1,0 +1,27 @@
+{
+  "operatorId": "SME_eval_benchmark",
+  "package": "SME_EVAL_BENCHMARK_001",
+  "type": "benchmark",
+  "config": {
+    "thresholds": {
+      "score": 5
+    },
+    "weights": [
+      25,
+      25,
+      20,
+      15,
+      15
+    ],
+    "grades": {
+      "AA": 95,
+      "A": 85,
+      "B": 70
+    },
+    "highValue": false
+  },
+  "engine": {
+    "module": "app.engines.benchmark.BenchmarkEngine",
+    "mode": "demo|measured"
+  }
+}

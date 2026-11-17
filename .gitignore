@@ -1,0 +1,56 @@
+# Model weights: restore locally; never commit
+*.bin
+*.ckpt
+*.ggml
+*.gguf
+*.h5
+*.hdf5
+*.onnx
+*.pb
+*.pickle
+*.pkl
+*.pt
+*.pth
+*.safetensors
+*.tflite
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.pem
+*.key
+id_rsa
+id_ed25519
+credentials
+# Generated files and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.venv/
+venv/
+node_modules/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+.DS_Store
+Thumbs.db
+# Deployment runtime data
+**/runtime/**
+!**/runtime/.gitkeep
+!**/runtime/.keep
+!**/runtime/README.md
+
+# Model-derived vector caches
+**/models/**/*.npz
+**/models/**/*.npy
+**/weight/**/*.npz
+**/weight/**/*.npy
+**/weights/**/*.npz
+**/weights/**/*.npy

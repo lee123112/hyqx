@@ -1,0 +1,57 @@
+# 算子 20「质检对齐产物」部署配置
+# 环节：表1 第 4 环节「数据质量评估」（stageId=S4），同环节下游为 #21 处置错配样本。
+operator:
+  name: alignment_qc
+  version: v1.0.0
+
+stage_id: S4
+
+# 表1 #20：默认开启，且为必须算子
+enabled: true
+
+# 无上游指标时才做本地补测的子集比例（表1 #20：10% 子集补测）
+quality_subset_fallback: 0.10
+
+# 偏科阈值：单一路由占比 > 该值即产出待补清单，但**不整批隔离**
+topic_skew_threshold: 0.70
+
+# [v4.2] §4.20：质量报告回写前只能 pending_writeback（抽检尚未回写，版本保持待发布）
+report_status: pending_writeback
+
+# 模型/测点后端不可用时是否允许显式降级（degraded）继续；
+# [v4.2 冲突保留] §4.20 建议默认 false，但本算子把「反向检索模型缺失」计为可降级诊断，
+# 置 false 会使无权重环境整体失败；此处保持 true，仅在报告 diagnostics 中如实记录。
+allow_degraded: true
+
+# 文本非空判定：去首尾空白后的最少字符数
+min_text_chars: 1
+
+# 整段无声判定阈值（解码后 RMS）
+silence_rms_threshold: 0.0001
+
+# 视频取证帧数上限（沿用表1 #14 的「最多 8 帧」）
+max_video_frames_probe: 8
+
+# 质量指标：优先复用上游四条预训练产线，无上游才在子集内补测
+# upstream_first | local_required | upstream_only | disable
+metrics:
+  ppl: upstream_first
+  brisque: upstream_first
+  snr: upstream_first
+  ffmpeg: upstream_first
+
+# 图文子集 CLIP 反向检索
+reverse_verify:
+  enabled: true
+  top_k: 5
+  # 与表1 #12 图文一致性口径一致的最小相似度阈值
+  min_consistency: 0.25
+  clip:
+    library: auto
+    model_name: ViT-B-32
+    # 权重路径：相对路径按 MODEL_ROOT 解析（默认本算子 weight/，见 weight/README.md）；
+    # 为空表示复用工程侧已加载的共享实例；两者都不可用时记 degraded，
+    # 不使用随机初始化权重产出分数。
+    weights: clip/ViT-B-32.pt
+    device: cpu
+    batch_size: 8

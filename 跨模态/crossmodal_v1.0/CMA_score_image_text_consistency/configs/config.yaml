@@ -1,0 +1,51 @@
+# 算子 #12 评分图文语义一致性 配置（表1 v4.1 第 12 行冻结口径）
+# 身份与部署项（operator/模型/设备/路径/输出根目录）不接受请求级覆盖。
+
+operator: image_text_semantic_scoring
+operator_version: v1.0.0
+stage_id: S3
+
+# ---- 业务参数（可通过 /predict 的 config 覆盖，也可用 CLI 参数覆盖） ----
+image_text_scoring:
+  # 图文语义一致性路线开关；表1 要求 #12/#13/#14 至少开启一条
+  enabled: true
+  # 低分隔离阈值：默认 0.25，定义域 0.20–0.40
+  # [round10 标定] 0.25→0.22：round9 同源 140 对最低分 0.2263，0.22 时正例零误隔离；
+  # 170 条错配负例 88.2% 被隔离、其余落人工复核带、0 条达到自动对齐（见 阈值标定.md）
+  # [2026-11-05 全量标定] 0.22→0.20：全流程效果测试集 800 条图文正样本，0.22 误隔离 6 条
+  # （0.75%）、0.21 误隔离 2 条、0.20 误隔离 1 条（0.12%）；50 条负样本隔离率
+  # 80%/78%/74%。负样本在 0.30–0.35 各自动档上 0/50 命中，即负样本始终要经人工复核，
+  # 隔离线只决定"自动隔离"还是"转人工"，因此取定义域下限 0.20 让正样本误隔离最小。
+  isolation_threshold: 0.20
+  # 自动对齐阈值：默认 0.32，定义域 0.25–0.50，必须大于隔离阈值
+  auto_align_threshold: 0.32
+  # 中间分（0.25–0.32）是否用 YOLOv8 补辅助证据：默认关闭，且不改变分档
+  use_detector_for_borderline: false
+  # [v4.2] 判定模式（V4.2 §2.8/§4.12）：operator=算子按快照阈值给分档（默认）；system=只回指标由平台判定
+  judge_mode: operator
+
+# ---- 模型（表1 正式模型 CLIP-ViT/B-32，只加载本地权重，不自动联网） ----
+model:
+  backend: clip_vit_b32
+  # auto | open_clip | clip | transformers | none
+  library: auto
+  model_name: ViT-B-32
+  # 权重路径：相对路径按 MODEL_ROOT 解析；未设 MODEL_ROOT 时默认 <算子目录>/weight
+  # （随算子目录交付，见 weight/README.md），MODEL_ROOT 只作覆盖；绝对路径原样使用；
+  # null = 未配置 -> 按 allow_degraded 输出 degraded/failed。
+  weights: clip/ViT-B-32.pt
+  device: auto
+  batch_size: 8
+  # 真实后端不可用时是否允许降级为"待模型"；false 时直接 failed
+  allow_degraded: true
+
+# ---- 可选 YOLOv8 辅助（默认关闭；不可用时只记录 unavailable，不改分档） ----
+detector:
+  weights: null
+  device: auto
+  confidence: 0.25
+
+# ---- IO ----
+io:
+  output_root: output
+  jsonl_utf8: true

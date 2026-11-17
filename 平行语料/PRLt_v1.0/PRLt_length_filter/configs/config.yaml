@@ -1,0 +1,32 @@
+# 算子7：长度过滤配置
+operator:
+  name: length_filtering
+  version: v1.1.0
+
+# 阈值语义：闭区间（等于边界视为通过）。
+# 长度按 Unicode NFC 归一后的 Python 字符计数，不按字节，不删除标点和空格。
+min_source_chars: 1
+max_source_chars: 5000
+min_target_chars: 1
+max_target_chars: 5000
+
+# 比例定义为 target_chars / max(source_chars, 1)，源文为空时不会除零。
+min_length_ratio: 0.2
+max_length_ratio: 5.0
+
+# reject=违规句对写入 06_length_rejects.jsonl；warn=保留记录并写 metadata.length_warnings
+on_violation: reject
+
+# 基础比例仍是质量告警线。对已声明的中英方向，告警线外但硬边界内的记录
+# 保留并写入 length_warnings；超过硬边界才拒绝，避免短中英句对被直接误杀。
+language_pair_ratio_policies:
+  zh-en:
+    hard_min_length_ratio: 0.1
+    hard_max_length_ratio: 12.5
+    soft_violation_action: warn
+
+# 本节点只按 source/target 计算长度，配置成其他字段会直接报错。
+text_fields: [source, target]
+
+# 上游算子已完成编码归一，本节点要求严格 UTF-8。
+input_encodings: [utf-8]

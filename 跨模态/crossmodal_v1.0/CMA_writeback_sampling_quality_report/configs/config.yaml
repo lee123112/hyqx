@@ -1,0 +1,45 @@
+# 算子 24「抽检并回写质量报告」部署配置
+# 对应表1 #24（第 7 环节「人工抽检复核」，stageId=S7，v4.2 §0.3）
+#
+# 分层：
+#   - operator.* / stage_id 属于**部署身份**，不接受 /predict 覆盖；
+#   - 其余为**业务参数**，其中 enabled / strata / include_auto_aligned 是表1 冻结值，
+#     配置层只做校验（enabled 必须 true、strata 必须恰为三个维度、
+#     自动对齐必须进入抽样框），不提供关闭开关。
+operator:
+  name: spot_check_writeback
+  version: v1.0.0
+stage_id: S7
+
+# 表1 #24「默认开启；否（必须）」：本算子不可跳过
+enabled: true
+
+# 表1 #24「抽多少：默认 10%，可以选 10% 到 20%」
+# 实际抽检总量由「比例取整 + 最大余数」在层间分配，并夹在 [10%, 20%] 内
+sample_rate: 0.10
+
+# 表1 #24「按场景、模态、对齐类型分开抽」（冻结，顺序即报告口径）
+strata:
+  - scene
+  - modality
+  - alignment_type
+
+# 表1 #24「自动对齐也进入抽样框」
+include_auto_aligned: true
+
+# 抽样哈希盐：层内按 blake2b(salt|sample_id) 升序选取，
+# 保证同一批样本的抽检结果可复现、与输入顺序无关（不使用随机数）
+sampling_salt: operator24
+
+# 上游「待回写质量报告」的候选文件名（纯文件名，按顺序取第一个存在的）
+report_source_names:
+  - 20_quality_report.json
+  - quality_report.json
+  - 24_quality_report.json
+
+# 缺上游报告时是否允许显式降级：true 继续并标记 degraded；
+# false 直接结构化失败——任何情况下都不会伪造「回写成功」
+allow_degraded: false
+
+# 人工结论必须携带复核人身份，否则按待人工处理
+require_reviewer_identity: true

@@ -1,0 +1,873 @@
+{
+  "_comment": "语音加扰（语音对抗平台）算子包统一注册表。key 为正式目录名，遵循甲方《算子目录结构规范》{SS}_{CATEGORY}_{MODALITY}_{SEQ3}。本文件同时是 /operators 接口与《语音加扰算子-接口与对接说明》的唯一真源。",
+  "service": "audio-adversarial-pipeline",
+  "title": "语音加扰（语音对抗平台）算子包",
+  "version": "v1.0.0",
+  "generatedAt": "2026-11-02",
+  "namingSpec": "{SS}_{CATEGORY}_{MODALITY}_{SEQ3}；SS=AVP（Audio adVersarial Platform）",
+  "sourceOfTruth": [
+    "语音加扰算子-接口与对接说明.md",
+    "接口文档-前端联调.md"
+  ],
+  "server": {
+    "listenPort": 17023,
+    "containerPort": 8000,
+    "containerName": "op-speech-adversarial",
+    "entrypoint": "inference:app",
+    "routing": "operator 字段接受：目录名 AVP_INGEST_AUD_001 / operatorId avp_ingest_corpus / tag 语料入库 / 编号 1（大小写不敏感）",
+    "endpoints": [
+      "GET  /health",
+      "GET  /operators",
+      "POST /uploadFile?uniqueId=",
+      "POST /predict",
+      "GET  /downloadFile?path=",
+      "POST /downloadFile",
+      "POST /removeFile?uniqueId="
+    ],
+    "apiRevision": "2026-11-13-download-v1"
+  },
+  "uploadStructure": {
+    "spec": "甲方《【开发规范】数据集合成算子开发规范与集成-多算子打包V1.0》「无训练过程的算子开发规范」",
+    "upperLevel": [
+      "Dockerfile",
+      "docker-compose.yml",
+      "inference.py",
+      "requirements.txt",
+      "weight/assets/",
+      "map.json",
+      "common/"
+    ],
+    "operatorDir": [
+      "configs/",
+      "dataset/DATA_SCHEMA.md",
+      "README.md"
+    ],
+    "operatorDirExtra": [
+      "processor.py",
+      "OPERATOR_MANUAL.md"
+    ],
+    "distributionNote": "服务器运行版本仅保留处理代码、配置和字段契约；原完整开发包结构见 AVP。"
+  },
+  "stages": {
+    "S1": {
+      "name": "样本生产",
+      "chain": [
+        "AVP_INGEST_AUD_001",
+        "AVP_NORMALIZE_AUD_002",
+        "AVP_PERTURB_AUD_003",
+        "AVP_PERTURB_AUD_004",
+        "AVP_QC_AUD_005",
+        "AVP_VERSION_DATA_006"
+      ],
+      "last": "AVP_VERSION_DATA_006"
+    },
+    "S2": {
+      "name": "评测执行",
+      "chain": [
+        "AVP_EVAL_DATA_007"
+      ],
+      "last": "AVP_EVAL_DATA_007"
+    },
+    "S3": {
+      "name": "效果分析",
+      "chain": [
+        "AVP_ATTRIBUTE_DATA_008",
+        "AVP_ADVICE_DATA_009"
+      ],
+      "last": "AVP_ADVICE_DATA_009"
+    },
+    "S4": {
+      "name": "数据运营",
+      "chain": [
+        "AVP_ASSET_DATA_010"
+      ],
+      "last": "AVP_ASSET_DATA_010"
+    },
+    "S5": {
+      "name": "报告中心",
+      "chain": [
+        "AVP_REPORT_DATA_011"
+      ],
+      "last": "AVP_REPORT_DATA_011"
+    }
+  },
+  "operators": {
+    "AVP_INGEST_AUD_001": {
+      "formalOperatorNumber": 1,
+      "name": "语料入库匹配校验",
+      "englishName": "avp_ingest_corpus",
+      "tag": "语料入库",
+      "operatorId": "avp_ingest_corpus",
+      "directory": "AVP_INGEST_AUD_001",
+      "modality": "audio",
+      "category": "样本生产",
+      "stageId": "S1",
+      "stagePosition": "1/6",
+      "isLastOfStage": false,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_INGEST_AUD_001/processor.py",
+      "summary": "把音频与参考文本清单配对成带 uttid 的语料数据集，并按三项内置规则做入库检测（只提示不阻断）。",
+      "outputs": {
+        "corpus": "001_corpus.jsonl",
+        "rejects": "001_rejects.jsonl",
+        "report": "001_ingest_report.json"
+      },
+      "paramsSpec": {
+        "action": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "ingest",
+            "recheck"
+          ],
+          "default": "ingest",
+          "desc": "ingest=正常入库；recheck=只重跑三项入库检测并就地更新报告，不重扫音频、不改入库结果"
+        },
+        "dataset_name": {
+          "type": "string",
+          "required": true,
+          "desc": "数据集名称，2–50 字；action=recheck 时可省略",
+          "example": "客服对话语音原始集-V2"
+        },
+        "source": {
+          "type": "enum",
+          "required": true,
+          "values": [
+            "自主采集",
+            "公开采购",
+            "合作方提供",
+            "业务回流"
+          ],
+          "desc": "数据来源，系统无法自动识别，必须由用户手选"
+        },
+        "dataset_id": {
+          "type": "string",
+          "required": false,
+          "desc": "数据集 ID，不传则自动生成 DS-{时间戳}",
+          "example": "DS-20261102-0001"
+        },
+        "manifest_mode": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "none",
+            "file"
+          ],
+          "default": "none",
+          "desc": "清单模式：none=按同名 .txt 配对；file=使用 manifest_path 指定的清单"
+        },
+        "manifest_path": {
+          "type": "string",
+          "required": false,
+          "desc": "清单路径（相对 uniqueId 工作目录或绝对路径可用），manifest_mode=file 时必填"
+        },
+        "id_column": {
+          "type": "int",
+          "required": false,
+          "desc": "清单 id 列（0 基），不传按表头猜或默认第 1 列"
+        },
+        "text_column": {
+          "type": "int|int[]",
+          "required": false,
+          "desc": "清单文本列（0 基），可传数组拼接，不传按表头猜或默认第 2 列起"
+        },
+        "delimiter": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "auto",
+            "tab",
+            "comma",
+            "space"
+          ],
+          "default": "auto",
+          "desc": "分隔符；auto 按制表符→逗号→空格顺序按行内出现次数判定"
+        },
+        "audio_exts": {
+          "type": "string[]",
+          "required": false,
+          "desc": "允许的音频扩展名，默认 wav/mp3/flac/aiff/aif/ogg/opus"
+        },
+        "check_min_duration": {
+          "type": "float",
+          "required": false,
+          "default": 2.0,
+          "desc": "入库检测：短音频阈值（秒）"
+        },
+        "check_allow_gbk": {
+          "type": "bool",
+          "required": false,
+          "default": false,
+          "desc": "是否允许 GBK 清单；默认 false，检测到 GBK 报 encoding_not_utf8"
+        }
+      }
+    },
+    "AVP_NORMALIZE_AUD_002": {
+      "formalOperatorNumber": 2,
+      "name": "语音标准化",
+      "englishName": "avp_normalize_audio",
+      "tag": "语音标准化",
+      "operatorId": "avp_normalize_audio",
+      "directory": "AVP_NORMALIZE_AUD_002",
+      "modality": "audio",
+      "category": "样本生产",
+      "stageId": "S1",
+      "stagePosition": "2/6",
+      "isLastOfStage": false,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_NORMALIZE_AUD_002/processor.py",
+      "summary": "按标准化规则统一采样率、声道、格式（固定 WAV PCM16）与时长范围；超范围样本直接剔除不裁剪。",
+      "outputs": {
+        "corpus": "002_std.jsonl",
+        "dropped": "002_dropped.jsonl",
+        "report": "002_normalize_report.json"
+      },
+      "paramsSpec": {
+        "sample_rate": {
+          "type": "enum",
+          "required": true,
+          "values": [
+            8000,
+            16000
+          ],
+          "desc": "目标采样率"
+        },
+        "channels": {
+          "type": "enum",
+          "required": true,
+          "values": [
+            1
+          ],
+          "desc": "目标声道，本期固定单声道"
+        },
+        "format": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "wav_pcm16"
+          ],
+          "default": "wav_pcm16",
+          "desc": "目标格式，固定 WAV(PCM 16bit)"
+        },
+        "min_duration": {
+          "type": "float",
+          "required": true,
+          "desc": "时长下限（秒），小于则剔除",
+          "example": 2.0
+        },
+        "max_duration": {
+          "type": "float",
+          "required": true,
+          "desc": "时长上限（秒），大于则剔除",
+          "example": 10.0
+        },
+        "remove_source": {
+          "type": "bool",
+          "required": false,
+          "default": false,
+          "desc": "是否删除原音频（默认保留，仅复制转码）"
+        }
+      }
+    },
+    "AVP_PERTURB_AUD_003": {
+      "formalOperatorNumber": 3,
+      "name": "噪声混音加扰",
+      "englishName": "avp_mix_noise",
+      "tag": "噪声混音",
+      "operatorId": "avp_mix_noise",
+      "directory": "AVP_PERTURB_AUD_003",
+      "modality": "audio",
+      "category": "样本生产",
+      "stageId": "S1",
+      "stagePosition": "3/6",
+      "isLastOfStage": false,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_PERTURB_AUD_003/processor.py",
+      "summary": "按加扰策略把噪声/环境音素材按目标 SNR 混入标准语料，产出带加扰参数快照的批次。",
+      "outputs": {
+        "batch": "003_batch.jsonl",
+        "report": "003_perturb_report.json"
+      },
+      "paramsSpec": {
+        "dimension": {
+          "type": "enum",
+          "required": true,
+          "values": [
+            "noise",
+            "env"
+          ],
+          "desc": "加扰维度：noise=噪声 / env=环境音；口音不是加扰维度"
+        },
+        "values": {
+          "type": "string[]",
+          "required": true,
+          "desc": "维度取值，如 [白噪,交通噪声] 或 [街道,车内]",
+          "example": [
+            "白噪",
+            "交通噪声"
+          ]
+        },
+        "snr_db": {
+          "type": "float[2]",
+          "required": true,
+          "desc": "SNR 区间 [下界, 上界]，单位 dB",
+          "example": [
+            5,
+            15
+          ]
+        },
+        "assets_dir": {
+          "type": "string",
+          "required": false,
+          "desc": "素材目录（相对工作目录）；不传则用 weight/assets/<dimension>/",
+          "example": "assets/noise"
+        },
+        "scope_mode": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "all",
+            "count"
+          ],
+          "default": "all",
+          "desc": "加工范围：all=全部样本 / count=指定条数"
+        },
+        "scope_count": {
+          "type": "int",
+          "required": false,
+          "desc": "scope_mode=count 时的条数，不得超过语料样本数"
+        },
+        "seed": {
+          "type": "int",
+          "required": false,
+          "default": 20261102,
+          "desc": "随机种子，保证同参数可复现"
+        },
+        "per_value": {
+          "type": "bool",
+          "required": false,
+          "default": false,
+          "desc": "true=每条样本对每个取值各产一条；false=每条样本随机取一个取值"
+        }
+      }
+    },
+    "AVP_PERTURB_AUD_004": {
+      "formalOperatorNumber": 4,
+      "name": "语速变换加扰",
+      "englishName": "avp_speed_perturb",
+      "tag": "语速变换",
+      "operatorId": "avp_speed_perturb",
+      "directory": "AVP_PERTURB_AUD_004",
+      "modality": "audio",
+      "category": "样本生产",
+      "stageId": "S1",
+      "stagePosition": "4/6",
+      "isLastOfStage": false,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_PERTURB_AUD_004/processor.py",
+      "summary": "按语速倍率做变速不变调变换，产出带加扰参数快照的批次；1.0× 为保证基线，原样透传。",
+      "outputs": {
+        "batch": "004_batch.jsonl",
+        "report": "004_speed_report.json"
+      },
+      "paramsSpec": {
+        "values": {
+          "type": "string[]",
+          "required": true,
+          "desc": "语速倍率集合，取值须来自 [0.8x,1.0x,1.2x]",
+          "example": [
+            "0.8x",
+            "1.0x",
+            "1.2x"
+          ]
+        },
+        "scope_mode": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "all",
+            "count"
+          ],
+          "default": "all",
+          "desc": "加工范围"
+        },
+        "scope_count": {
+          "type": "int",
+          "required": false,
+          "desc": "scope_mode=count 时的条数"
+        },
+        "seed": {
+          "type": "int",
+          "required": false,
+          "default": 20261102,
+          "desc": "随机种子"
+        },
+        "per_value": {
+          "type": "bool",
+          "required": false,
+          "default": true,
+          "desc": "true=每条样本对每个倍率各产一条；false=随机取一个倍率"
+        }
+      }
+    },
+    "AVP_QC_AUD_005": {
+      "formalOperatorNumber": 5,
+      "name": "样本质检",
+      "englishName": "avp_inspect_batch",
+      "tag": "样本质检",
+      "operatorId": "avp_inspect_batch",
+      "directory": "AVP_QC_AUD_005",
+      "modality": "audio",
+      "category": "样本生产",
+      "stageId": "S1",
+      "stagePosition": "5/6",
+      "isLastOfStage": false,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_QC_AUD_005/processor.py",
+      "summary": "全量自动检查（完整性 + 信噪比）后按比例抽样生成人工试听队列；复核判定回填后产出最终样本表与版本草稿样本数。",
+      "outputs": {
+        "report": "005_qc_report.json",
+        "review_queue": "005_review_queue.jsonl",
+        "batch_final": "005_batch_final.jsonl",
+        "qc_final": "005_qc_final.json"
+      },
+      "paramsSpec": {
+        "mode": {
+          "type": "enum",
+          "required": true,
+          "values": [
+            "start",
+            "finalize"
+          ],
+          "desc": "start=自动检查+抽样生成复核队列；finalize=回填复核判定并出具最终结论"
+        },
+        "sample_ratio": {
+          "type": "float",
+          "required": false,
+          "default": 0.05,
+          "desc": "抽检比例，默认 0.05"
+        },
+        "min_samples": {
+          "type": "int",
+          "required": false,
+          "default": 20,
+          "desc": "抽检最少条数"
+        },
+        "snr_threshold_db": {
+          "type": "float",
+          "required": false,
+          "default": 15.0,
+          "desc": "信噪比阈值，低于即存疑"
+        },
+        "snr_below_ratio_max": {
+          "type": "float",
+          "required": false,
+          "default": 0.2,
+          "desc": "低于阈值占比上限，超过则自动检查不通过"
+        },
+        "seed": {
+          "type": "int",
+          "required": false,
+          "default": 20261102,
+          "desc": "抽样随机种子"
+        },
+        "review_decisions": {
+          "type": "object[]",
+          "required": false,
+          "desc": "finalize 必填：每条含 sample_id 与 decision(pass/reject)"
+        },
+        "batch_reject": {
+          "type": "bool",
+          "required": false,
+          "default": false,
+          "desc": "finalize 时整批退回"
+        }
+      }
+    },
+    "AVP_VERSION_DATA_006": {
+      "formalOperatorNumber": 6,
+      "name": "样本版本",
+      "englishName": "avp_pack_version",
+      "tag": "样本版本",
+      "operatorId": "avp_pack_version",
+      "directory": "AVP_VERSION_DATA_006",
+      "modality": "data",
+      "category": "样本生产",
+      "stageId": "S1",
+      "stagePosition": "6/6",
+      "isLastOfStage": true,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_VERSION_DATA_006/processor.py",
+      "summary": "把质检通过的批次固化成带 sha256 manifest 的版本包，并支持发布/回滚/版本对比。",
+      "outputs": {
+        "version_zip": "006_version.zip",
+        "version": "006_version.json",
+        "compare": "006_compare.json"
+      },
+      "paramsSpec": {
+        "action": {
+          "type": "enum",
+          "required": true,
+          "values": [
+            "pack",
+            "publish",
+            "rollback",
+            "compare"
+          ],
+          "desc": "pack=打包成草稿版本；publish=发布；rollback=回滚；compare=版本对比"
+        },
+        "version_name": {
+          "type": "string",
+          "required": false,
+          "desc": "版本名称；pack 必填",
+          "example": "客服场景-加扰集"
+        },
+        "version_no": {
+          "type": "string",
+          "required": false,
+          "desc": "版本号，形如 v1.2；不传则同任务内自增",
+          "example": "v1.2"
+        },
+        "source_task": {
+          "type": "string",
+          "required": false,
+          "desc": "来源加工任务号",
+          "example": "T-20261028-01"
+        },
+        "qc_conclusion": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "通过",
+            "待复核",
+            "不通过"
+          ],
+          "desc": "质检结论；publish 前置必须为「通过」"
+        },
+        "published_at": {
+          "type": "string",
+          "required": false,
+          "desc": "发布时间，不传取当前时间"
+        },
+        "version_id": {
+          "type": "string",
+          "required": false,
+          "desc": "rollback/compare 时的版本 ID"
+        },
+        "compare_with": {
+          "type": "string",
+          "required": false,
+          "desc": "compare 的对比版本 ID；不传自动取最近两个已发布版本"
+        }
+      }
+    },
+    "AVP_EVAL_DATA_007": {
+      "formalOperatorNumber": 7,
+      "name": "评测结果接收",
+      "englishName": "avp_ingest_eval_result",
+      "tag": "评测结果接收",
+      "operatorId": "avp_ingest_eval_result",
+      "directory": "AVP_EVAL_DATA_007",
+      "modality": "data",
+      "category": "评测执行",
+      "stageId": "S2",
+      "stagePosition": "1/1",
+      "isLastOfStage": true,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_EVAL_DATA_007/processor.py",
+      "summary": "校验数据集评测回传的字段与版本 ID，通过则落库，不通过整条标记解析失败不落库。",
+      "outputs": {
+        "results": "007_eval_results.jsonl",
+        "parse_failed": "007_parse_failed.jsonl",
+        "report": "007_eval_report.json"
+      },
+      "paramsSpec": {
+        "known_versions": {
+          "type": "string[]",
+          "required": false,
+          "desc": "已知版本 ID 列表；不传则从 registry_path 读取"
+        },
+        "registry_path": {
+          "type": "string",
+          "required": false,
+          "desc": "版本注册表 JSON 路径（006 产物目录）"
+        },
+        "rolled_back_versions": {
+          "type": "string[]",
+          "required": false,
+          "desc": "已回滚版本 ID；命中则落库但标记 attributable=false"
+        },
+        "required_fields": {
+          "type": "string[]",
+          "required": false,
+          "desc": "自定义必填字段，默认按任务书 §6.2 六项"
+        }
+      }
+    },
+    "AVP_ATTRIBUTE_DATA_008": {
+      "formalOperatorNumber": 8,
+      "name": "差异归因",
+      "englishName": "avp_attribute_gap",
+      "tag": "差异归因",
+      "operatorId": "avp_attribute_gap",
+      "directory": "AVP_ATTRIBUTE_DATA_008",
+      "modality": "data",
+      "category": "效果分析",
+      "stageId": "S3",
+      "stagePosition": "1/2",
+      "isLastOfStage": false,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_ATTRIBUTE_DATA_008/processor.py",
+      "summary": "按归因规则对评测结果逐维度下钻，输出主因、占比、影响条数、置信度与归因链路。",
+      "outputs": {
+        "attribution": "008_attribution.json",
+        "alerts": "008_alerts.json",
+        "version_compare": "008_version_compare.json"
+      },
+      "paramsSpec": {
+        "baseline_type": {
+          "type": "enum",
+          "required": false,
+          "default": "model",
+          "values": [
+            "model",
+            "version"
+          ],
+          "desc": "对比对象类型：其他模型 / 上一个已发布版本"
+        },
+        "baseline_id": {
+          "type": "string",
+          "required": false,
+          "desc": "对比对象标识",
+          "example": "豆包 ASR（同版本）"
+        },
+        "dimensions": {
+          "type": "string[]",
+          "required": false,
+          "desc": "归因维度，默认 [噪声,语速,环境音]"
+        },
+        "alert_pp": {
+          "type": "float",
+          "required": false,
+          "default": 1.5,
+          "desc": "差异告警阈值：单维度差值大于该值触发"
+        },
+        "main_cause_share": {
+          "type": "float",
+          "required": false,
+          "default": 0.35,
+          "desc": "主因判定：占比不低于该值且为最高"
+        },
+        "confidence_bands": {
+          "type": "object",
+          "required": false,
+          "default": {
+            "low": 100,
+            "high": 200
+          },
+          "desc": "置信度分档：主因样本 <low 低 / low–high 中 / >high 高"
+        }
+      }
+    },
+    "AVP_ADVICE_DATA_009": {
+      "formalOperatorNumber": 9,
+      "name": "优化建议生成",
+      "englishName": "avp_suggest_optimization",
+      "tag": "优化建议",
+      "operatorId": "avp_suggest_optimization",
+      "directory": "AVP_ADVICE_DATA_009",
+      "modality": "data",
+      "category": "效果分析",
+      "stageId": "S3",
+      "stagePosition": "2/2",
+      "isLastOfStage": true,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_ADVICE_DATA_009/processor.py",
+      "summary": "把归因结论转成 1–3 条可执行建议，四段式（事实/证据强度/解释/验证方式）；数字全由系统计算，文字由固定模板回填。",
+      "outputs": {
+        "advice": "009_advice.json"
+      },
+      "paramsSpec": {
+        "max_suggestions": {
+          "type": "int",
+          "required": false,
+          "default": 3,
+          "desc": "最多建议条数，1–3"
+        },
+        "min_suggestions": {
+          "type": "int",
+          "required": false,
+          "default": 1,
+          "desc": "最少建议条数，保底 1 条"
+        },
+        "p0_pp": {
+          "type": "float",
+          "required": false,
+          "default": 3.0,
+          "desc": "P0 判定：差值不低于该值"
+        },
+        "p0_share": {
+          "type": "float",
+          "required": false,
+          "default": 0.3,
+          "desc": "P0 判定：占比不低于该值"
+        },
+        "p1_pp": {
+          "type": "float",
+          "required": false,
+          "default": 1.0,
+          "desc": "P1 判定：差值不低于该值"
+        },
+        "sample_plan_factor": {
+          "type": "float",
+          "required": false,
+          "default": 1.5,
+          "desc": "补样数量 = 缺口 × 该系数"
+        },
+        "target_pp_drop": {
+          "type": "float",
+          "required": false,
+          "default": 0.3,
+          "desc": "验证方式里的目标回落幅度"
+        }
+      }
+    },
+    "AVP_ASSET_DATA_010": {
+      "formalOperatorNumber": 10,
+      "name": "数据资产统计",
+      "englishName": "avp_asset_statistics",
+      "tag": "数据资产",
+      "operatorId": "avp_asset_statistics",
+      "directory": "AVP_ASSET_DATA_010",
+      "modality": "data",
+      "category": "数据运营",
+      "stageId": "S4",
+      "stagePosition": "1/1",
+      "isLastOfStage": true,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_ASSET_DATA_010/processor.py",
+      "summary": "汇总资产总量、数据集数、时间范围内新增与按天趋势；只做统计，不承载质量问题处理与回流运营。",
+      "outputs": {
+        "asset": "010_asset.json"
+      },
+      "paramsSpec": {
+        "time_range": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            7,
+            30,
+            90
+          ],
+          "default": 7,
+          "desc": "时间范围（天）"
+        },
+        "keyword": {
+          "type": "string",
+          "required": false,
+          "desc": "按数据集名称模糊搜索"
+        },
+        "registry_path": {
+          "type": "string",
+          "required": false,
+          "desc": "样本注册表（素材库数据集 + 入库记录）路径"
+        }
+      }
+    },
+    "AVP_REPORT_DATA_011": {
+      "formalOperatorNumber": 11,
+      "name": "优化建议报告",
+      "englishName": "avp_generate_report",
+      "tag": "报告生成",
+      "operatorId": "avp_generate_report",
+      "directory": "AVP_REPORT_DATA_011",
+      "modality": "data",
+      "category": "报告中心",
+      "stageId": "S5",
+      "stagePosition": "1/1",
+      "isLastOfStage": true,
+      "toolType": "规则型",
+      "port": 17023,
+      "processor": "AVP_REPORT_DATA_011/processor.py",
+      "summary": "把评测结果、归因与建议汇编成八段式优化建议报告（Markdown + 自包含 HTML + PDF，三种格式同源同数）。",
+      "outputs": {
+        "report_md": "011_report.md",
+        "report_html": "011_report.html",
+        "report_pdf": "011_report.pdf",
+        "report_meta": "011_report_meta.json"
+      },
+      "paramsSpec": {
+        "report_no": {
+          "type": "string",
+          "required": false,
+          "desc": "报告编号，不传自动生成 RPT-BENCH-{日期}-{序号}"
+        },
+        "title": {
+          "type": "string",
+          "required": false,
+          "desc": "报告标题，不传用「{任务名} · 优化建议报告」"
+        },
+        "format": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "md",
+            "html",
+            "pdf",
+            "both",
+            "all"
+          ],
+          "default": "all",
+          "desc": "输出格式：md/html/pdf 单出，both=md+html，all=三种全出（默认）"
+        },
+        "include_sections": {
+          "type": "string[]",
+          "required": false,
+          "desc": "自定义章节，不传按固定八段"
+        }
+      }
+    }
+  },
+  "aliases": {
+    "1": "AVP_INGEST_AUD_001",
+    "2": "AVP_NORMALIZE_AUD_002",
+    "3": "AVP_PERTURB_AUD_003",
+    "4": "AVP_PERTURB_AUD_004",
+    "5": "AVP_QC_AUD_005",
+    "6": "AVP_VERSION_DATA_006",
+    "7": "AVP_EVAL_DATA_007",
+    "8": "AVP_ATTRIBUTE_DATA_008",
+    "9": "AVP_ADVICE_DATA_009",
+    "10": "AVP_ASSET_DATA_010",
+    "11": "AVP_REPORT_DATA_011",
+    "语料入库": "AVP_INGEST_AUD_001",
+    "语音标准化": "AVP_NORMALIZE_AUD_002",
+    "噪声混音": "AVP_PERTURB_AUD_003",
+    "语速变换": "AVP_PERTURB_AUD_004",
+    "样本质检": "AVP_QC_AUD_005",
+    "样本版本": "AVP_VERSION_DATA_006",
+    "评测结果接收": "AVP_EVAL_DATA_007",
+    "差异归因": "AVP_ATTRIBUTE_DATA_008",
+    "优化建议": "AVP_ADVICE_DATA_009",
+    "数据资产": "AVP_ASSET_DATA_010",
+    "报告生成": "AVP_REPORT_DATA_011"
+  },
+  "distribution": {
+    "type": "server-deployment",
+    "packagedAt": "2026-11-12",
+    "containsRuntimeData": false,
+    "containsAsrModels": false,
+    "noiseAssets": "weight/assets",
+    "sourcePackage": "AVP"
+  }
+}

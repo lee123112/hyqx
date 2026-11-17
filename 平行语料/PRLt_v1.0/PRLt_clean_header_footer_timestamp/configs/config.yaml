@@ -1,0 +1,84 @@
+# 算子5：页眉页脚与时间戳清理配置
+operator:
+  name: layout_noise_cleanup
+  version: v1.0.0
+
+# 算子3/4 已完成编码与空白归一；本节点默认只接受严格 UTF-8。
+input_encodings: [utf-8]
+
+# 只清理句对文本字段，避免改写 id、语言声明和业务元数据。
+text_fields: [source, target]
+
+# ---- 总开关 ----
+remove_timestamps: true            # 整行字幕时间戳
+remove_page_numbers: true          # 整行页码
+remove_header_footer: true         # 用户自定义页眉页脚整行模式
+remove_repeated_lines: true        # 跨记录高频重复行
+remove_blank_lines: true           # 纯空白行
+remove_inline_timestamps: true     # 行内带 --> 的字幕时间片段（边界明确）
+remove_inline_page_markers: false  # 行内页码默认不删除，避免误伤正文
+
+# ---- 整行匹配模式（使用 fullmatch，模式需覆盖整行）----
+# boundary_only=true 表示只在记录首/尾 head_lines/tail_lines 行内自动删除；
+# 出现在正文中间时不删除也不报不确定，避免误删正文。
+timestamp_patterns:
+  - name: subtitle_range
+    pattern: '^\s*\d{1,2}:\d{2}:\d{2}[.,]\d{1,3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[.,]\d{1,3}\s*$'
+  - name: subtitle_range_short
+    pattern: '^\s*\d{1,2}:\d{2}\s*-->\s*\d{1,2}:\d{2}\s*$'
+  - name: subtitle_single
+    pattern: '^\s*\d{1,2}:\d{2}:\d{2}[.,]\d{1,3}\s*$'
+    boundary_only: true
+  - name: bracket_time
+    pattern: '^\s*[\[\(]\s*\d{1,2}:\d{2}(?::\d{2})?(?:[.,]\d{1,3})?\s*[\]\)]\s*$'
+    boundary_only: true
+
+page_number_patterns:
+  - name: page_number_decorated
+    pattern: '^\s*[-–—]\s*\d{1,4}\s*[-–—]\s*$'
+  - name: page_number_cn
+    pattern: '^\s*第\s*\d{1,4}\s*页(?:\s*[/／]\s*共?\s*\d{1,4}\s*页)?\s*$'
+  - name: page_number_en
+    pattern: '^\s*[Pp]age\s*\d{1,4}(?:\s*(?:of|/)\s*\d{1,4})?\s*$'
+  - name: page_number_fraction
+    pattern: '^\s*\d{1,4}\s*[/／]\s*\d{1,4}\s*$'
+  - name: page_number_bare
+    pattern: '^\s*\d{1,4}\s*$'
+    boundary_only: true
+
+# 用户自定义页眉页脚模式；默认三条均为明显版式噪声，可按任务替换。
+header_footer_patterns:
+  - name: header_footer_url
+    pattern: '^\s*https?://\S+\s*$'
+    boundary_only: true
+  - name: header_footer_copyright
+    pattern: '^\s*(?:©|\(c\)|版权所有|版权|Copyright)\s*.*$'
+    boundary_only: true
+  - name: header_footer_confidential
+    pattern: '^\s*(?:机密|内部资料|Confidential)\s*$'
+    boundary_only: true
+
+# ---- 行内模式（只在对应开关开启时生效）----
+inline_timestamp_patterns:
+  - name: subtitle_range_inline
+    pattern: '\d{1,2}:\d{2}:\d{2}[.,]\d{1,3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[.,]\d{1,3}'
+
+inline_page_patterns:
+  - name: page_marker_cn
+    pattern: '第\s*\d{1,4}\s*页'
+  - name: page_marker_en
+    pattern: '[Pp]age\s*\d{1,4}(?![0-9])'
+
+# ---- 重复行判定 ----
+min_repeat_ratio: 0.5      # 命中记录占比达到该值即视为页眉/页脚候选（含等于）
+min_repeat_count: 2        # 至少跨 2 条记录
+head_lines: 2              # 记录首部区域行数
+tail_lines: 2              # 记录尾部区域行数
+max_tracked_lines: 200000  # 频率表上限，超过即截断并在统计中标记
+min_repeat_line_chars: 2
+max_repeat_line_chars: 120
+
+# ---- 不确定性处理 ----
+max_whole_line_chars: 120        # 命中整行模式但超过该长度视为可疑，转人工
+protect_whole_field: true        # 清理后整字段为空则保留原文并转人工
+uncertain_action: waiting_manual  # waiting_manual | keep_original

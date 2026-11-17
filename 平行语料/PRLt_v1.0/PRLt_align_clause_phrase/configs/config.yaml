@@ -1,0 +1,117 @@
+# 算子11：子句与短语级对齐配置
+operator:
+  name: clause_phrase_alignment
+  version: v1.0.0
+
+# 任务声明的语言方向；记录自带的 source_lang/target_lang 必须与之一致
+source_lang: zh
+target_lang: en
+# 上游默认产物文件名（阶段内实际路径由 /predict 的 inputFile 指定）
+input_file_name: 10_sentence_pairs.jsonl
+# pair_id 取值优先级：pair_id 优先，回退 id（兼容上游句子级对齐输出）
+pair_id_fields: [pair_id, id]
+# 缺少父句引用（source_ref/target_ref）时判为 schema_error
+require_parent_ref: true
+# 只校验记录声明语言与配置方向是否一致；真实语言检测属算子6 职责
+language_check: true
+
+# 本地 mDeBERTa-v3-base 权重，路径相对本算子目录，禁止回退到远程模型服务。
+# 模型目录内提供 tokenizer.json（fast tokenizer）：中文路径下 sentencepiece 直接加载
+# spm.model 会因非 ASCII 路径失败，语义后端固定走 AutoTokenizer 的 fast 路径。
+model_name: microsoft/mdeberta-v3-base
+model_path: ../models/mdeberta-v3-base
+model_service_url: null
+model_timeout_seconds: 30
+# auto=优先模型，不可用按 fallback_policy 处理
+# model=要求模型；rule_degraded=显式规则后端（状态标记 degraded）
+# 当前开发验证默认强制使用本地权重；加载失败时按 fail 结构化失败。
+model_backend: model
+# 模型不可用：rule_degraded=降级并标记 degraded；fail=结构化失败
+fallback_policy: fail
+device: cpu
+batch_size: 32
+# 单条记录模型错误记入异常清单后继续；累计超过上限即整次执行结构化失败
+max_model_errors: 10
+
+# 父句内单调 DP：|源序号 - 目标序号| > window 的配对不参与评分
+window: 3
+min_confidence: 0.50
+# 置信度 >= review_threshold 标记 auto_pass，否则 needs_review（两者都进通过集）
+review_threshold: 0.75
+# 最优配对与次优配对总分差 <= ambiguity_margin 时判为多候选冲突
+ambiguity_margin: 0.02
+# 跳过一段的代价；仅在配对得分低于该代价时才选择跳过
+skip_penalty: 0.35
+
+# 置信度权重：只对实际可用的分项按比例重新归一，规则降级下语义分恒为 null
+semantic_weight: 0.45
+dictionary_weight: 0.20
+position_weight: 0.10
+length_weight: 0.15
+parent_weight: 0.10
+
+allow_1_to_2: true
+allow_2_to_1: true
+# 开启后，词典无证据的子句对进入异常清单（reason=no_evidence）
+require_lexicon_evidence: false
+
+# ---- 碎片 / 跨位门禁（2026-11-04）----
+# 全链路实测：399 句切出 844 个子句对，交付集里 26 条 <=5 字、77 条 <=10 字，
+# 且存在「教育、」→「science or charitable purposes,」这类高置信度错配。
+# 这类碎片进入下游后会被 14/15/17 当成正常句对评分，最终污染交付集。
+# 口径：源或目标任一侧去空白后 <= fragment_min_chars 即拒收（reason=fragment_too_short）；
+# 1-2 / 2-1 多单位对若两侧起始序号差 > cross_position_max_gap 即拒收
+# （reason=cross_position_mismatch）。1-1 对不受跨位门禁限制。
+fragment_gate: true
+fragment_min_chars: 4
+cross_position_gate: true
+cross_position_max_gap: 2
+
+# ---- 重复单位门禁（2026-11-05）----
+# 单个子句对的置信度只看得见这一对，看不见父句里的结构问题。父句内同一段源文
+# 被对齐了两遍（或译文把同一句贴两次）时，每个子句对语义都很高，整份对齐却不可信。
+# 依据（Fullflow-Effect-Bench-v1 / defect-10-* clause_reorder 40 条）：
+#   - 18 条可评估的漏检里 9 条父句内源侧包含度 = 1.00（同一源子句出现两次），
+#     置信度 0.70–0.85，全部高于 min_confidence 0.50、review_threshold 0.75 也拦不住；
+#   - 自然语料 399 个父句单元里，源侧最大包含度 0.67、目标侧 0.75，>= 0.80 的 0 个。
+# 口径：包含度 = 交集 / 较短一侧；中文按相邻两字 shingle、英文按相邻两词 shingle。
+# 命中时**不删记录**，只把该父句的全部子句对标记 review_status=needs_review、
+# low_confidence_reason=duplicate_unit，并附 metadata.repetition 证据（两侧原文与引用）。
+# 想回滚成只打标签：repetition_guard: false。
+repetition_guard: true
+repetition_containment: 0.80
+
+# 碎片/跨位门禁命中后的去向（2026-11-05）：drop（旧行为，只进异常清单）
+# | mark_and_keep（仍写通过输出，review_status=needs_review + low_confidence_reason）。
+# 依据：Fullflow-Effect-Bench-v1 的 20 条 fragment 标签（「银行 / bank」）此前在
+# 本算子被删掉，算子11 根本看不到这些记录，缺陷在链路上不可见；交付门禁该在
+# 17 号按标记拦截，而不是在这里让记录凭空消失。
+fragment_policy: mark_and_keep
+
+# 本节点要求严格 UTF-8（上游已完成编码归一）
+input_encodings: [utf-8]
+text_fields: [source, target]
+
+# 切分：标点 + 连词 + 配置词表（词表命中的边界保留在下一片段）
+zh_clause_punctuation: ["，", "。", "；", "：", "！", "？", "、", "…"]
+en_clause_punctuation: [",", ";", ":", ".", "!", "?"]
+zh_conjunctions: ["并且", "而且", "但是", "然而", "因为", "所以", "如果", "虽然", "因此", "此外"]
+en_conjunctions: ["and", "but", "or", "because", "so", "however", "if", "when", "while", "although"]
+split_terms: []
+
+# 内置中英术语表：只用于可解释的词典证据，不参与模型分数
+terminology:
+  - {source: 数据清洗, target: ["data cleaning"]}
+  - {source: 血缘, target: ["lineage"]}
+  - {source: 对齐结果, target: ["alignment results"]}
+  - {source: 人工复核, target: ["review"]}
+  - {source: 证据, target: ["evidence"]}
+  - {source: 系统, target: ["system"]}
+  - {source: 多种语言, target: ["multiple languages"]}
+  - {source: 平行语料, target: ["parallel corpus"]}
+
+# 小于该计量单元数的片段并入相邻片段，避免碎片爆炸
+min_clause_units: 2
+# 单侧最多切出的子句数；超出时合并计量单元数最小的相邻片段
+max_clauses: 12
+

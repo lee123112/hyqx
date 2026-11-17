@@ -1,0 +1,5 @@
+# 可选：图像 D_ours/D_ref 线性探针实验
+# 在线图像引擎仍是规则/代理测量，不读取这些权重。
+# torch 版本需与本机已有 torch 匹配，否则请按 PyTorch 官方矩阵选择 torchvision。
+torch>=2.2
+torchvision>=0.16

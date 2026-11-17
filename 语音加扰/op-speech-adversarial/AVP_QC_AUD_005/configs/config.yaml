@@ -1,0 +1,49 @@
+# 05 样本质检（avp_inspect_batch）
+# 所有阈值/系数必须来自本文件，代码里不得出现魔法数字。
+
+operator:
+  id: avp_inspect_batch
+  name: 样本质检
+  tag: 样本质检
+  version: v1.0.0
+  number: 5
+
+io:
+  # 输入是目录时，按以下顺序找批次 JSONL（005 通常接 004_batch / 003_batch）
+  batch_filename_candidates: ["005_batch_final.jsonl", "004_batch.jsonl", "003_batch.jsonl"]
+  # 报告里最多列出的问题样本条数（统计数仍是全量）
+  max_listed: 200
+  # 每处理多少条打一次进度日志
+  progress_every: 200
+  output_subdir: ""
+
+audio:
+  # 「非空」判定阈值（RMS），与 001 空音频口径一致
+  silence_rms: 0.00001
+
+qc:
+  # ---- 抽样：max(min_samples, ceil(N * sample_ratio)) ----
+  sample_ratio: 0.05
+  min_samples: 20
+
+  # ---- 自动检查固定两项：完整性 / 信噪比 ----
+  # 完整性 = 字段齐全 + 音频可解码 + 非空 + 实际时长 > 0（字段名按 §8 数据契约）
+  required_fields: ["sample_id", "source_uttid", "dataset_id", "audio_path", "text", "duration", "perturb"]
+  # 信噪比低于该阈值判「存疑」，进入人工试听队列优先项
+  snr_threshold_db: 15.0
+  # 全量样本中信噪比低于阈值的占比上限；超过则自动检查不通过（批次退回）
+  snr_below_ratio_max: 0.2
+  # 不做信噪比判定的维度：语速变换没有加噪声，SNR 无业务含义。
+  # 这些维度的样本 snr_source 记 not_applicable，且**不计入** below_ratio 分母。
+  no_snr_dimensions: ["speed"]
+
+  # ---- 信噪比口径 ----
+  # 干净参考路径字段名（先查 perturb 内部，再查行顶层；兼容上游多种命名）
+  clean_ref_keys: ["clean_audio_path", "clean_path", "source_audio_path", "reference_audio_path", "clean_ref", "ref_audio_path"]
+  # 无干净参考时盲估校正量（dB）；默认 0，表示不校正，结果一律标 estimated
+  estimate_bias_db: 0.0
+  # SNR 数值上限（dB）：无噪声参考时按定义是无穷大，落盘前截断为该值，避免 JSON 出现 inf
+  snr_cap_db: 120.0
+
+  # 抽样随机种子，保证同输入同种子结果一致
+  seed: 20261102

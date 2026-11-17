@@ -1,0 +1,58 @@
+{
+  "format": "crossmodal-delivery-package-v1",
+  "operator": "delivery_package",
+  "operator_number": 23,
+  "operator_version": "v1.0.0",
+  "entrypoint": "demo.jsonl",
+  "version_state": "deliverable",
+  "status": "可交付",
+  "deliverable": true,
+  "missing_requirements": [],
+  "materials": {
+    "quality_report": {
+      "status": "found",
+      "written_back": true
+    },
+    "sampling_conclusion": {
+      "status": "found",
+      "written_back": true
+    },
+    "isolation_list": {
+      "status": "found"
+    },
+    "version_notes": {
+      "status": "found"
+    }
+  },
+  "files": [
+    {
+      "path": "demo.jsonl",
+      "role": "other"
+    },
+    {
+      "path": "manifest.json",
+      "role": "other"
+    },
+    {
+      "path": "version.json",
+      "role": "other"
+    },
+    {
+      "path": "materials/quality_report.json",
+      "role": "other"
+    },
+    {
+      "path": "materials/sampling_conclusion.json",
+      "role": "other"
+    },
+    {
+      "path": "materials/isolation_list.jsonl",
+      "role": "other"
+    },
+    {
+      "path": "materials/version_notes.json",
+      "role": "other"
+    }
+  ],
+  "notes": "仓库自带演示交付包（合成样例，非真实用户数据）"
+}

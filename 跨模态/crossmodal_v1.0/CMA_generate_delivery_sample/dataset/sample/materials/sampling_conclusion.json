@@ -1,0 +1,9 @@
+{
+  "format": "crossmodal-sampling-conclusion-v1",
+  "operator": "#24",
+  "sampling_rate": 0.1,
+  "status": "written_back",
+  "writeback": {
+    "completed": true
+  }
+}

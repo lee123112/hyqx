@@ -1,0 +1,34 @@
+[
+  {
+    "operator": "data_screening",
+    "operator_version": "v1.0.0",
+    "uniqueId": "demoS1_f1",
+    "stageId": "S1",
+    "runId": "run001",
+    "inputFile": "raw_demo.jsonl",
+    "status": "success",
+    "startedAt": "2026-01-01T09:00:00+08:00",
+    "finishedAt": "2026-01-01T09:05:00+08:00",
+    "config": {
+      "business": {
+        "min_text_chars": 2,
+        "min_image_side": 32
+      },
+      "deployment": {
+        "stage_id": "S1"
+      }
+    },
+    "statistics": {
+      "total_lines": 15,
+      "output": 14,
+      "rejected": 1,
+      "bad_lines": 0
+    },
+    "artifacts": [
+      {
+        "path": "01_screened.jsonl",
+        "role": "main"
+      }
+    ]
+  }
+]

@@ -1,0 +1,346 @@
+{
+  "service": "pretrain-parallel-corpus-pipeline",
+  "version": "2026-10-24-1022-operator-id-v1",
+  "modality": "parallel_corpus",
+  "operators": {
+    "01": {
+      "name": "PRLt_validate_lang_pair",
+      "operatorCode": "PRLt_validate_lang_pair",
+      "package": "PRLt_validate_lang_pair",
+      "version": "v1.0.0",
+      "port": 8002,
+      "inputFile": "chain_input_pairs.jsonl",
+      "outputFile": "02_validated.jsonl",
+      "rejectFile": "02_rejects.jsonl",
+      "backend": "rule"
+    },
+    "02": {
+      "name": "PRLt_clean_encoding_control",
+      "operatorCode": "PRLt_clean_encoding_control",
+      "package": "PRLt_clean_encoding_control",
+      "version": "v1.0.0",
+      "port": 8003,
+      "inputFile": "02_validated.jsonl",
+      "outputFile": "03_encoding_cleaned.jsonl",
+      "rejectFile": "03_encoding_rejects.jsonl",
+      "backend": "rule"
+    },
+    "03": {
+      "name": "PRLt_clean_blank_html",
+      "operatorCode": "PRLt_clean_blank_html",
+      "package": "PRLt_clean_blank_html",
+      "version": "v1.1.0",
+      "port": 8004,
+      "inputFile": "03_encoding_cleaned.jsonl",
+      "outputFile": "04_html_cleaned.jsonl",
+      "rejectFile": "04_html_rejects.jsonl",
+      "backend": "rule"
+    },
+    "04": {
+      "name": "PRLt_clean_header_footer_timestamp",
+      "operatorCode": "PRLt_clean_header_footer_timestamp",
+      "package": "PRLt_clean_header_footer_timestamp",
+      "version": "v1.0.0",
+      "port": 8005,
+      "inputFile": "04_html_cleaned.jsonl",
+      "outputFile": "05_layout_cleaned.jsonl",
+      "rejectFile": "05_layout_rejects.jsonl",
+      "backend": "rule"
+    },
+    "05": {
+      "name": "PRLt_length_filter",
+      "operatorCode": "PRLt_length_filter",
+      "package": "PRLt_length_filter",
+      "version": "v1.1.0",
+      "port": 8006,
+      "inputFile": "05_layout_cleaned.jsonl",
+      "outputFile": "06_length_filtered.jsonl",
+      "rejectFile": "06_length_rejects.jsonl",
+      "backend": "rule"
+    },
+    "06": {
+      "name": "PRLt_hash_dedup",
+      "operatorCode": "PRLt_hash_dedup",
+      "package": "PRLt_hash_dedup",
+      "version": "v1.0.0",
+      "port": 8007,
+      "inputFile": "06_length_filtered.jsonl",
+      "outputFile": "07_deduped.jsonl",
+      "rejectFile": "07_rejects.jsonl",
+      "backend": "rule"
+    },
+    "07": {
+      "name": "PRLt_desensitize_sensitive_info",
+      "operatorCode": "PRLt_desensitize_sensitive_info",
+      "package": "PRLt_desensitize_sensitive_info",
+      "version": "v1.0.0",
+      "port": 8008,
+      "inputFile": "07_deduped.jsonl",
+      "outputFile": "08_deidentified.jsonl",
+      "rejectFile": "08_deidentification_rejects.jsonl",
+      "backend": "rule"
+    },
+    "08": {
+      "name": "PRLt_align_document_paragraph",
+      "operatorCode": "PRLt_align_document_paragraph",
+      "package": "PRLt_align_document_paragraph",
+      "version": "v1.0.0",
+      "port": 8009,
+      "inputFile": "alignment_plan.json",
+      "outputFile": "09_paragraph_pairs.jsonl",
+      "rejectFile": "09_paragraph_rejects.jsonl",
+      "backend": "rule_degraded",
+      "note": "输入契约=文档对齐计划（alignment_plan.json），非上游句对流"
+    },
+    "09": {
+      "name": "PRLt_align_sentence",
+      "operatorCode": "PRLt_align_sentence",
+      "package": "PRLt_align_sentence",
+      "version": "v1.0.0",
+      "port": 8010,
+      "inputFile": "09_paragraph_pairs.jsonl",
+      "outputFile": "10_sentence_pairs.jsonl",
+      "rejectFile": "10_sentence_rejects.jsonl",
+      "backend": "qwen3-embedding",
+      "depends_on": [
+        "08"
+      ],
+      "depends_note": "工具清单：开启句子级对齐必须强制开启文档/段落级对齐（API08）"
+    },
+    "10": {
+      "name": "PRLt_align_clause_phrase",
+      "operatorCode": "PRLt_align_clause_phrase",
+      "package": "PRLt_align_clause_phrase",
+      "version": "v1.0.0",
+      "port": 8011,
+      "inputFile": "10_sentence_pairs.jsonl",
+      "outputFile": "11_clause_pairs.jsonl",
+      "rejectFile": "11_clause_rejects.jsonl",
+      "backend": "mdeberta-v3",
+      "depends_on": [
+        "08",
+        "09"
+      ],
+      "default_enabled": false,
+      "depends_note": "工具清单：默认关闭；开启子句级对齐必须强制开启 API08 与 API09"
+    },
+    "11": {
+      "name": "PRLt_domain_detection_filter",
+      "operatorCode": "PRLt_domain_detection_filter",
+      "package": "PRLt_domain_detection_filter",
+      "version": "v1.1.0",
+      "port": 8016,
+      "inputFile": "15_fluency_checked.jsonl",
+      "outputFile": "16_domain_checked.jsonl",
+      "rejectFile": "16_rejects.jsonl",
+      "backend": "qwen3-embedding-domain-prototype"
+    },
+    "12": {
+      "name": "PRLt_score_alignment_confidence",
+      "operatorCode": "PRLt_score_alignment_confidence",
+      "package": "PRLt_score_alignment_confidence",
+      "version": "v1.0.0",
+      "port": 8012,
+      "inputFile": "11_clause_pairs.jsonl",
+      "outputFile": "12_scored.jsonl",
+      "rejectFile": "12_rejects.jsonl",
+      "backend": "rule"
+    },
+    "13": {
+      "name": "PRLt_grade_alignment_quality",
+      "operatorCode": "PRLt_grade_alignment_quality",
+      "package": "PRLt_grade_alignment_quality",
+      "version": "v1.0.0",
+      "port": 8013,
+      "inputFile": "12_scored.jsonl",
+      "outputFile": "13_graded.jsonl",
+      "rejectFile": "13_rejects.jsonl",
+      "backend": "rule"
+    },
+    "14": {
+      "name": "PRLt_semantic_equivalence_check",
+      "operatorCode": "PRLt_semantic_equivalence_check",
+      "package": "PRLt_semantic_equivalence_check",
+      "version": "v1.0.0",
+      "port": 8014,
+      "inputFile": "13_graded.jsonl",
+      "outputFile": "14_semantic_checked.jsonl",
+      "rejectFile": "14_rejects.jsonl",
+      "backend": "qwen3-embedding"
+    },
+    "15": {
+      "name": "PRLt_fluency_check",
+      "operatorCode": "PRLt_fluency_check",
+      "package": "PRLt_fluency_check",
+      "version": "v1.1.0",
+      "port": 8015,
+      "inputFile": "14_semantic_checked.jsonl",
+      "outputFile": "15_fluency_checked.jsonl",
+      "rejectFile": "15_rejects.jsonl",
+      "backend": "qwen3.5-2b-local"
+    },
+    "16": {
+      "name": "PRLt_number_entity_consistency",
+      "operatorCode": "PRLt_number_entity_consistency",
+      "package": "PRLt_number_entity_consistency",
+      "version": "v1.0.0",
+      "port": 8017,
+      "inputFile": "16_domain_checked.jsonl",
+      "outputFile": "17_entity_checked.jsonl",
+      "rejectFile": "17_entity_rejects.jsonl",
+      "backend": "rule",
+      "default_enabled": false,
+      "depends_note": "工具清单：可跳过=是，默认关闭（可选校验）"
+    },
+    "17": {
+      "name": "PRLt_build_metadata_package",
+      "operatorCode": "PRLt_build_metadata_package",
+      "package": "PRLt_build_metadata_package",
+      "version": "v1.0.0",
+      "port": 8018,
+      "inputFile": "17_entity_checked.jsonl",
+      "outputFile": "18_dataset.jsonl",
+      "rejectFile": "18_rejects.jsonl",
+      "backend": "rule",
+      "note": "交付打包算子：输出数据集 JSONL + 交付 zip；无血缘改造后不再读取上游血缘、不再把血缘文件打进交付包"
+    },
+    "18": {
+      "name": "PRLt_quality_report",
+      "operatorCode": "PRLt_quality_report",
+      "package": "PRLt_quality_report",
+      "version": "v1.0.0",
+      "port": 8019,
+      "inputFile": "19_input.jsonl",
+      "outputFile": "19_quality_report.json",
+      "rejectFile": "19_rejects.jsonl",
+      "backend": "rule"
+    },
+    "19": {
+      "name": "PRLt_manual_inspection",
+      "operatorCode": "PRLt_manual_inspection",
+      "package": "PRLt_manual_inspection",
+      "version": "v1.1.0",
+      "port": 8020,
+      "inputFile": "17_entity_checked.jsonl",
+      "outputFile": "20_review_queue.jsonl",
+      "rejectFile": "20_review_rejects.jsonl",
+      "backend": "rule"
+    },
+    "20": {
+      "name": "PRLt_back_translation",
+      "operatorCode": "PRLt_back_translation",
+      "package": "PRLt_back_translation",
+      "version": "v1.0.0",
+      "port": 8021,
+      "inputFile": "17_entity_checked.jsonl",
+      "outputFile": "21_back_translated.jsonl",
+      "rejectFile": "21_rejects.jsonl",
+      "backend": "siliconflow-qwen3.5-9b",
+      "optional": true,
+      "rejoin": [
+        "14",
+        "15",
+        "11",
+        "16",
+        "17"
+      ]
+    },
+    "21": {
+      "name": "PRLt_synonym_substitution",
+      "operatorCode": "PRLt_synonym_substitution",
+      "package": "PRLt_synonym_substitution",
+      "version": "v1.1.0",
+      "port": 8022,
+      "inputFile": "17_entity_checked.jsonl",
+      "outputFile": "22_synonym_substituted.jsonl",
+      "rejectFile": "22_rejects.jsonl",
+      "backend": "rule",
+      "optional": true,
+      "rejoin": [
+        "14",
+        "15",
+        "11",
+        "16",
+        "17"
+      ]
+    },
+    "22": {
+      "name": "PRLt_syntactic_transformation",
+      "operatorCode": "PRLt_syntactic_transformation",
+      "package": "PRLt_syntactic_transformation",
+      "version": "v1.0.0",
+      "port": 8023,
+      "inputFile": "17_entity_checked.jsonl",
+      "outputFile": "23_syntactic_transformed.jsonl",
+      "rejectFile": "23_rejects.jsonl",
+      "backend": "qwen3.5-2b-local",
+      "optional": true,
+      "rejoin": [
+        "14",
+        "15",
+        "11",
+        "16",
+        "17"
+      ]
+    },
+    "23": {
+      "name": "PRLt_cross_lingual_synthesis",
+      "operatorCode": "PRLt_cross_lingual_synthesis",
+      "package": "PRLt_cross_lingual_synthesis",
+      "version": "v1.0.0",
+      "port": 8024,
+      "inputFile": "17_entity_checked.jsonl",
+      "outputFile": "24_cross_lingual_synthesized.jsonl",
+      "rejectFile": "24_rejects.jsonl",
+      "backend": "siliconflow-qwen3.5-9b",
+      "optional": true,
+      "rejoin": [
+        "14",
+        "15",
+        "11",
+        "16",
+        "17"
+      ]
+    }
+  },
+  "legacyOperatorAliases": {
+    "02": "01",
+    "03": "02",
+    "04": "03",
+    "05": "04",
+    "06": "05",
+    "07": "06",
+    "08": "07",
+    "09": "08",
+    "10": "09",
+    "11": "10",
+    "16": "11",
+    "12": "12",
+    "13": "13",
+    "14": "14",
+    "15": "15",
+    "17": "16",
+    "18": "17",
+    "19": "18",
+    "20": "19",
+    "21": "20",
+    "22": "21",
+    "23": "22",
+    "24": "23"
+  },
+  "legacyOperatorAliasPolicy": {
+    "mode": "explicit_request_only",
+    "requestField": "operatorIdScheme",
+    "currentValue": "current",
+    "legacyValue": "legacy",
+    "reason": "legacy API02-API24 IDs overlap current IDs and cannot be inferred from ID value alone"
+  },
+  "historicalOperators": {
+    "sourceCopyrightCheck": {
+      "legacyOperatorId": "01",
+      "package": "PRLt_source_copyright_check",
+      "status": "historical_not_registered",
+      "note": "2026-10-24 V1.6起API01复用为1022清单#1语言与句对结构校验；历史来源准入不再注册。"
+    }
+  }
+}

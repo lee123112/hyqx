@@ -1,0 +1,34 @@
+# 算子 21（处置错配样本）部署配置
+# 表1 冻结口径：本算子**无模型、无权重、无外部服务**，纯规则处置。
+# 结构：operator（身份） / stage_id / enabled / 业务参数 / transport（传输约定）
+# 请求不可覆盖 operator、stage_id、enabled、去向与评分分层口径（见 utils/schemas.py）。
+
+operator:
+  name: mismatch_disposal          # 算子正式名（英文，落台账与血缘）
+  version: v1.0.0
+
+stage_id: S4                       # 阶段归属：S4 数据质量评估（v4.2 §0.3：M21→S4）
+
+# 表1 #21 为“必须开启”的工具，置 false 会导致配置校验失败
+enabled: true
+
+# ---- 退回 / 锁定预算（表1 冻结口径，可被请求覆盖，但只能收紧放宽本项）----
+return_limit: 1                    # 单条允许退回重跑次数上限（本算子维度）
+max_retry_per_item: 2              # 全产线单条最多重跑次数；第 3 次锁定样本隔离库
+
+# ---- 表1 只读去向（请求不可覆盖，改值会直接配置失败）----
+raw_issue_destination: raw_isolation        # 原始文件问题 → 原始隔离区
+quality_issue_destination: sample_isolation # 治理不达标 → 样本隔离库
+scoring_tiers_not_isolated: true             # 评分分层 / 流程状态不进隔离区
+
+# ---- 人工复核平台接入状态（未接入时只能显式 waiting_manual，绝不伪造人工确认）----
+manual_platform_available: false    # demo 环境尚未接入人工复核平台
+allow_degraded: false                # true → 相关记录置 waiting_manual 并显式 degraded
+                                    # false → 结构化失败 DependencyError（工单处理）
+
+# ---- 台账快照与传输 ----
+max_embedded_record_bytes: 32768    # 隔离台账内嵌原记录的字节上限（超出只留计数与哈希）
+
+transport:
+  format: crossmodal-files-v1       # demo 阶段传输约定（非甲方正式协议）
+  max_response_bytes: 67108864      # 阶段末文件内容对象字节上限（64MiB）

@@ -1,0 +1,94 @@
+# 算子15：译文流畅度检测配置
+operator:
+  name: translation_fluency
+  version: v1.2.0
+
+# 上游算子3/4 已完成编码归一；本节点默认只接受严格 UTF-8。
+input_encodings: [utf-8]
+
+# 上游默认产物名（阶段内实际路径由 /predict 的 inputFile 指定）。
+input_file_name: 14_semantic_checked.jsonl
+
+# 只读取译文，不改写 source/target 原文。
+text_field: target
+
+# 任务声明的语言方向；记录自带的 target_lang 必须与之一致。
+source_lang: zh
+target_lang: en
+language_check: true
+
+# ---- 后端门禁 ----
+# auto=有模型用模型、无模型按 fallback_policy；model=必须用模型；rule_degraded=只做规则降级。
+# 本地 Qwen3.5-2B 流畅度适配器（多模态后训练架构，文本推理）；不调用远程模型服务。
+# 适配器惰性加载权重：路径存在但权重缺失/加载失败时由 resolve_backend 结构化失败。
+backend: model
+model_service_url: null
+model_name: Qwen3.5-2B
+model_path: ../models/Qwen3.5-2B/adapter.py
+model_version: Qwen3.5-2B-local-fluency-defect-v3
+# CPU 无 GPU 加速，单条 0-100 紧凑 JSON 约 30-120s；HTTP 服务路径用该超时。
+model_timeout_seconds: 900
+# 本地模型适配器入口函数名（adapter.py 中的可调用对象）。
+# detect_defects：只提缺陷主张，不打分（scoring_mode=defect_count_v1）。
+# 历史入口 score_fluency 保留，仅在 scoring_mode=rubric_v2 时使用。
+model_entrypoint: detect_defects
+# 模型不可用时：rule_degraded=降级并标记 degraded；fail=结构化失败（不静默降级）。
+fallback_policy: fail
+# 模型错误容忍度：超过则整次失败，不静默截断。
+# [2026-11-02 B2] 只保留绝对值 20 时，5000 条批次的容忍度只有 0.4%；改为
+# 「比例 2% 与绝对下限 20 取大」：实际上限 = max(20, ceil(0.02 × 输入条数))。
+# 402 条批次仍是 20 条（与改前一致），2000 条批次放宽到 40 条。
+max_model_errors: 20
+max_model_error_rate: 0.02
+
+# ---- 评分口径（defect_count_v1，2026-11-06 起默认）----
+# 背景：rubric-v2 让模型直接给 0-100 整体印象分。在 942 条自然句上实测只吐出 16 个
+# 不同分值、71.9% 集中在 95 和 78 两个点；被判 <60 的记录里模型给出的理由是事后编造
+# （如 "Mendoza was gunned down." 判 20 分、理由 wrong collocation）。结论：整体印象分
+# 没有排序能力，且低分是「先有分、后有理由」，改 rubric 改不掉。
+# 新口径：模型只提 {type, span, fix} 缺陷主张，算子核验后按条数计分。
+# 详见 _eval/reports/op15_fluency_redesign.md。
+scoring_mode: defect_count_v1
+defect_taxonomy_version: en-defect-taxonomy-v1
+# 只有这些类型能进分数 —— 全部可用机械规则独立确证。
+# agreement/verb_form 验的是「主张具体且可证伪」（有定位、有最小修正），
+# 不是替代语法分析器；本环境无 spacy/LanguageTool，故更要靠这里的白名单收紧。
+# article/preposition/collocation/word_order/fragment 一律只作 suspect 证据，不计分。
+scored_defect_types: [agreement, verb_form, dup_word, punctuation]
+severity_weights: {hard: 1.0, minor: 0.4}
+# score = 100 × max(0, 1 − rate / score_scale)，rate = 加权错误 / max(词数, token_floor) × 100。
+# score_scale=12.5 的含义：每 100 词 12.5 个加权错误 = 0 分；60 分线 = 每 100 词 ≤ 5 个。
+# 先验设定，不随数据回调；验收不达标只报告，不改常数。
+score_scale: 12.5
+token_floor: 20
+max_defects: 5
+max_fix_edit_distance: 2
+low_confidence_length_tokens: 8
+
+# ---- 评分与过滤 ----
+# 真实流畅度分数范围 0–100，默认阈值 60；低于阈值标记 fluent=false。
+fluency_threshold: 60.0
+require_calibrated_score: true
+require_approved_calibration: true
+# 规范 4.15：分数状态为 waiting_calibration，未完成 Gold 校准前不作为放行/拦截的
+# 最终依据，不为演示放宽。当前分数语义为 defect_count_v1（规则计数映射值，不是概率），
+# 不在本白名单内 → 算子输出 waiting_calibration，只写分数与缺陷证据，不判 accepted/
+# low_fluency。Gold 校准完成、拿到 calibrated_probability_percent 后再加入白名单开闸。
+accepted_score_semantics: [calibrated_probability_percent]
+score_min: 0.0
+score_max: 100.0
+# low_fluency=保留在通过集并写审计；move_to_rejects=只写异常清单。
+low_fluency_policy: mark_and_keep
+# 降级/模型错误记录的去向。
+degraded_policy: mark_and_keep
+# 为 true 时降级记录标记 waiting_manual（明确允许进入人工复核），否则 model_unavailable。
+allow_degraded_delivery: false
+
+# ---- 规则门禁 ----
+# 连续标点串（如译文末尾被注入 ",, .. ??"）是结构性硬伤，不需要 Gold 校准就能确证。
+# 命中即判 low_fluency 并写 review_status=needs_review / low_confidence_reason=
+# punctuation_disorder / flagged_by=15_rule，记录仍按 low_fluency_policy 保留在通过集。
+# fluency_score 原样保留：模型给了分照抄，没给仍是 null，规则结论不写成模型分数。
+# 实测：构造缺陷 55 段命中 45 段；自然语料 2253 条 0 命中（"..."、"ibid., para." 不触发）。
+rule_gate: true
+rule_gate_kinds: [punctuation_run]

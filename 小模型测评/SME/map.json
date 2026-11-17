@@ -1,0 +1,102 @@
+{
+  "service": "small-model-evaluation",
+  "version": "1.0.0",
+  "modality": "multi",
+  "operators": {
+    "SME_eval_text": {
+      "name": "预训练文本小模型测评",
+      "operatorCode": "SME_EVAL_TEXT_001",
+      "package": "SME_EVAL_TEXT_001",
+      "module": "SME_EVAL_TEXT_001.utils.processor",
+      "class": "TextEvaluationOperator",
+      "stage": "1",
+      "stageName": "小模型测评",
+      "version": "v1.0.0",
+      "type": "text",
+      "modality": "TEXT",
+      "description": "用待评估文本训练轻量 MLM，对比参考语料基线，输出准确率、F1 与损失变异系数。",
+      "inputFile": "dataset.zip",
+      "outputFile": "output.zip",
+      "port": 6289,
+      "aliases": [
+        "SME_EVAL_TEXT_001"
+      ]
+    },
+    "SME_eval_image": {
+      "name": "预训练图像小模型测评",
+      "operatorCode": "SME_EVAL_IMAGE_001",
+      "package": "SME_EVAL_IMAGE_001",
+      "module": "SME_EVAL_IMAGE_001.utils.processor",
+      "class": "ImageEvaluationOperator",
+      "stage": "1",
+      "stageName": "小模型测评",
+      "version": "v1.0.0",
+      "type": "image",
+      "modality": "IMAGE",
+      "description": "对图像批次计算 IoU、清晰度、语义完整性与场景识别准确率。",
+      "inputFile": "dataset.zip",
+      "outputFile": "output.zip",
+      "port": 6289,
+      "aliases": [
+        "SME_EVAL_IMAGE_001"
+      ]
+    },
+    "SME_eval_audio": {
+      "name": "预训练语音小模型测评",
+      "operatorCode": "SME_EVAL_AUDIO_001",
+      "package": "SME_EVAL_AUDIO_001",
+      "module": "SME_EVAL_AUDIO_001.utils.processor",
+      "class": "AudioEvaluationOperator",
+      "stage": "1",
+      "stageName": "小模型测评",
+      "version": "v1.0.0",
+      "type": "audio",
+      "modality": "AUDIO",
+      "description": "对语音批次计算 CER、说话人准确率与领域 F1；CER 需要 ASR 资产。",
+      "inputFile": "dataset.zip",
+      "outputFile": "output.zip",
+      "port": 6289,
+      "aliases": [
+        "SME_EVAL_AUDIO_001"
+      ]
+    },
+    "SME_eval_video": {
+      "name": "视频质量分级（VQA 诊断）",
+      "operatorCode": "SME_EVAL_VIDEO_001",
+      "package": "SME_EVAL_VIDEO_001",
+      "module": "SME_EVAL_VIDEO_001.utils.processor",
+      "class": "VideoEvaluationOperator",
+      "stage": "1",
+      "stageName": "小模型测评",
+      "version": "v1.1.0",
+      "type": "video",
+      "modality": "VIDEO",
+      "description": "对视频批次计算清晰度、对齐、可信、安全与完整性，输出 AA/A/B/C 等级，并保留启发式 VQA 技术质量诊断。",
+      "inputFile": "dataset.zip",
+      "outputFile": "output.zip",
+      "port": 6289,
+      "aliases": [
+        "SME_EVAL_VIDEO_001"
+      ]
+    },
+    "SME_eval_benchmark": {
+      "name": "后训练评测语料区分度",
+      "operatorCode": "SME_EVAL_BENCHMARK_001",
+      "package": "SME_EVAL_BENCHMARK_001",
+      "module": "SME_EVAL_BENCHMARK_001.utils.processor",
+      "class": "BenchmarkEvaluationOperator",
+      "stage": "1",
+      "stageName": "小模型测评",
+      "version": "v1.0.0",
+      "type": "benchmark",
+      "modality": "BENCHMARK",
+      "description": "对比基础模型与优化模型在同一批后训练题目上的得分差，判断语料区分度。",
+      "inputFile": "dataset.zip",
+      "outputFile": "output.zip",
+      "port": 6289,
+      "aliases": [
+        "SME_EVAL_BENCHMARK_001"
+      ]
+    }
+  }
+}

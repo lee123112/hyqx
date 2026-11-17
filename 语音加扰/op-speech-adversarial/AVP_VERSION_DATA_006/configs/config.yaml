@@ -1,0 +1,41 @@
+# 06 样本版本（avp_pack_version）
+# 所有阈值/系数必须来自本文件，代码里不得出现魔法数字。
+
+operator:
+  id: avp_pack_version
+  name: 样本版本
+  tag: 样本版本
+  version: v1.0.0
+  number: 6
+
+io:
+  # 版本注册表（持久化在 ctx.work_dir，供 007 / 010 复用）
+  registry_filename: "006_registry.json"
+  # 每个版本的权威版本包目录（在 ctx.work_dir 下，同名版本重复打包不会互相覆盖）
+  package_subdir: "006_packages"
+  # 输入是目录时，按以下顺序找质检最终样本表
+  batch_filename_candidates: ["005_batch_final.jsonl", "004_batch.jsonl", "003_batch.jsonl"]
+  # 质检最终结论文件（pack 未显式传 qc_conclusion 时回读）
+  qc_final_filename: "005_qc_final.json"
+  # 报告/对比里最多列出的样本条数（统计数仍是全量）
+  max_listed: 200
+  # 每处理多少条打一次进度日志
+  progress_every: 200
+  output_subdir: ""
+
+version:
+  # 版本名称长度上限（业务：2–50 字）
+  name_min_len: 2
+  name_max_len: 50
+  # 同任务内同版本名自增：v1.0 → v1.1
+  first_version_no: "v1.0"
+  minor_step: 1
+  version_no_pattern: "^v\\d+\\.\\d+$"
+  id_prefix: "VER"
+  # pack 未传 qc_conclusion 且回读不到 005 结论时的兜底值（草稿可打包，发布仍会被拦截）
+  default_qc_conclusion: "待复核"
+  # 版本包内部结构
+  zip_name: "006_version.zip"
+  manifest_name: "manifest.json"
+  batch_name_in_zip: "005_batch_final.jsonl"
+  audio_dir_in_zip: "audio"

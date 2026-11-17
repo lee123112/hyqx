@@ -1,0 +1,46 @@
+{
+  "format": "crossmodal-quality-report-v1",
+  "report_id": "quality-report-prev_task-run001",
+  "operator": "alignment_qc",
+  "operator_number": 20,
+  "operator_version": "v1.0.0",
+  "stage_id": "S4",
+  "uniqueId": "prev_task",
+  "runId": "run001",
+  "generated_at": "2026-10-07T15:08:48+08:00",
+  "status": "waiting_writeback",
+  "writeback": {
+    "required": true,
+    "writeback_by": "operator_24",
+    "writeback_completed": false,
+    "version_state": "pending_release"
+  },
+  "checks": {
+    "text_nonempty": {
+      "ok": 40,
+      "failed": 0
+    },
+    "modality_openable": {
+      "ok": 40,
+      "failed": 0
+    },
+    "alignment_shape": {
+      "ok": 40,
+      "failed": 0
+    }
+  },
+  "metrics": {
+    "alignment_confidence": {
+      "avg": 0.93
+    },
+    "text_length": {
+      "avg": 18.4
+    }
+  },
+  "statistics": {
+    "input": 40,
+    "output": 40,
+    "origin_quarantined": 0
+  },
+  "note": "本样例模拟上游 #20 待回写报告，供算子 24 回写演示"
+}

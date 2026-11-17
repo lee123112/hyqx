@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+.idea/
+.mypy_cache/
+ruff_cache/
+# 宿主机运行配置不进入镜像层
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+output/
+*/output/*
+!*/output/.gitkeep
+!*/output/model/
+!*/output/model/.gitkeep
+*/*.log
+_workspace/
+# v1.0 正式版：各算子自带 weight/ 必须进入构建上下文/镜像（单算子独立运行所需）。
+# 包根 weight/ 在交付时只保留 README/清单，不含模型大文件；因此这里不再排除任何 weight 目录。
+# MTY 归档镜像与关系库（运行期产物；生产用 MTY_TRANSPORT_DIR 指到持久化卷）
+*/_mty_transport/
+*/*/_mty_transport/

@@ -1,0 +1,10 @@
+operator_version: v1.0.0
+model_name: Qwen/Qwen3.5-9B
+model_version: siliconflow/Qwen3.5-9B
+model_service_url: https://api.siliconflow.cn/v1/chat/completions
+model_path: null
+model_timeout_seconds: 180
+rounds: 1
+source_lang: en
+target_lang: zh
+max_candidates_per_input: 1

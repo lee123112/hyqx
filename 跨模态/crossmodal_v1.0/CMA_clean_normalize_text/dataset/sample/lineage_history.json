@@ -1,0 +1,20 @@
+[
+  {
+    "operator": "data_screening",
+    "operator_version": "v1.0.0",
+    "uniqueId": "demoS2_f1",
+    "stageId": "S1",
+    "status": "success",
+    "inputFile": "01_source.jsonl",
+    "config": {
+      "operator": {
+        "name": "data_screening",
+        "version": "v1.0.0"
+      }
+    },
+    "statistics": {
+      "total_lines": 13,
+      "output": 8
+    }
+  }
+]

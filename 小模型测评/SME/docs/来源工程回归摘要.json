@@ -1,0 +1,14 @@
+{
+  "backendTests": 328,
+  "backendFailures": 0,
+  "backendErrors": 0,
+  "frontendUnitTests": 19,
+  "frontendTypecheck": "passed",
+  "frontendBuild": "passed",
+  "relocatedZipExecutions": 12,
+  "relocatedZipFailed": 0,
+  "clipSmoke": "passed",
+  "modelFiles": 47,
+  "modelBytes": 3774682017,
+  "independentReview": "approved; 20 focused tests passed"
+}

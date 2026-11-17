@@ -1,0 +1,50 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "demo_bad.jsonl",
+      "role": "review"
+    },
+    {
+      "path": "lineage_history.json",
+      "role": "sidecar"
+    },
+    {
+      "path": "media/aud_8bit_mono_05s.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/aud_broken.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/aud_empty.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/aud_sine_16000_mono_2s.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/aud_sine_22050_stereo_1s.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/aud_sine_8000_mono_05s.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/img_main.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/vid_main.mp4",
+      "role": "media"
+    }
+  ]
+}

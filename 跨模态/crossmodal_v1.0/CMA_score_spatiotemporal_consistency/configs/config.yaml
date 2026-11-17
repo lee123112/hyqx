@@ -1,0 +1,41 @@
+# 算子 15 评分时空一致性（表1 #15）默认配置。
+# 表1 冻结项（enabled / 阈值定义域 / 插值类型）不可被 /predict 覆盖为其它口径。
+
+operator:
+  # 表1 正式编号，固定为 15；写成其它值直接失败
+  number: 15
+  # 跨模态英文 id（中文名见 map.json：评分时空一致性）
+  name: temporal_consistency
+  version: v1.0.0
+
+# S3 数据加工阶段
+stage_id: S3
+
+# 表1 总开关：默认关闭。这批数据没有音视频时间戳时不要打开。
+# 关闭时不执行任何时序判定，样本原样透传（只追加 processing["15"]={status: skipped}）。
+enabled: false
+
+# 表1 参数 1：画面、声音、字幕最多差几秒（可配 0.2–2.0，单位秒，默认 0.5）。
+# 超过该值 → 样本隔离库（标签：样本-语义不通）。
+max_time_delta_sec: 0.5
+
+# 表1 固定插值类型：线性。仅允许 linear，写作其它值直接失败。
+interpolation: linear
+
+# 线性插值的具体实现（表1 未细化，本算子提供两种等价实现并显式记录）：
+#   piecewise_linear（默认）：按锚点排序做分段线性插值，区间外按边界段斜率外推；
+#   global_linear          ：对全部锚点做最小二乘直线拟合。
+interpolation_method: piecewise_linear
+
+# 少于该锚点数视为“无可用校准”：仍按原始时间轴计算真实差值，
+# 并在 temporal_alignment.interpolation.applied=false 显式标记，绝不伪造已校准。
+min_anchors_for_calibration: 2
+
+# true 时，锚点不足的记录进入“待人工校准”台账（流程状态，留产线，不隔离，不判通过）；
+# false（默认）时按未校准结果照常判定，并显式标记 calibration=uncalibrated。
+require_calibration: false
+
+# 资源保护：单条记录最多处理的时序绑定数（超出按异常进原始隔离区，不静默截断）
+max_bindings: 5000
+# temporal_alignment.evidence 最多保留的逐绑定证据条数（其余只计数）
+max_evidence_bindings: 20

@@ -1,0 +1,74 @@
+# 算子12：双语对齐置信度配置
+operator:
+  name: alignment_confidence
+  version: v1.0.0
+
+# 任务声明的语言方向；记录自带的 source_lang/target_lang 必须与之一致
+source_lang: zh
+target_lang: en
+# 上游默认产物文件名（阶段内实际路径由 /predict 的 inputFile 指定）
+input_file_name: 11_clause_pairs.jsonl
+# pair_id 取值优先级：pair_id 优先，回退 id（兼容上游子句级对齐输出）
+pair_id_fields: [pair_id, id]
+# 缺少 source_ref/target_ref 时判为 schema_error
+require_refs: true
+# 只校验记录声明语言与配置方向是否一致；真实语言检测属算子6 职责
+language_check: true
+
+# 参与融合的粒度：子句/短语 0.6、句子 0.3、文档/段落 0.1
+# 未启用的粒度不进分母；缺失分项按有效权重重新归一
+enabled_granularities: [clause_phrase, sentence, paragraph]
+component_weights:
+  clause_phrase: 0.6
+  sentence: 0.3
+  paragraph: 0.1
+# component_scores 中记录的来源算子，用于血缘追溯
+component_source_operators:
+  clause_phrase: clause_phrase_alignment
+  sentence: sentence_alignment
+  paragraph: paragraph_alignment
+
+# 低置信阈值：低于该值只做标记与审计，是否物理过滤交由算子13/下游
+low_confidence_threshold: 0.7
+# 置信度 >= review_threshold 标记 auto_pass，否则 needs_review
+review_threshold: 0.9
+# 最优与次优候选融合分差 <= ambiguity_margin 判为并列冲突，进入 waiting_manual
+ambiguity_margin: 0.005
+# mark_and_keep=低置信保留在通过集并同时写异常清单审计；move_to_rejects=只写异常清单
+low_confidence_policy: mark_and_keep
+
+# ---- 父句级守卫（2026-11-05）----
+# 融合分是逐条子句对算的，看不见父句层面的结构问题。两类实测信号：
+#   1) 重复单位：同一父句内两条源/目标子句的包含度 >= repetition_containment。
+#      构造缺陷 defect-12-* length_ratio 里有 7 条是「同一句译文贴给两个源子句」，
+#      单条子句对语义 0.82–0.88，融合分 0.72–0.88，全部高于低置信阈值 0.70；
+#      自然语料 399 个父句：源侧最大 0.67、目标侧最大 0.75，>= 0.80 的 0 个。
+#   2) 跨语言长度比：父句源侧单元数 / 目标侧单元数（中文按字、英文按词）。
+#      自然语料 0.88–4.08（p50 1.59），构造缺陷 length_ratio 有 8 条落在 0.50–0.81，
+#      阈值 0.88 在自然语料上零命中。上界 4.10 对应 length_extreme（26.0）。
+# 命中时：alignment_confidence 封顶到 guard_confidence_cap（原融合分保留在
+# fused_confidence 与 metadata.parent_guard 里），review_status=needs_review。
+# 想只打标签不封顶：parent_guard: false。
+parent_guard: true
+repetition_containment: 0.80
+parent_ratio_min: 0.88
+parent_ratio_max: 4.10
+# 0.45 < 下游 13/14 使用的 0.55 兜底置信度：命中守卫 = 本算子不为这份对齐背书
+guard_confidence_cap: 0.45
+#   3) 段内兄弟对重复（2026-11-05）：同一段落的两条 pair 给出同一段译文。
+#      整段译文被复制一遍后，09/10 会把它拆成两条 1-1 句对：各自长度比正常、
+#      父句内部也没有重复，只有把同段兄弟 pair 放在一起比才看得见。
+#      自然语料 895 段（holdout 399 + flores 496）0 命中；缺陷 defect-12-021 p2 命中 1.0。
+sibling_duplicate_guard: true
+
+confidence_version: v1.0.0
+
+# 可选：通过 metadata 引用上游 10（句子）/09（段落）产物的旁路证据文件；
+# 给定时按 id→置信度建索引，找不到分项时补齐；缺失文件不补分、不伪造分数
+sentence_evidence_file: null
+paragraph_evidence_file: null
+evidence_id_fields: [pair_id, id]
+evidence_confidence_fields: [confidence, alignment_confidence]
+
+# 本节点要求严格 UTF-8（上游已完成编码归一）
+input_encodings: [utf-8]

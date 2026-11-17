@@ -1,0 +1,35 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "media/audio_ok.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/img_broken.png",
+      "role": "media"
+    },
+    {
+      "path": "media/img_empty.png",
+      "role": "media"
+    },
+    {
+      "path": "media/img_ok.png",
+      "role": "media"
+    },
+    {
+      "path": "media/video_ok.mp4",
+      "role": "media"
+    }
+  ],
+  "operator": "input_admission",
+  "formal_operator_numbers": [
+    10
+  ],
+  "notes": "算子10 表1 #10 准入核对样例；4 合格 / 3 退回 / 3 原始隔离 / 4 样本隔离 / 2 坏行"
+}

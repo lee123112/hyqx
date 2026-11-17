@@ -1,0 +1,728 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-11-06 16:52:28",
+  "runId": "20261106_164921_dc7a2eb7",
+  "seed": 42,
+  "baselines": [
+    {
+      "id": "CFG26110639YYND",
+      "type": "text",
+      "modelId": "bert-base",
+      "mode": "measured",
+      "name": "CLUE/TNEWS本地切片 + CLUENER参考语料",
+      "modelName": "bert-base-chinese",
+      "description": "MLM heldout proxy; not downstream CLUE scores",
+      "version": "2026.11.06.1",
+      "status": "published",
+      "validationVersion": "text-bert-mlm-v2",
+      "seed": 42,
+      "config": {
+        "thresholds": {
+          "accuracy": 42.307692,
+          "f1": 35.970696,
+          "lossCv": 0.652885
+        },
+        "weights": [
+          25,
+          25,
+          20,
+          15,
+          15
+        ],
+        "grades": {
+          "AA": 95,
+          "A": 85,
+          "B": 70
+        },
+        "highValue": false
+      },
+      "source": "builtin",
+      "updatedAt": "2026-11-06 16:52:28",
+      "isDefault": true,
+      "evidence": {
+        "kind": "local_open_dataset",
+        "createdAt": "2026-11-06 16:51:21",
+        "runId": "20261106_164921_dc7a2eb7",
+        "runSha256": "d07becc2595adc6353deb9a15b524045014ac91184ddde8b6d4f9b253205ec55",
+        "dataset": {
+          "name": "CLUE/TNEWS本地切片 + CLUENER参考语料",
+          "sourceUrl": "https://huggingface.co/datasets/clue/clue",
+          "split": "TNEWS train前128条，按规范化内容组90/10划分；CLUENER train参考语料",
+          "model": "bert-base-chinese",
+          "method": "MLM heldout proxy; not downstream CLUE scores"
+        },
+        "sampleCount": 13,
+        "inputCount": 128,
+        "engineVersion": "text-bert-mlm-v2",
+        "modelSha256": "2a00d2aa19acc816627ab7d9e2eff6eba482a8409d99839734d0cdb0df159a11",
+        "metrics": [
+          {
+            "key": "accuracy",
+            "value": 42.307692,
+            "count": 13,
+            "sampleStd": 39.595983,
+            "status": "measured",
+            "provenance": "measured_model",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "准确率",
+            "unit": "%"
+          },
+          {
+            "key": "f1",
+            "value": 35.970696,
+            "count": 13,
+            "sampleStd": 40.098431,
+            "status": "measured",
+            "provenance": "measured_model",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "F1",
+            "unit": "%"
+          },
+          {
+            "key": "lossCv",
+            "value": 0.652885,
+            "count": 13,
+            "sampleStd": 0.315974,
+            "status": "measured",
+            "provenance": "measured_model",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "损失变异系数",
+            "unit": ""
+          }
+        ],
+        "parameterSources": {
+          "accuracy": {
+            "kind": "reference_measurement",
+            "provenance": "measured_model"
+          },
+          "f1": {
+            "kind": "reference_measurement",
+            "provenance": "measured_model"
+          },
+          "lossCv": {
+            "kind": "reference_measurement",
+            "provenance": "measured_model"
+          }
+        },
+        "seed": 42,
+        "qualityConclusionEligible": false,
+        "notes": [
+          "候选模型在样本输入上训练，基线模型在同字符量的参考语料上训练。",
+          "accuracy/f1/lossCv 是掩码语言模型（MLM）代理指标，不等同于 CLUE 下游任务准确率，不承诺达到前端 80/80/0.2 阈值。",
+          "BERT 路径采用 15% 掩码与 80/10/10 替换，默认学习率 2e-5；CLUE TNEWS/CLUENER/AFQMC 下游指标需运行离线固定协议实验，在线任务不会把 MLM 分数冒充下游分数。",
+          "公开集本地小样本参考，不是官方榜单或业务验收；新任务没有自动共享本次固定评测集。",
+          "权重、等级线和缺失指标阈值是规则参数，不是测量值。"
+        ],
+        "sourceCodeSha256": {
+          "text.py": "91cb918e616c25eebf77a77029f3d3943a90ab0950ac14d9c21ef4c7e7876c66",
+          "image.py": "7db769f9ae660e38ec7c8278a73aa69d100b8100d4693bee8ac00059e7971f10",
+          "video.py": "ec3c7ba8da80f0c87f94d4a374229c84b2b3296c776b44c4e318f6b53a82c459",
+          "audio.py": "76d0c4609e411d7f25b8d71f3b20cc33c52fdd381f07245d4519647f6fa47705",
+          "benchmark.py": "c09e6edd33fe8805573b63cf708ca3bec3889c4f3572e06f978fc19ca2d7e02f"
+        }
+      }
+    },
+    {
+      "id": "CFG261106MVC6HY",
+      "type": "image",
+      "modelId": "image-validator",
+      "mode": "measured",
+      "name": "CIFAR-10本地test切片",
+      "modelName": "ImageEngine像素规则/代理",
+      "description": "original-image pixel diagnostics; no annotated segmentation/classifier",
+      "version": "2026.11.06.1",
+      "status": "published",
+      "validationVersion": "image-proxy-v1",
+      "seed": 42,
+      "config": {
+        "thresholds": {
+          "iou": 0.879949,
+          "clarity": 77.089545,
+          "semantic": 93.347099,
+          "accuracy": 77.414799
+        },
+        "weights": [
+          25,
+          25,
+          20,
+          15,
+          15
+        ],
+        "grades": {
+          "AA": 95,
+          "A": 85,
+          "B": 70
+        },
+        "highValue": false
+      },
+      "source": "builtin",
+      "updatedAt": "2026-11-06 16:52:28",
+      "isDefault": true,
+      "evidence": {
+        "kind": "local_open_dataset",
+        "createdAt": "2026-11-06 16:51:22",
+        "runId": "20261106_164921_dc7a2eb7",
+        "runSha256": "27049626b1464f281850fb6e102b30987138914f0daa8e4d986ad3d535947398",
+        "dataset": {
+          "name": "CIFAR-10本地test切片",
+          "sourceUrl": "https://huggingface.co/datasets/uoft-cs/cifar10",
+          "split": "test每类文件名字典序前10张，共100张",
+          "model": "ImageEngine像素规则/代理",
+          "method": "original-image pixel diagnostics; no annotated segmentation/classifier"
+        },
+        "sampleCount": 100,
+        "inputCount": 100,
+        "engineVersion": "image-proxy-v1",
+        "modelSha256": null,
+        "metrics": [
+          {
+            "key": "iou",
+            "value": 0.879949,
+            "count": 100,
+            "sampleStd": 0.138239,
+            "status": "proxy",
+            "provenance": "proxy",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "分割 IoU",
+            "unit": ""
+          },
+          {
+            "key": "clarity",
+            "value": 77.089545,
+            "count": 100,
+            "sampleStd": 11.497641,
+            "status": "measured",
+            "provenance": "measured_rule",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "清晰度",
+            "unit": "分"
+          },
+          {
+            "key": "semantic",
+            "value": 93.347099,
+            "count": 100,
+            "sampleStd": 6.485367,
+            "status": "measured",
+            "provenance": "measured_rule",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "语义完整性",
+            "unit": "分"
+          },
+          {
+            "key": "accuracy",
+            "value": 77.414799,
+            "count": 100,
+            "sampleStd": 14.059087,
+            "status": "proxy",
+            "provenance": "proxy",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "场景识别准确率",
+            "unit": "%"
+          }
+        ],
+        "parameterSources": {
+          "iou": {
+            "kind": "reference_measurement",
+            "provenance": "proxy"
+          },
+          "clarity": {
+            "kind": "reference_measurement",
+            "provenance": "measured_rule"
+          },
+          "semantic": {
+            "kind": "reference_measurement",
+            "provenance": "measured_rule"
+          },
+          "accuracy": {
+            "kind": "reference_measurement",
+            "provenance": "proxy"
+          }
+        },
+        "seed": 42,
+        "qualityConclusionEligible": false,
+        "notes": [
+          "图像 iou/accuracy 为代理测量（重编码显著性 IoU、颜色/边缘一致性），clarity/semantic 为固定规则公式；详见 ImageEngine docstring。",
+          "公开集本地小样本参考，不是官方榜单或业务验收；新任务没有自动共享本次固定评测集。",
+          "权重、等级线和缺失指标阈值是规则参数，不是测量值。"
+        ],
+        "sourceCodeSha256": {
+          "text.py": "91cb918e616c25eebf77a77029f3d3943a90ab0950ac14d9c21ef4c7e7876c66",
+          "image.py": "7db769f9ae660e38ec7c8278a73aa69d100b8100d4693bee8ac00059e7971f10",
+          "video.py": "ec3c7ba8da80f0c87f94d4a374229c84b2b3296c776b44c4e318f6b53a82c459",
+          "audio.py": "76d0c4609e411d7f25b8d71f3b20cc33c52fdd381f07245d4519647f6fa47705",
+          "benchmark.py": "c09e6edd33fe8805573b63cf708ca3bec3889c4f3572e06f978fc19ca2d7e02f"
+        }
+      }
+    },
+    {
+      "id": "CFG261106539E5E",
+      "type": "video",
+      "modelId": "video-quality",
+      "mode": "measured",
+      "name": "THQA-NTIRE本地视频切片",
+      "modelName": "VideoEngine video-vqa-v3",
+      "description": "same-input rule/proxy; no MOS labels",
+      "version": "2026.11.06.1",
+      "status": "published",
+      "validationVersion": "video-vqa-v3",
+      "seed": 42,
+      "config": {
+        "thresholds": {
+          "clarity": 20.898217,
+          "alignment": 60.0,
+          "trust": 80.0,
+          "safety": 100.0,
+          "integrity": 100.0
+        },
+        "weights": [
+          25,
+          25,
+          20,
+          15,
+          15
+        ],
+        "grades": {
+          "AA": 95,
+          "A": 85,
+          "B": 70
+        },
+        "highValue": false
+      },
+      "source": "builtin",
+      "updatedAt": "2026-11-06 16:52:28",
+      "isDefault": true,
+      "evidence": {
+        "kind": "local_open_dataset",
+        "createdAt": "2026-11-06 16:51:40",
+        "runId": "20261106_164921_dc7a2eb7",
+        "runSha256": "15e4dd3793e22be52cda8901bc604c5d131026ee5f2fab0bb1f8aa3c5ec64754",
+        "dataset": {
+          "name": "THQA-NTIRE本地视频切片",
+          "sourceUrl": "https://huggingface.co/datasets/zyj2000/THQA-NTIRE",
+          "split": "既有thqa_samples_12.json的12个原始视频",
+          "model": "VideoEngine video-vqa-v3",
+          "method": "same-input rule/proxy; no MOS labels"
+        },
+        "sampleCount": 12,
+        "inputCount": 12,
+        "engineVersion": "video-vqa-v3",
+        "modelSha256": null,
+        "metrics": [
+          {
+            "key": "clarity",
+            "value": 20.898217,
+            "count": 12,
+            "sampleStd": 7.814238,
+            "status": "measured",
+            "provenance": "measured_rule",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "清晰度",
+            "unit": "分"
+          },
+          {
+            "key": "alignment",
+            "value": 60.0,
+            "count": 12,
+            "sampleStd": 0.0,
+            "status": "proxy",
+            "provenance": "proxy",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "图文对齐度",
+            "unit": "分"
+          },
+          {
+            "key": "trust",
+            "value": 80.0,
+            "count": 12,
+            "sampleStd": 0.0,
+            "status": "measured",
+            "provenance": "measured_rule",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "来源可信度",
+            "unit": "分"
+          },
+          {
+            "key": "safety",
+            "value": 100.0,
+            "count": 12,
+            "sampleStd": 0.0,
+            "status": "measured",
+            "provenance": "measured_rule",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "安全等级",
+            "unit": "分"
+          },
+          {
+            "key": "integrity",
+            "value": 100.0,
+            "count": 12,
+            "sampleStd": 0.0,
+            "status": "measured",
+            "provenance": "measured_rule",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "完整性",
+            "unit": "分"
+          }
+        ],
+        "parameterSources": {
+          "clarity": {
+            "kind": "reference_measurement",
+            "provenance": "measured_rule"
+          },
+          "alignment": {
+            "kind": "reference_measurement",
+            "provenance": "proxy"
+          },
+          "trust": {
+            "kind": "reference_measurement",
+            "provenance": "measured_rule"
+          },
+          "safety": {
+            "kind": "reference_measurement",
+            "provenance": "measured_rule"
+          },
+          "integrity": {
+            "kind": "reference_measurement",
+            "provenance": "measured_rule"
+          }
+        },
+        "seed": 42,
+        "qualityConclusionEligible": false,
+        "notes": [
+          "视频五维为规则/代理测量：清晰度按 12 帧分位稳健合成，完整性实测容器/解码，图文对齐为关键词+画面属性代理，来源可信度为规则，安全仅检查文本关键词，不评估画面安全。",
+          "baseline/candidate 均评价输入原视频（same_input_diagnostic），不代表训练收益。",
+          "quality 是启发式技术质量诊断（清晰/曝光/对比/时域/分辨率），不是训练好的 MOS 模型；没有逐视频 MOS 标签就不能计算 SRCC/PLCC。",
+          "公开集本地小样本参考，不是官方榜单或业务验收；新任务没有自动共享本次固定评测集。",
+          "权重、等级线和缺失指标阈值是规则参数，不是测量值。"
+        ],
+        "sourceCodeSha256": {
+          "text.py": "91cb918e616c25eebf77a77029f3d3943a90ab0950ac14d9c21ef4c7e7876c66",
+          "image.py": "7db769f9ae660e38ec7c8278a73aa69d100b8100d4693bee8ac00059e7971f10",
+          "video.py": "ec3c7ba8da80f0c87f94d4a374229c84b2b3296c776b44c4e318f6b53a82c459",
+          "audio.py": "76d0c4609e411d7f25b8d71f3b20cc33c52fdd381f07245d4519647f6fa47705",
+          "benchmark.py": "c09e6edd33fe8805573b63cf708ca3bec3889c4f3572e06f978fc19ca2d7e02f"
+        }
+      }
+    },
+    {
+      "id": "CFG261106FR854R",
+      "type": "audio",
+      "modelId": "cnn-lstm",
+      "mode": "measured",
+      "name": "AISHELL-1本地train切片 · CNN-LSTM",
+      "modelName": "whisper-base + MFCC nearest-neighbour proxy",
+      "description": "frozen-ASR corpus CER; speaker LOO proxy; domain labels unavailable",
+      "version": "2026.11.06.1",
+      "status": "published",
+      "validationVersion": "audio-asr-v2",
+      "seed": 42,
+      "config": {
+        "thresholds": {
+          "cer": 37.5,
+          "speakerAccuracy": 66.666667,
+          "domainF1": 85
+        },
+        "weights": [
+          25,
+          25,
+          20,
+          15,
+          15
+        ],
+        "grades": {
+          "AA": 95,
+          "A": 85,
+          "B": 70
+        },
+        "highValue": false
+      },
+      "source": "builtin",
+      "updatedAt": "2026-11-06 16:52:28",
+      "isDefault": true,
+      "evidence": {
+        "kind": "local_open_dataset",
+        "createdAt": "2026-11-06 16:52:28",
+        "runId": "20261106_164921_dc7a2eb7",
+        "runSha256": "8b9c6bf2d8467037f7ba35022cc850cfa4fb7703a7215c3aa53929fd295519b4",
+        "dataset": {
+          "name": "AISHELL-1本地train切片",
+          "sourceUrl": "https://huggingface.co/datasets/AISHELL/AISHELL-1",
+          "split": "说话人0002/0003/0004各4条，时长2–4秒，元数据顺序确定",
+          "model": "whisper-base + MFCC nearest-neighbour proxy",
+          "method": "frozen-ASR corpus CER; speaker LOO proxy; domain labels unavailable"
+        },
+        "sampleCount": 12,
+        "inputCount": 12,
+        "engineVersion": "audio-asr-v2",
+        "modelSha256": "af1ab4c9547f1b2a9b90fadfb2182bc2b2f28db0b52adaf37ed9170fd03c3732",
+        "metrics": [
+          {
+            "key": "cer",
+            "value": 37.5,
+            "count": 12,
+            "sampleStd": 21.907489,
+            "status": "measured",
+            "provenance": "measured_model",
+            "aggregation": "sum(cerEdits)/sum(cerReferenceChars)*100",
+            "name": "字错误率 CER",
+            "unit": "%"
+          },
+          {
+            "key": "speakerAccuracy",
+            "value": 66.666667,
+            "count": 12,
+            "sampleStd": 49.236596,
+            "status": "proxy",
+            "provenance": "proxy",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "说话人识别准确率",
+            "unit": "%"
+          },
+          {
+            "key": "domainF1",
+            "value": null,
+            "count": 0,
+            "status": "missing",
+            "provenance": "proxy",
+            "reason": "DOMAIN_LABEL_MISSING",
+            "aggregation": null,
+            "name": "领域指令 F1",
+            "unit": "%"
+          }
+        ],
+        "parameterSources": {
+          "cer": {
+            "kind": "reference_measurement",
+            "provenance": "measured_model"
+          },
+          "speakerAccuracy": {
+            "kind": "reference_measurement",
+            "provenance": "proxy"
+          },
+          "domainF1": {
+            "kind": "rule_default",
+            "reason": "DOMAIN_LABEL_MISSING"
+          }
+        },
+        "seed": 42,
+        "qualityConclusionEligible": false,
+        "notes": [
+          "CER 使用本地 ASR（Paraformer 优先，Whisper 回退，不下载模型）；说话人/领域为声学特征最近邻代理测量。",
+          "公开集本地小样本参考，不是官方榜单或业务验收；新任务没有自动共享本次固定评测集。",
+          "权重、等级线和缺失指标阈值是规则参数，不是测量值。",
+          "两个逻辑模型方案共享当前Whisper/MFCC引擎；没有分别训练CNN-LSTM或Transformer。"
+        ],
+        "sourceCodeSha256": {
+          "text.py": "91cb918e616c25eebf77a77029f3d3943a90ab0950ac14d9c21ef4c7e7876c66",
+          "image.py": "7db769f9ae660e38ec7c8278a73aa69d100b8100d4693bee8ac00059e7971f10",
+          "video.py": "ec3c7ba8da80f0c87f94d4a374229c84b2b3296c776b44c4e318f6b53a82c459",
+          "audio.py": "76d0c4609e411d7f25b8d71f3b20cc33c52fdd381f07245d4519647f6fa47705",
+          "benchmark.py": "c09e6edd33fe8805573b63cf708ca3bec3889c4f3572e06f978fc19ca2d7e02f"
+        }
+      }
+    },
+    {
+      "id": "CFG261106FX2MWG",
+      "type": "audio",
+      "modelId": "small-transformer",
+      "mode": "measured",
+      "name": "AISHELL-1本地train切片 · 小型 Transformer",
+      "modelName": "whisper-base + MFCC nearest-neighbour proxy",
+      "description": "frozen-ASR corpus CER; speaker LOO proxy; domain labels unavailable",
+      "version": "2026.11.06.1",
+      "status": "published",
+      "validationVersion": "audio-asr-v2",
+      "seed": 42,
+      "config": {
+        "thresholds": {
+          "cer": 37.5,
+          "speakerAccuracy": 66.666667,
+          "domainF1": 85
+        },
+        "weights": [
+          25,
+          25,
+          20,
+          15,
+          15
+        ],
+        "grades": {
+          "AA": 95,
+          "A": 85,
+          "B": 70
+        },
+        "highValue": false
+      },
+      "source": "builtin",
+      "updatedAt": "2026-11-06 16:52:28",
+      "isDefault": true,
+      "evidence": {
+        "kind": "local_open_dataset",
+        "createdAt": "2026-11-06 16:52:28",
+        "runId": "20261106_164921_dc7a2eb7",
+        "runSha256": "8b9c6bf2d8467037f7ba35022cc850cfa4fb7703a7215c3aa53929fd295519b4",
+        "dataset": {
+          "name": "AISHELL-1本地train切片",
+          "sourceUrl": "https://huggingface.co/datasets/AISHELL/AISHELL-1",
+          "split": "说话人0002/0003/0004各4条，时长2–4秒，元数据顺序确定",
+          "model": "whisper-base + MFCC nearest-neighbour proxy",
+          "method": "frozen-ASR corpus CER; speaker LOO proxy; domain labels unavailable"
+        },
+        "sampleCount": 12,
+        "inputCount": 12,
+        "engineVersion": "audio-asr-v2",
+        "modelSha256": "af1ab4c9547f1b2a9b90fadfb2182bc2b2f28db0b52adaf37ed9170fd03c3732",
+        "metrics": [
+          {
+            "key": "cer",
+            "value": 37.5,
+            "count": 12,
+            "sampleStd": 21.907489,
+            "status": "measured",
+            "provenance": "measured_model",
+            "aggregation": "sum(cerEdits)/sum(cerReferenceChars)*100",
+            "name": "字错误率 CER",
+            "unit": "%"
+          },
+          {
+            "key": "speakerAccuracy",
+            "value": 66.666667,
+            "count": 12,
+            "sampleStd": 49.236596,
+            "status": "proxy",
+            "provenance": "proxy",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "说话人识别准确率",
+            "unit": "%"
+          },
+          {
+            "key": "domainF1",
+            "value": null,
+            "count": 0,
+            "status": "missing",
+            "provenance": "proxy",
+            "reason": "DOMAIN_LABEL_MISSING",
+            "aggregation": null,
+            "name": "领域指令 F1",
+            "unit": "%"
+          }
+        ],
+        "parameterSources": {
+          "cer": {
+            "kind": "reference_measurement",
+            "provenance": "measured_model"
+          },
+          "speakerAccuracy": {
+            "kind": "reference_measurement",
+            "provenance": "proxy"
+          },
+          "domainF1": {
+            "kind": "rule_default",
+            "reason": "DOMAIN_LABEL_MISSING"
+          }
+        },
+        "seed": 42,
+        "qualityConclusionEligible": false,
+        "notes": [
+          "CER 使用本地 ASR（Paraformer 优先，Whisper 回退，不下载模型）；说话人/领域为声学特征最近邻代理测量。",
+          "公开集本地小样本参考，不是官方榜单或业务验收；新任务没有自动共享本次固定评测集。",
+          "权重、等级线和缺失指标阈值是规则参数，不是测量值。",
+          "两个逻辑模型方案共享当前Whisper/MFCC引擎；没有分别训练CNN-LSTM或Transformer。"
+        ],
+        "sourceCodeSha256": {
+          "text.py": "91cb918e616c25eebf77a77029f3d3943a90ab0950ac14d9c21ef4c7e7876c66",
+          "image.py": "7db769f9ae660e38ec7c8278a73aa69d100b8100d4693bee8ac00059e7971f10",
+          "video.py": "ec3c7ba8da80f0c87f94d4a374229c84b2b3296c776b44c4e318f6b53a82c459",
+          "audio.py": "76d0c4609e411d7f25b8d71f3b20cc33c52fdd381f07245d4519647f6fa47705",
+          "benchmark.py": "c09e6edd33fe8805573b63cf708ca3bec3889c4f3572e06f978fc19ca2d7e02f"
+        }
+      }
+    },
+    {
+      "id": "CFG261106X9T8FY",
+      "type": "benchmark",
+      "modelId": "benchmark-pair",
+      "mode": "measured",
+      "name": "CLUE/TNEWS本次MLM留出配对评分",
+      "modelName": "paired bert-base-chinese MLM",
+      "description": "derived paired masked-token accuracy; not official QA benchmark",
+      "version": "2026.11.06.1",
+      "status": "published",
+      "validationVersion": "benchmark-import-v2",
+      "seed": 42,
+      "config": {
+        "thresholds": {
+          "score": 5
+        },
+        "weights": [
+          25,
+          25,
+          20,
+          15,
+          15
+        ],
+        "grades": {
+          "AA": 95,
+          "A": 85,
+          "B": 70
+        },
+        "highValue": false
+      },
+      "source": "builtin",
+      "updatedAt": "2026-11-06 16:52:28",
+      "isDefault": true,
+      "evidence": {
+        "kind": "local_open_dataset",
+        "createdAt": "2026-11-06 16:52:28",
+        "runId": "20261106_164921_dc7a2eb7",
+        "runSha256": "dd8ca7ed2d575f294f2daa8778b5f332462441b97a0c592e48357fcdd3c905df",
+        "dataset": {
+          "name": "CLUE/TNEWS本次MLM留出配对评分",
+          "sourceUrl": "https://huggingface.co/datasets/clue/clue",
+          "split": "本次text run的独立留出样本；无训练内分数",
+          "model": "paired bert-base-chinese MLM",
+          "method": "derived paired masked-token accuracy; not official QA benchmark"
+        },
+        "sampleCount": 13,
+        "inputCount": 13,
+        "engineVersion": "benchmark-import-v2",
+        "modelSha256": "2a00d2aa19acc816627ab7d9e2eff6eba482a8409d99839734d0cdb0df159a11",
+        "metrics": [
+          {
+            "key": "score",
+            "value": 42.307692,
+            "count": 13,
+            "sampleStd": 39.595983,
+            "status": "measured",
+            "provenance": "imported",
+            "aggregation": "arithmetic_mean_on_evaluation_samples",
+            "name": "模型评测得分",
+            "unit": "分"
+          }
+        ],
+        "parameterSources": {
+          "score": {
+            "kind": "rule_default",
+            "reason": "score参考值与分差阈值含义不同"
+          }
+        },
+        "seed": 42,
+        "qualityConclusionEligible": false,
+        "notes": [
+          "benchmark 不训练模型，逐题得分按导入数据处理。",
+          "分差表示两个模型的题目区分度，不代表训练数据质量差。",
+          "未核验上游模型、评分协议和训练集泄漏；bootstrap 不替代多种子训练。",
+          "公开集本地小样本参考，不是官方榜单或业务验收；新任务没有自动共享本次固定评测集。",
+          "权重、等级线和缺失指标阈值是规则参数，不是测量值。"
+        ],
+        "sourceCodeSha256": {
+          "text.py": "91cb918e616c25eebf77a77029f3d3943a90ab0950ac14d9c21ef4c7e7876c66",
+          "image.py": "7db769f9ae660e38ec7c8278a73aa69d100b8100d4693bee8ac00059e7971f10",
+          "video.py": "ec3c7ba8da80f0c87f94d4a374229c84b2b3296c776b44c4e318f6b53a82c459",
+          "audio.py": "76d0c4609e411d7f25b8d71f3b20cc33c52fdd381f07245d4519647f6fa47705",
+          "benchmark.py": "c09e6edd33fe8805573b63cf708ca3bec3889c4f3572e06f978fc19ca2d7e02f"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+# 算子 19「筛选高置信样本入池」配置
+#
+# 表1 v4.1 #19 冻结口径：默认开启；否（必须）；类型 = 规则型；优先级 = P0；模型 = --
+# 处理边界：评分开启且通过、整体自动/人工对齐、授权可训练、有时间戳样本时序通过，
+#           四项同时满足入候选池。
+# 研发测边界：不得用加权分把已隔离样本加回；局部标注不作为入池硬条件。
+#
+# 说明：本算子未知键一律配置失败（extra=forbid），避免静默忽略配置错误。
+#       计划第3节里的 settings 列表已落地为下列**强类型扁平键**（更严格、可校验）。
+
+operator:
+  number: 19                        # 表1 正式编号，写错即配置失败
+  id: high_confidence_pool
+  name: high_confidence_pool        # 工程 slug，用于 output/<uniqueId>/<name>/ 与血缘 operator
+  label: 筛选高置信样本入池           # 表1/计划中的中文名称
+  version: v1.0.0
+  enabled: true                     # 与顶层 enabled 必须一致；置 false 直接失败
+
+transport:
+  format: crossmodal-files-v1       # 禁止改动字段语义
+  max_response_bytes: 67108864      # 单次响应上限（64 MiB）
+
+stage_id: S3                        # 数据加工
+
+# --- 业务开关（仅 enabled/training_authorization/min_enabled_routes/
+#     missing_upstream_policy 可通过 /predict 的 overrides 覆盖） ----------------- #
+# 表1 #19 为「必须」工具，置 false 会直接配置失败，不提供 passthrough 路径。
+enabled: true
+
+# 允许的整体对齐结论（#16 alignment.whole.decision）——固定口径（不可通过请求削弱，
+# 请求携带该键即 HTTP 422）：
+#   auto        -> 只接受 auto_aligned
+#   human       -> 只接受 manual_aligned
+#   auto|human  -> 两者都接受（默认）
+required_alignment: auto|human
+
+# 仅当记录确实带时间轴时，「时序通过」才作为必过项——固定口径（不可通过请求关闭，
+# 请求携带该键即 HTTP 422）。
+# 不存在时间轴的样本视为「不适用」，不拦截（表1 #15：不适用不拦，留产线）。
+require_temporal_if_present: true
+
+# 评分路线兜底：三条评分路线（#12/#13/#14）都未生效时，是否把 #15「时序通过」
+# 作为路线证据（2026-11-05 起默认 true）。
+#   - 时序窗口的 #14 判 not_applicable、#13 可能因转写不可靠判 not_applicable，
+#     此时没有 CLIP/CER 分；不开兜底会以 no_scoring_route_enabled 留产线待人工。
+#   - 只认「通过」；#15 失败仍由 temporal 门以 temporal_failed 隔离
+#     （主因不会被改写成 route_failed）。
+#   - not_applicable / skipped / pending_calibration 不构成证据，保持待人工。
+#   - 置 false 复现旧行为；仅部署配置可改（不在请求覆盖白名单内）。
+temporal_route_fallback: true
+
+# 授权结论要求（#10 admission.license）：只有「可训练」才允许入池。
+training_authorization: required
+
+# 至少要有多少条评分路线「已开启且在生效」（#12 图文 / #13 音文 / #14 视文）。
+# 规则文档 1.2：三路至少启用一个，不能三路全关。
+min_enabled_routes: 1
+
+# 必过项结论缺失时的处理策略：
+#   waiting_manual -> 记为待人工（流程状态，不隔离；若候选池为空则运行状态 degraded）
+#   failed         -> 显式失败（严格模式，用于投产前口径校验）
+missing_upstream_policy: waiting_manual

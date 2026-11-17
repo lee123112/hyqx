@@ -1,0 +1,56 @@
+# 算子 22「生成跨模态Token」配置
+#
+# 表1 v4.1 #22 冻结口径：流程环节 = 5 样本构建；默认开启；必须；P0；模型列 = --
+# 模板配置项（页面控件均为只读，配置员不改这些项，任务按「默认显示」执行）：
+#   1. 文字里用什么标记模态：图像写成 <image>；音频写成 <audio>；视频写成 <video>；
+#      页面说明「没打开的路线不会生成对应文件」→ 音文/视文/局部标注路线可开关。
+#   2. 样本文件名：samples.jsonl（固定这个名字）；
+#      页面说明「隔离区里的样本不会写进这个文件」→ exclude_isolated 必须为 true。
+# 边界：本工具不压缩、不改版本状态；原文件仅保留对象存储链接。
+#
+# 说明：本算子未知键一律配置失败（extra=forbid），避免静默忽略配置错误。
+
+operator:
+  number: 22                        # 表1 正式编号，写错即配置失败
+  id: crossmodal_token
+  name: crossmodal_token            # 工程 slug：output/<uniqueId>/crossmodal_token/ 与血缘 operator
+  label: 生成跨模态Token             # 表1/计划中的中文名称
+  version: v1.0.1
+  enabled: true                     # 与顶层 enabled 必须一致；置 false 直接失败（不能关）
+
+transport:
+  format: crossmodal-files-v1       # 禁止改动字段语义
+  max_response_bytes: 67108864      # 单次响应上限（64 MiB）
+
+stage_id: S5                        # 表1 第 5 环节「样本构建」
+
+# --- 业务开关（可通过 /predict 的 overrides 覆盖） -------------------------- #
+enabled: true                       # 总开关：默认开，不能关
+exclude_isolated: true              # 隔离区样本不进入样本文件（置 false 即配置失败）
+samples_file_name: samples.jsonl    # 固定名，改成其它值即配置失败
+
+# 配置项 1：模态标记（只读，值固定；本算子按默认显示执行）
+markers:
+  image: "<image>"
+  audio: "<audio>"
+  video: "<video>"
+
+# 路线开关：
+#   image_text      默认图文路线（必须开启）
+#   audio_text      音文路线（未开启则不产出 samples_audio_text.jsonl）
+#   video_text      视文路线（未开启则不产出 samples_video_text.jsonl）
+#   local_annotation 局部标注路线（未开启则不产出 samples_local_annotation.jsonl）
+#
+# video_text 出厂默认开启（v1.0.1 起）：视频样本在上游是合法模态，若默认关闭，
+# 全部视频样本会以 route_disabled 落进 22_pending，等于把「未配置」当成「无路线」。
+# 不需要视文产出时再显式配 false；显式关闭仍按 route_disabled 进待处理（可追溯）。
+routes:
+  image_text: true
+  audio_text: false
+  video_text: true
+  local_annotation: false
+
+# 还没有质量结论时的处理策略：
+#   waiting_manual -> 不拦样本、留在产线、不生成 Token（默认；若一条也没生成则运行状态 degraded）
+#   failed         -> 显式失败（严格模式，用于投产前口径校验）
+missing_quality_policy: waiting_manual

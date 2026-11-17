@@ -1,0 +1,73 @@
+# 10 数据资产统计（avp_asset_statistics）
+# 全部阈值/口径参数必须来自本文件，代码里不得出现魔法数字。
+# 业务硬口径（规范 §11 第 11 条 / 原型《数据资产 · 研发标注》③）：
+#   - 资产总量 = 各数据集样本数之和，不去重（同一音频属两个数据集算两次）；
+#   - 近 N 天新增按入库时间（created_at）聚合，无数据日补 0；
+#   - 数据集列表是存量，不随时间范围变化；指标卡与列表合计一致。
+
+operator:
+  id: avp_asset_statistics
+  name: 数据资产统计
+  tag: 数据资产
+  version: v1.0.0
+  number: 10
+
+io:
+  # 可接受的输入：JSONL = 入库记录；JSON = 登记表 / 记录数组 / 006 单版本产物
+  input_exts: [".jsonl", ".json"]
+  output_subdir: ""
+  # 输出里最多回填的告警条数（统计数仍是全量）
+  max_warnings: 50
+  # 输出文件名（与 map.json outputs.asset 一致）
+  asset_filename: "010_asset.json"
+
+asset:
+  # 时间范围枚举（天）；必须与 map.json paramsSpec 的 values 一致
+  time_ranges: [7, 30, 90]
+  default_time_range: 7
+  # 「近 N 天」口径：含今天在内的连续 N 天，起点 = 今天 - (N-1)，终点 = 今天
+  timezone: "Asia/Shanghai"
+  # 本机 Windows 无 tzdata 时的固定偏移兜底（小时）；不影响有 tzdata 的环境
+  utc_offset_hours: 8
+  # 关键词长度上限（按数据集名称模糊搜索）
+  keyword_max_len: 50
+  # 入库记录里没有 dataset_id 时的归集 ID
+  unknown_dataset_id: "__unregistered__"
+
+time:
+  # 入库时间解析顺序（带时区偏移的 ISO 优先；Z 后缀按 UTC 处理）
+  formats:
+    - "%Y-%m-%dT%H:%M:%S%z"
+    - "%Y-%m-%dT%H:%M:%S.%f%z"
+    - "%Y-%m-%d %H:%M:%S%z"
+    - "%Y-%m-%dT%H:%M:%S"
+    - "%Y-%m-%d %H:%M:%S"
+    - "%Y-%m-%dT%H:%M"
+    - "%Y-%m-%d %H:%M"
+    - "%Y-%m-%d"
+  # 输出时间格式
+  output_formats:
+    datetime: "%Y-%m-%d %H:%M:%S"
+    date: "%Y-%m-%d"
+
+registry:
+  # 登记表字段别名（大小写不敏感，按顺序取第一个非空值）
+  dataset_list_keys: ["datasets", "dataset_list"]
+  record_list_keys: ["records", "samples", "entries", "items"]
+  dataset_id_keys: ["dataset_id", "datasetId", "id"]
+  dataset_name_keys: ["name", "dataset_name", "datasetName", "title"]
+  source_keys: ["source", "data_source", "dataSource"]
+  sample_count_keys: ["sample_count", "sampleCount", "count", "total"]
+  updated_at_keys: ["updated_at", "updatedAt", "update_time"]
+  created_at_keys: ["created_at", "createdAt", "create_time", "registered_at"]
+  # 数据集条目内联样本列表的键（登记表里直接带 samples 的场景）
+  inline_record_keys: ["samples", "records"]
+  # 入库记录的时间字段
+  record_time_keys: ["created_at", "createdAt", "ingest_time", "ingested_at"]
+  # 006 单版本产物兼容：命中 version_id 且带 sample_count 时视为一个数据集
+  version_id_keys: ["version_id", "versionId"]
+  version_name_keys: ["version_name", "versionName"]
+
+checks:
+  # 至少识别出 1 个数据集，否则视为输入不可用（不静默返回 0）
+  min_datasets: 1

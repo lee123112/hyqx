@@ -1,0 +1,22 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "16_human_events.jsonl",
+      "role": "sidecar"
+    },
+    {
+      "path": "media/cat.png",
+      "role": "media"
+    },
+    {
+      "path": "media/street.png",
+      "role": "media"
+    }
+  ]
+}

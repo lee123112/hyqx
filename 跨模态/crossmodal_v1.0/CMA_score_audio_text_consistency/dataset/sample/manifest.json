@@ -1,0 +1,30 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "media/seg_01.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/seg_02.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/seg_03.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/seg_04.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/seg_silent.wav",
+      "role": "media"
+    }
+  ]
+}

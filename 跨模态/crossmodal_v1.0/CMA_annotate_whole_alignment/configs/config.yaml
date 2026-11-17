@@ -1,0 +1,57 @@
+# 算子 #16 标注整体对齐关系 配置（表1 v4.1 第 16 行冻结口径）
+# 身份与部署项（operator/模型/设备/路径/输出根目录）不接受请求级覆盖。
+# 表1 冻结：本工具「可跳过=否（必须）」「默认开启，不能关闭」——
+# 因此 whole_alignment.enabled=false 与 rescore_modified_description=false 都是配置错误。
+
+operator: 16_whole_alignment
+operator_version: v1.0.0
+stage_id: S3
+
+# ---- 业务参数（/predict 的 config 可覆盖阈值，但不能改写 enabled/模型/路径） ----
+whole_alignment:
+  # 必选工具，不能关闭（置 false 直接配置失败）
+  enabled: true
+  # 不对齐阈值：表1 复用 #12 的低分线，定义域 0.20–0.40，含等号为人工。
+  # [2026-11-05] 0.25→0.20，与 #12/#14 全量标定后的 0.20 一致；只在样本没有上游
+  # 标定线（follow_upstream_thresholds 取不到值）时才用本值。
+  isolation_threshold: 0.20
+  # 自动对齐阈值：默认 0.32（表1 复用 #12），定义域 0.25–0.50，必须大于不对齐阈值
+  auto_align_threshold: 0.32
+  # 人工改写描述后必须用同一 CLIP 实例重算（表1 冻结，置 false 直接配置失败）
+  rescore_modified_description: true
+  # [2026-11-05] 跟随上游算子自带的标定线：#12 节点写 thresholds{isolation,auto_align}、
+  # #14 节点写 low_score_threshold。本算子原先固定 0.25，而 #12/#14 标定线低于它，
+  # 同一份 CLIP 分在上游判"通过"、在 #16 被判"不对齐"进隔离库——实测 800 条图文正样本中
+  # 有 33 条落在 [0.22, 0.25) 被这样误隔离（其中 27 条真值是 aligned）。跟随上游后，
+  # 这 33 条由 #16 写入人工复核队列，不再进隔离库（`_calib/m16out` 实测隔离 0 条）。
+  # 上游没有声明阈值（人工重评分等）时仍用本算子 isolation_threshold/auto_align_threshold。
+  # 置 false 只用于回归对比（固定用本算子的 0.25/0.32）。
+  follow_upstream_thresholds: true
+  # [2026-11-05] 时序路线：样本没有 CLIP 分（#14 已对时序记录判 not_applicable）、
+  # 但带 #15 的时间轴结论（processing["15"]）时，按 #15 分档：
+  #   within_threshold/passed → auto_aligned（bucketed_by=temporal_15）
+  #   failed/not_aligned      → not_aligned（沿用上游隔离记录）
+  #   pending_calibration/其余 → pending_manual_review
+  # 此前该分支一律落 no_score/pending，等于把 #15 算好的结论丢掉。
+  # 置 false 只用于回归对比（复现旧行为）。
+  temporal_route: true
+
+# ---- 模型（表1 正式模型 CLIP-ViT/B-32，只加载本地权重，不自动联网） ----
+# 常规分档消费 #12 的真实分数，本算子只在「人工改描述」时才需要本地 CLIP。
+model:
+  backend: clip_vit_b32
+  # auto | open_clip | clip | transformers | none
+  library: auto
+  model_name: ViT-B-32
+  # 权重路径：相对路径按 MODEL_ROOT 解析（默认本算子 weight/，见 weight/README.md）；
+  # 绝对路径原样使用；null 时不影响常规分档，只把「人工改描述」记录延后为待人工
+  weights: clip/ViT-B-32.pt
+  device: auto
+  batch_size: 8
+  # 重评分需要模型但不可用时：true=显式降级（记录 pending_manual_review），false=任务失败
+  allow_degraded: true
+
+# ---- IO ----
+io:
+  output_root: output
+  jsonl_utf8: true

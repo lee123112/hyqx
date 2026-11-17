@@ -1,0 +1,100 @@
+{
+  "snapshot_date": "2026-11-17",
+  "files": [
+    {
+      "path": "跨模态/crossmodal_v1.0/CMA_align_semantic_unit/weight/whisper-base/model.safetensors",
+      "bytes": 290403936,
+      "reason": "model_weight"
+    },
+    {
+      "path": "跨模态/crossmodal_v1.0/CMA_annotate_local_to_local/weight/clip/ViT-B-32.pt",
+      "bytes": 353976522,
+      "reason": "model_weight"
+    },
+    {
+      "path": "跨模态/crossmodal_v1.0/CMA_annotate_local_to_whole/weight/YOLOv8n/yolov8n.pt",
+      "bytes": 6534387,
+      "reason": "model_weight"
+    },
+    {
+      "path": "跨模态/crossmodal_v1.0/CMA_annotate_whole_alignment/weight/clip/ViT-B-32.pt",
+      "bytes": 353976522,
+      "reason": "model_weight"
+    },
+    {
+      "path": "跨模态/crossmodal_v1.0/CMA_check_alignment_quality/weight/clip/ViT-B-32.pt",
+      "bytes": 353976522,
+      "reason": "model_weight"
+    },
+    {
+      "path": "跨模态/crossmodal_v1.0/CMA_score_image_text_consistency/weight/YOLOv8n/yolov8n.pt",
+      "bytes": 6534387,
+      "reason": "model_weight"
+    },
+    {
+      "path": "跨模态/crossmodal_v1.0/CMA_score_image_text_consistency/weight/clip/ViT-B-32.pt",
+      "bytes": 353976522,
+      "reason": "model_weight"
+    },
+    {
+      "path": "跨模态/crossmodal_v1.0/CMA_score_video_text_consistency/weight/clip/ViT-B-32.pt",
+      "bytes": 353976522,
+      "reason": "model_weight"
+    },
+    {
+      "path": "平行语料/PRLt_v1.0/models/Qwen3-Embedding-0.6B/model.safetensors",
+      "bytes": 1191586416,
+      "reason": "model_weight"
+    },
+    {
+      "path": "平行语料/PRLt_v1.0/models/Qwen3.5-2B/model.safetensors-00001-of-00001.safetensors",
+      "bytes": 4548221488,
+      "reason": "model_weight"
+    },
+    {
+      "path": "平行语料/PRLt_v1.0/models/mdeberta-v3-base/pytorch_model.bin",
+      "bytes": 1332809049,
+      "reason": "model_weight"
+    },
+    {
+      "path": "小模型测评/SME/SME_EVAL_AUDIO_001/models/paraformer-zh/model.pt",
+      "bytes": 989763045,
+      "reason": "model_weight"
+    },
+    {
+      "path": "小模型测评/SME/SME_EVAL_AUDIO_001/models/whisper-base/model.safetensors",
+      "bytes": 290403936,
+      "reason": "model_weight"
+    },
+    {
+      "path": "小模型测评/SME/SME_EVAL_AUDIO_001/models/whisper-small/model.safetensors",
+      "bytes": 966995080,
+      "reason": "model_weight"
+    },
+    {
+      "path": "小模型测评/SME/SME_EVAL_IMAGE_001/models/mobilenet_v2/mobilenet_v2-b0353104.pth",
+      "bytes": 14212972,
+      "reason": "model_weight"
+    },
+    {
+      "path": "小模型测评/SME/SME_EVAL_IMAGE_001/models/resnet18/resnet18-f37072fd.pth",
+      "bytes": 46830571,
+      "reason": "model_weight"
+    },
+    {
+      "path": "小模型测评/SME/SME_EVAL_IMAGE_001/models/resnet50/resnet50-0676ba61.pth",
+      "bytes": 102530333,
+      "reason": "model_weight"
+    },
+    {
+      "path": "小模型测评/SME/SME_EVAL_TEXT_001/models/bert-base-chinese/model.safetensors",
+      "bytes": 411553788,
+      "reason": "model_weight"
+    },
+    {
+      "path": "小模型测评/SME/SME_EVAL_VIDEO_001/models/clip/ViT-L-14.pt",
+      "bytes": 932768134,
+      "reason": "model_weight"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "operator": "SME_EVAL_IMAGE_001",
+  "files": [
+    {
+      "path": "resnet18/resnet18-f37072fd.pth",
+      "bytes": 46830571,
+      "sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec"
+    },
+    {
+      "path": "resnet50/resnet50-0676ba61.pth",
+      "bytes": 102530333,
+      "sha256": "0676ba61b6795bbe1773cffd859882e5e297624d384b6993f7c9e683e722fb8a"
+    },
+    {
+      "path": "mobilenet_v2/mobilenet_v2-b0353104.pth",
+      "bytes": 14212972,
+      "sha256": "b03531047ffacf1e2488318dcd2aba1126cde36e3bfe1aa5cb07700aeeee9889"
+    }
+  ]
+}

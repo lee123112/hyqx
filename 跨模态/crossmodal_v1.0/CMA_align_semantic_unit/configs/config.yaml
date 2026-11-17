@@ -1,0 +1,50 @@
+# 算子 8：带时间索引的语音转写 —— 部署默认配置
+# 业务参数可通过 /predict 的 config 覆盖；operator / stage_id 是部署身份，请求不可改写。
+# [v1.0.1] 本算子已收缩为「ASR 段落单元」：不再组对、不再生成 semantic_unit（固定 null）。
+operator:
+  name: multimodal_preprocessing
+  version: v1.0.0
+stage_id: S2
+
+# 表1 #8 总开关。关闭时不做任何模型加载（含 Whisper-base）。
+# [v4.2 §4.8] 默认关闭（需显式打开）；仅约束形态二产线编排，形态一由表单显式控制。
+enabled: false
+
+# 表1 #8 语音转写：默认关闭，「是否做语音转写」关闭时不加载模型。
+# 固定项（model / language / model_dir）不可被请求覆盖，写别的值直接配置失败。
+transcription:
+  enabled: false            # 默认关闭：纯图文任务走这里，日志写明未加载 Whisper-base
+  model: whisper-base       # 表1 固定；边界：不换成更大的 Whisper
+  language: zh              # 表1 固定：按中文解码
+  # 相对路径按 MODEL_ROOT 解析（默认算子本地 weight，即 <本算子目录>/weight，
+  # 见 weight/README.md）；schema 缺省值 weight 与本文件显式 "." 等价。
+  # 容器部署把 weight/ 挂到 /models 并设 -e MODEL_ROOT=/models 即可。
+  model_root: .
+  model_dir: whisper-base
+  device: auto              # auto / cpu / cuda
+  max_segment_seconds: 30.0       # 单段落最大时长，超过即按段落切开
+  paragraph_silence_seconds: 0.6  # 相邻片段间隔超过该秒数即切为新段落
+  beam_size: 1
+  initial_prompt: ''       # 可选：简体中文提示；检测到提示词回声时自动回退无提示解码
+  # 送 ASR 前的时长/信噪比预检（2026-11-05 新增，默认开启）。
+  # 命中即不加载模型、不产出文本，记 status=no_speech + 具体原因码，样本留产线进候选描述：
+  #   audio_too_short  音频短于 min_duration_seconds（Whisper-base 易幻觉/空文本）
+  #   low_snr          估计信噪比低于 min_snr_db 且波形接近稳态（噪声/稳态片段易触发解码循环）；
+  #                    低 SNR 但有明显能量起伏的语音/伴奏不拦截，交给 ASR 判断
+  #   audio_silent     整段电平低于静音阈值（无需跑 ASR）
+  # 只做「明显不可转写」的粗筛，不判断语音内容；置 false 可回退为全部送 ASR。
+  precheck: true
+  min_duration_seconds: 0.4
+  min_snr_db: 6.0
+  fail_action: keep_in_pipeline   # 转写失败留在产线，进候选描述，不能直接评分
+
+# ---------------------------------------------------------------------------
+# 以下为 [v1.0.1] deprecated 兼容参数：仅保留以便旧配置/旧请求不报错，
+# 不再参与任何判定（#8 不组对、不校验音视频元数据）。
+# 注意 require_existing_media 仍是运行期强制项：只能为 true。
+# ---------------------------------------------------------------------------
+unit_policy: per_sample            # deprecated
+max_av_duration_diff_ratio: 0.20   # deprecated
+av_mismatch_action: review         # deprecated
+require_existing_media: true       # 仍强制：媒体存在性校验不可关闭
+validate_frame_timestamps: true    # deprecated

@@ -1,0 +1,18 @@
+# 算子2：语言与句对结构校验 配置
+operator:
+  name: structure_validation
+  version: v1.0.0
+
+# 必填字段（缺失则进入异常清单）
+required_fields: [id, source, target]
+
+# 空值检查字段（空白/空串视为空值）
+empty_check_fields: [source, target]
+
+# 语言方向校验：记录中声明的语言与任务配置不一致时拦截
+check_declared_lang: true
+source_lang: zh
+target_lang: en
+
+# 违规处理策略：reject（拦截进异常清单）| warn（保留记录并写入 metadata.warnings）
+on_violation: reject

@@ -1,0 +1,100 @@
+# 算子8：敏感信息脱敏配置
+operator:
+  name: sensitive_info_deidentification
+  version: v1.0.0
+
+# 算子7 已完成去重并输出 UTF-8；本节点默认只接受严格 UTF-8。
+input_encodings: [utf-8]
+
+# 同步脱敏的文本字段：双语句对必须成对处理，禁止单边修改。
+text_fields: [source, target]
+
+# 声明允许脱敏的 metadata 字段；未声明的 metadata 一律不改写。
+# demo 默认只声明 contact；正式任务确认后可改为 [contact, email, author_phone]。
+metadata_fields: [contact]
+
+# 占位符格式：只含类型与序号，不含原始值，不可逆。
+# 同一记录内「同类同值」共享序号，便于双语句对复核。
+placeholder_template: "[REDACTED_{type}_{index}]"
+
+# 规则版本写入每条记录 metadata 与血缘，便于追溯与复核。
+# v1.0.1（2026-11-01）：account_kv_cn 英文分支加词边界并要求分隔符，修 accountable/account work 误报。
+rule_version: "rules-v1.0.1"
+
+# 源/目标同步检查口径：
+#   value_multiset = 类型与规范化值多重集都必须一致（最严格，默认）
+#   type_counts    = 只要求各类型命中数量一致
+#   off            = 不做同步检查
+sync_check_mode: value_multiset
+
+# true  = 同步告警记录转入 waiting_manual（不进主输出，不猜测对应关系）
+# false = 保留在输出并把 redaction_status 置为 redacted_with_warning
+strict_sync: true
+
+# 单条记录命中上限；超过该值说明模式或输入异常，整条转入异常清单，不做部分替换。
+max_hits_per_record: 200
+
+# 地址规则锚点词表（省级/直辖市）。正式业务可按任务替换，避免额外误报。
+address_regions: [北京, 天津, 上海, 重庆, 河北, 山西, 辽宁, 吉林, 黑龙江, 江苏, 浙江,
+                  安徽, 福建, 江西, 山东, 河南, 湖北, 湖南, 广东, 广西, 海南, 四川,
+                  贵州, 云南, 西藏, 陕西, 甘肃, 青海, 宁夏, 新疆, 内蒙古, 香港,
+                  澳门, 台湾]
+
+# 默认规则集。正则一律带显式边界；priority 越小优先级越高；
+# group=0 表示替换整段匹配，group>0 表示只替换该捕获组。
+# 可用 extra_rules 追加上游特有模式（例如工单号、内部账号）。
+rules:
+  - name: email_basic
+    type: email
+    priority: 10
+    pattern: '(?<![A-Za-z0-9._%+\-])[A-Za-z0-9._%+\-]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?)+'
+  - name: id_card_18
+    type: id_card
+    priority: 15
+    pattern: '(?<![0-9A-Za-z])[1-9]\d{5}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[0-9Xx](?![0-9A-Za-z])'
+  - name: id_card_15
+    type: id_card
+    priority: 16
+    pattern: '(?<![0-9A-Za-z])[1-9]\d{5}\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}(?![0-9A-Za-z])'
+  - name: phone_cn_mobile
+    type: phone
+    priority: 20
+    pattern: '(?<!\d)(?:\+?86[\s\-]?)?1[3-9]\d{9}(?!\d)'
+  - name: phone_cn_landline
+    type: phone
+    priority: 25
+    pattern: '(?<!\d)0\d{2,3}[\s\-]?\d{7,8}(?!\d)'
+  - name: bank_card_plain
+    type: account
+    priority: 30
+    pattern: '(?<!\d)\d{16,19}(?!\d)'
+  - name: bank_card_spaced
+    type: account
+    priority: 31
+    pattern: '(?<!\d)\d{4}(?:[ \-]\d{4}){3,4}(?!\d)'
+  # 中英两个分支分开写：中文关键词后面允许"零分隔符"（"账号ABC1234"是常见写法），
+  # 英文关键词必须出现 : ： # = 之一——否则 "account"+任意单词就会被当成账号值
+  # （accountable / account work / Account amounted 实测误报）。词边界同样只加在英文侧。
+  # 两个分支共用同一个捕获组，因为 group=1 是配置契约。
+  - name: account_kv_cn
+    type: account
+    priority: 35
+    group: 1
+    pattern: '(?:(?:账号|帐号|账户|卡号)[\s:：#]*|\b(?:account|Account)[\s]*[:：#=][\s]*)([A-Za-z0-9_\-]{4,32})'
+  - name: address_cn_province
+    type: address
+    priority: 40
+    pattern: '(?:{provinces})(?:特别行政区|壮族自治区|回族自治区|维吾尔自治区|自治区|省)[\u4e00-\u9fff]{2,10}(?:市|自治州|地区)[\u4e00-\u9fff]{2,10}(?:区|县|旗|镇|街道)[\u4e00-\u9fffA-Za-z0-9\-]{0,30}'
+  - name: address_cn_municipality
+    type: address
+    priority: 41
+    pattern: '(?:{municipalities})市[\u4e00-\u9fff]{2,10}(?:区|县)[\u4e00-\u9fffA-Za-z0-9\-]{0,30}'
+
+# 追加自定义规则（默认留空）。示例：
+# extra_rules:
+#   - name: ticket_kv
+#     type: ticket
+#     priority: 5
+#     group: 1
+#     pattern: '工单[:：](\w{6,16})'
+extra_rules: []

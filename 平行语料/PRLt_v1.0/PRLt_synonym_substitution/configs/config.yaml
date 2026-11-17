@@ -1,0 +1,9 @@
+operator_version: v1.1.0
+dictionary_path: configs/general_synonyms.json
+language_scope: [source, target]
+max_replacements_per_record: 1
+allow_domain_dictionary: false
+# 默认词库：哈工大同义词词林扩展版 V3（m75 精筛版，1100 条；临时采用，待业务确认）。
+# 来源/许可/筛选记录见 configs/DICTIONARY_PROVENANCE.json；
+# 旧 v1 人工词表备份在 configs/general_synonyms-v1.json，回滚方式见 provenance。
+dictionary_version: cilin-v3-m75-curated

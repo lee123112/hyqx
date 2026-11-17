@@ -1,0 +1,55 @@
+# 算子13：S/A/C 对齐质量分级配置
+operator:
+  name: alignment_quality_grading
+  version: v1.0.0
+
+# 任务声明的语言方向；记录自带的 source_lang/target_lang 必须与之一致。
+# 只做声明一致性校验，真实语言检测属算子 6 职责。
+source_lang: zh
+target_lang: en
+language_check: true
+
+# 上游默认产物文件名（阶段内实际路径由 /predict 的 inputFile 指定）
+input_file_name: 12_scored.jsonl
+
+# 置信度读取优先级：优先 alignment_confidence，回退 confidence；
+# 顶层缺失时按 read_metadata_fallback 读 metadata 同名/同优先级字段。
+confidence_fields: [alignment_confidence, confidence]
+# 已存在的 0-100 质量分字段；存在时必须与置信度换算值一致
+declared_score_fields: [quality_score]
+read_metadata_fallback: true
+
+# 量纲：auto=<=1 视为 0-1 比例并乘 100，1<N<=100 视为百分制；
+# ratio_0_1=必须落在 [0,1]；percent_0_100=必须落在 [0,100]。
+score_scale: auto
+# 置信度换算值与已存在 quality_score 的最大允许偏差，超过判 score_conflict
+score_consistency_tolerance: 0.01
+
+# 严格开闭区间（以 DEVELOPMENT_PLAN.md「验收」行为准）：
+#   S=(90,100]，A=[80,90]，C=[0,80)；边界不得用 round 改变。
+# 注意：计划 §2 正文写「C 为 N<=80」，与验收「80 分为 A」冲突，本实现取验收口径。
+grade_s_threshold: 90.0
+grade_a_threshold: 80.0
+
+# 等级名做成配置项：甲方四级口径（优质/合格/待复核/不入库）可在此改名，不改代码
+grade_labels:
+  S: S
+  A: A
+  C: C
+
+# 等级 -> 复核状态：C 级默认 waiting_manual，不得直接进入交付节点 18；
+# S/A 进入 quality_check 通过集
+grade_status_map:
+  S: accepted_for_quality_check
+  A: accepted_for_quality_check
+  C: waiting_manual
+
+# 允许交付节点消费的等级；其余由交付节点拦截
+delivery_eligible_grades: [S, A]
+
+# 分级规则与量纲换算的口径版本，写入记录与统计
+grade_rule_version: v1.0.0
+score_conversion_version: v1.0.0
+
+# 本节点要求严格 UTF-8（上游已完成编码归一）
+input_encodings: [utf-8]

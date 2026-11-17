@@ -1,0 +1,76 @@
+# 09 优化建议生成（avp_suggest_optimization）
+# 所有阈值/模板/精度必须来自本文件；processor.py 不得出现魔法数字或建议文案。
+
+operator:
+  id: avp_suggest_optimization
+  name: 优化建议生成
+  tag: 优化建议生成
+  version: v1.0.0
+  number: 9
+
+io:
+  # 输入：008 的归因产物；传目录时优先找归因文件，告警文件可选
+  input_default_name: "008_attribution.json"
+  alerts_default_name: "008_alerts.json"
+  output_advice: "009_advice.json"
+  # 标题最大长度（字符）；超过时截断并告警
+  max_title_len: 20
+
+advice:
+  # P2 的「样本不足」门槛：维度取值样本少于该值 → 补样/扩量建议
+  min_samples_per_value: 100
+  # 兜底方案：没有任何建议时，用整体指标给 1 条复核建议
+  overall_fallback: true
+
+checks:
+  # 优先级阈值（硬口径，可由 params 覆盖）
+  p0_pp: 3.0
+  p0_share: 0.3
+  p1_pp: 1.0
+  # 补样数量 = 缺口 × 该系数
+  sample_plan_factor: 1.5
+  # 验证方式里的目标回落幅度（pp）
+  target_pp_drop: 0.3
+  # 建议条数 1–3
+  min_suggestions: 1
+  max_suggestions: 3
+  # 补样最少条数（缺口为 0 时也用该值兜底）
+  sample_plan_min_count: 1
+  # 告警阈值（仅用于补样验证文案，与 008 默认一致）
+  alert_pp: 1.5
+
+stats:
+  # 置信区间置信水平（写进证据强度文案）
+  ci_level: 95
+
+precision:
+  # 差值/目标回落小数位
+  pp_digits: 2
+  # 百分比小数位
+  pct_digits: 2
+
+# 固定模板：只用 {占位符} 回填真实计算出的数字，不接大模型。
+# 占位符必须由 processor 的模板数据字典提供，缺一个就报 internal_error（宁可失败不编文案）。
+templates:
+  title_degradation: "{value}：{metric} 升高{diff_pp}pp"
+  title_coverage: "{value}：样本不足，补样确认"
+  title_overall: "整体指标复核"
+  title_overall_with_cause: "{value}：整体指标复核"
+
+  fact_degradation: "该维度 {dimension}/{value} 的 {metric} 较基准升高 {diff_pp}pp，折算多错约 {affected} 条，占整体净多错的 {share_pct}%。"
+  evidence: "证据强度：该维度 {samples} 条样本，错误样本 {error_samples} 条（错误率 {error_rate_pct}%），{ci_level}% 置信区间半宽 ±{ci_half_pp}pp，置信度 {confidence}。"
+  evidence_no_ci: "证据强度：该维度 {samples} 条样本，置信度 {confidence}；样本级证据不足，未估算置信区间。"
+  explanation: "错误形态构成：替换 {sub} 条、删除 {del} 条、插入 {ins} 条、未识别 {unk} 条；最集中在 SNR {top_snr_bucket} dB 分桶。"
+  explanation_no_snr: "错误形态构成：替换 {sub} 条、删除 {del} 条、插入 {ins} 条、未识别 {unk} 条；无 SNR 标注，未做分桶。"
+  explanation_fallback: "错误形态构成（整体口径）：替换 {sub} 条、删除 {del} 条、插入 {ins} 条、未识别 {unk} 条。"
+  verification: "补样 {sample_count} 条（缺口 {gap} 条 × 系数 {factor}）复测，目标 {metric} 回落 ≥{target_pp}pp 视为有效。"
+
+  fact_coverage: "该维度 {dimension}/{value} 仅 {samples} 条样本（占比 {ratio_pct}%），低于最低 {min_samples} 条，退化信号（{diff_pp}pp）难以确认。"
+  evidence_coverage: "证据强度：{samples} 条样本，缺口 {gap} 条；补样后预计 {projected_samples} 条，才具备稳定的差值判断。"
+  explanation_coverage: "该维度当前差值 {diff_pp}pp、样本占比 {ratio_pct}%，样本量不足，暂不能判定为退化主因，也不应据此改模型。"
+  verification_coverage: "扩量补样 {sample_count} 条（缺口 {gap} × 系数 {factor}）后复测，确认差值是否稳定超过 {alert_pp}pp。"
+
+  fact_overall: "整体 {metric} 较基准 {trend} {abs_diff_pp}pp，总净多错 {total_net_error} 条，未定位到可比维度主因。"
+  evidence_overall: "证据强度：整体 {samples} 条样本按维度拆解后无可比项，暂不能把退化归到单一维度。"
+  explanation_overall: "该结论只覆盖整体指标，不指向具体维度；维度覆盖补齐前，不建议直接改模型或调参。"
+  verification_overall: "补样 {sample_count} 条（缺口 {gap} × 系数 {factor}）复核整体指标与维度覆盖后再判定主因。"

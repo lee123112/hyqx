@@ -1,0 +1,96 @@
+{
+  "generated_by": "tools/make_real_noise_assets.py",
+  "source": "NOIZEUS（本地 dataset/speech_noise_cc0）",
+  "derivation": "noise = noisy - clean；与语音相关性 |r|<0.03，实测 SNR≈4.33 dB",
+  "limit": "NOIZEUS 为 8 kHz，有效带宽 4 kHz；升采样到 16 kHz 后仍带限",
+  "values": {
+    "noise/人群嘈杂": {
+      "source": "NOIZEUS 残差（noisy − clean）",
+      "noise_types": [
+        "Babble"
+      ],
+      "segments": 30,
+      "source_sr": 8000,
+      "out_sr": 16000,
+      "seconds": 60.0,
+      "file": "weight\\assets\\noise\\人群嘈杂.wav",
+      "bytes": 1920044,
+      "rms": 0.097779,
+      "peak": 0.8,
+      "samples_used": [
+        "Babble/sp01",
+        "Babble/sp02",
+        "Babble/sp03",
+        "…"
+      ]
+    },
+    "noise/交通噪声": {
+      "source": "NOIZEUS 残差（noisy − clean）",
+      "noise_types": [
+        "Street",
+        "Station",
+        "Train"
+      ],
+      "segments": 90,
+      "source_sr": 8000,
+      "out_sr": 16000,
+      "seconds": 60.0,
+      "file": "weight\\assets\\noise\\交通噪声.wav",
+      "bytes": 1920044,
+      "rms": 0.050914,
+      "peak": 0.8,
+      "samples_used": [
+        "Street/sp01",
+        "Street/sp02",
+        "Street/sp03",
+        "…"
+      ]
+    },
+    "env/街道": {
+      "source": "NOIZEUS 残差（noisy − clean）",
+      "noise_types": [
+        "Street"
+      ],
+      "segments": 30,
+      "source_sr": 8000,
+      "out_sr": 16000,
+      "seconds": 60.0,
+      "file": "weight\\assets\\env\\街道.wav",
+      "bytes": 1920044,
+      "rms": 0.050914,
+      "peak": 0.8,
+      "samples_used": [
+        "Street/sp01",
+        "Street/sp02",
+        "Street/sp03",
+        "…"
+      ]
+    },
+    "env/车内": {
+      "source": "NOIZEUS 残差（noisy − clean）",
+      "noise_types": [
+        "Car"
+      ],
+      "segments": 30,
+      "source_sr": 8000,
+      "out_sr": 16000,
+      "seconds": 60.0,
+      "file": "weight\\assets\\env\\车内.wav",
+      "bytes": 1920044,
+      "rms": 0.052631,
+      "peak": 0.8,
+      "samples_used": [
+        "Car/sp01",
+        "Car/sp02",
+        "Car/sp03",
+        "…"
+      ]
+    },
+    "noise/白噪": {
+      "source": "程序化合成（白噪按定义即平谱噪声）",
+      "file": "weight\\assets\\noise\\白噪.wav",
+      "bytes": 960044,
+      "rms": 0.168331
+    }
+  }
+}

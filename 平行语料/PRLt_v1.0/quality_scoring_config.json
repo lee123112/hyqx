@@ -1,0 +1,30 @@
+{
+  "version": "parallel-corpus-quality-v1.0.0",
+  "language_pair": "zh-en",
+  "frozen_thresholds": {
+    "operator_14_semantic_threshold": 0.7,
+    "operator_15_fluency_threshold": 60.0,
+    "operator_16_domain_confidence_threshold": 0.8,
+    "operator_18_allowed_grades": ["S", "A"],
+    "operator_18_allow_c_grade": false,
+    "operator_18_allow_waiting_manual": false
+  },
+  "unit_policy": {
+    "operator_10": "sentence_pair",
+    "operator_11_and_downstream": "clause_pair",
+    "preserve_fields": ["unit_type", "parent_pair_id", "aggregation_scope"]
+  },
+  "business_gates": {
+    "operator_15": "waiting_calibration_until_gold_calibrated",
+    "operator_16": "waiting_manual_until_domain_gold_exists",
+    "operator_18": "zero_formal_delivery_when_prerequisites_missing",
+    "operator_19": "blocked_without_human_gold_and_same_unit_denominator",
+    "operator_20": "queue_for_manual_review_and_write_back_results"
+  },
+  "provenance": {
+    "dataset": "TED2020-Medium-Eval-v1",
+    "commercial_use": false,
+    "formal_commercial_delivery": false
+  }
+}
+

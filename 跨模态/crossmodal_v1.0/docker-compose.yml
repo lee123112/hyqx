@@ -1,0 +1,142 @@
+# =============================================================================
+# 跨模态算子包（表1 #01–#26）· Docker Compose 部署文件
+#
+# 交付口径：一个镜像、一个入口、一个端口。
+#   服务名 / 镜像名：opcrossmodalpool:1.0.0（发布包 opcrossmodalpool-v1.0.0.zip）
+#   宿主机对外端口 17059 → 容器内 8100（内部算子端口 8101–8126 仅容器内可见，不对外暴露）
+#
+# 本包与单算子镜像的差异：
+#   · 入口是上层池化服务 inference.py（监听 8100），按 map.json 的 operatorId 拉起 26 个子算子进程；
+#   · 模型全部本地加载（CLIP / Whisper / YOLOv8 等），无远程 API Key、无大模型调用；
+#   · 推理设备：只解析 cpu / cuda 两种，**纯 CPU 环境可直接运行**（各算子 configs 默认 auto/cpu，
+#     auto 在无 CUDA 时退回 cpu）；本服务【不占用】GPU/NPU，昇腾节点按普通 CPU 容器调度即可；
+#   · v1.0 正式版：权重已逐算子内置到 <算子目录>/weight/，随镜像构建，无需挂载共享模型目录；
+#     单算子目录可独立复制、独立启动；MODEL_ROOT 仅保留为可选覆盖（外挂统一模型盘时）；
+#   · 运行产物统一写 /data/output（OUTPUT_DIR），宿主机持久化目录见 OUTPUT_HOST_DIR。
+#
+# 上传覆盖更新文件后，直接执行 `docker compose up -d --build`。
+#
+# 推理设备：**纯 CPU 可直接运行**（华为昇腾节点也按 CPU 容器调度，不需要 GPU/NPU 设备）。
+#   想缩小镜像（不装 CUDA 运行库）：
+#     TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu docker compose up -d --build
+#
+# 使用（在包根目录，docker-compose.yml 与 Dockerfile 同级）：
+#   docker compose up -d --build
+#   docker compose ps
+#   curl http://127.0.0.1:17059/health
+#   curl http://127.0.0.1:17059/operators
+#   docker compose logs -f --tail=200
+#   docker compose down
+#
+# 可覆盖变量（写同目录 .env 或服务器环境变量即可，无需改本文件）：
+#   HOST_PORT        宿主机对外端口，默认 17059（交付分配值）；宿主机端口被占用时在此改
+#   OUTPUT_HOST_DIR  宿主机产物目录（默认值见 volumes 行）
+#   POOL_AUTOSTART / POOL_STARTUP_TIMEOUT / POOL_ONLY / TZ
+#   上传/响应限额（MAX_*）固定写在下方 environment 中（按交付数据集回归放大），需要调整时直接改本文件。
+#   构建换源（仅构建镜像时生效，透传给 Dockerfile；默认已是国内源）：
+#     PYTHON_IMAGE / PIP_INDEX_URL / PIP_TRUSTED_HOST / APT_MIRROR / TORCH_INDEX_URL
+#     默认：pip=清华 TUNA、apt=清华 TUNA Debian 镜像、基础镜像仍用 docker.io 官方 python:3.11-slim
+#     例（国内机器 + 华为云/内网镜像）：
+#         PYTHON_IMAGE=docker.m.daocloud.io/library/python:3.11-slim \
+#         PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple \
+#         docker compose up -d --build
+#     想装 CPU 版 torch（镜像小一半、不含 CUDA 运行库）：
+#         TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu docker compose up -d --build
+#     想改回官方源：PIP_INDEX_URL=https://pypi.org/simple APT_MIRROR=off
+#
+# v4.2 停用项（默认不再产生 OSS 归档/关系入库/任务级输出）：
+#   MTY_*（对象存储归档与关系库入库）与 TASK_OUTPUT_*（任务级最终输出）属历史回滚入口，
+#   回滚时取消下方 MTY 注释并按 .env.example 配置；当前交付不依赖它们。
+#
+# 系统依赖：#6/#7 需要容器内的 ffmpeg / ffprobe（非 pip 包），已在 Dockerfile 中 apt 安装。
+# =============================================================================
+
+name: opcrossmodalpool
+
+services:
+  opcrossmodalpool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PYTHON_IMAGE: "${PYTHON_IMAGE:-python:3.11-slim}"
+        # 默认走国内源（清华 TUNA）；内网或有其他镜像站时在此覆盖
+        PIP_INDEX_URL: "${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}"
+        PIP_TRUSTED_HOST: "${PIP_TRUSTED_HOST:-}"
+        APT_MIRROR: "${APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}"
+        # 纯 CPU 部署（无 NVIDIA GPU、也无 NPU）时建议传 CPU 轮子索引，镜像更小、不引入 CUDA 运行库：
+        #   TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu docker compose up -d --build
+        TORCH_INDEX_URL: "${TORCH_INDEX_URL:-}"
+        TORCH_VERSION: "${TORCH_VERSION:-2.3.1}"
+        TORCHVISION_VERSION: "${TORCHVISION_VERSION:-0.18.1}"
+    image: opcrossmodalpool:1.0.0
+    container_name: opcrossmodalpool
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-17059}:8100"
+    environment:
+      # ---- 池化入口与子算子调度 ----
+      PORT: "8100"
+      POOL_AUTOSTART: "${POOL_AUTOSTART:-0}"
+      POOL_ONLY: "${POOL_ONLY:-}"
+      POOL_STARTUP_TIMEOUT: "${POOL_STARTUP_TIMEOUT:-60}"
+      # ---- 路径（必须与下方 volumes 的容器侧一致）----
+      # 权重默认由各算子加载自身 <算子目录>/weight/；只有外挂统一模型盘时才设置 MODEL_ROOT
+      # MODEL_ROOT: /models
+      OUTPUT_DIR: /data/output
+      # ---- 上传 / 解压 / 文件数 / 阶段末响应限额（字节）----
+      # 固定按交付数据集回归实测放大（#6 关键帧产物约 820 MB、#23 上传包约 346 MB、test7 #14 输入约 360 MB）；
+      # 如需调整请直接改本文件（不要把这里改成读 .env，.env.example 的默认值更小）。
+      MAX_UPLOAD_BYTES: "2147483648"
+      MAX_UNPACKED_BYTES: "4294967296"
+      MAX_UPLOAD_FILES: "2000"
+      MAX_RESPONSE_BYTES: "1073741824"
+      # ---- 时区（日志时间戳；容器内需有 tzdata 才能按名称生效）----
+      TZ: "${TZ:-Asia/Shanghai}"
+      # ---- CPU 推理调优（纯 CPU 部署可选，不填则用容器可见核数）----
+      # 与容器 CPU limit 对齐，避免 OpenMP 线程超额争抢：
+      # OMP_NUM_THREADS: "8"
+      # 纯 CPU 交付：验收脚本据此断言「无 CUDA、设备解析为 cpu」；如在 GPU 机器上验收可设 0
+      EXPECT_CPU: "${EXPECT_CPU:-1}"
+      # ---- 模型调用方式（强制离线）：只用各算子内置 weight/，不联网下载、不调远程模型 API ----
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+      YOLO_OFFLINE: "1"
+      # ---- MTY 传输（v4.2 停用；仅回滚时需要，取消注释并按平台填写）----
+      # MTY_TRANSPORT_ENABLED: "1"
+      # MTY_OSS_ENDPOINT: ""
+      # MTY_OSS_BUCKET: ""
+      # MTY_OSS_ACCESS_KEY_ID: ""
+      # MTY_OSS_ACCESS_KEY_SECRET: ""
+      # MTY_OSS_PREFIX: "crossmodal"
+      # MTY_REGISTRY_DSN: ""
+      # MTY_SLOT_ID: ""
+    volumes:
+      # 产物目录：宿主机持久化目录 → 容器输出根（OUTPUT_DIR）
+      - "${OUTPUT_HOST_DIR:-/data/webapp/idg/数据工程产线算子/operator-output/opcrossmodalpool}:/data/output"
+      # v1.0 正式版：权重随各算子目录内置进镜像，不再挂载包根 weight/
+      # 如确需外挂统一模型盘（会覆盖各算子本地权重），取消下一行并设置 MODEL_ROOT: /models
+      # - ./models:/models:ro
+    healthcheck:
+      # 池化存活探针（不判断子算子是否就绪；就绪情况看 /ready、/operators）
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:8100/health', timeout=5)\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    stop_grace_period: 30s
+    # ---- 可选：GPU ----
+    # 宿主机已装 NVIDIA 驱动 + NVIDIA Container Toolkit 时取消注释；各算子 device: auto，
+    # 容器能看到显卡时会自动走 CUDA，CPU-only 部署保持注释即可。
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"

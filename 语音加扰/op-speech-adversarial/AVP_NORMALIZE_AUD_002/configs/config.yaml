@@ -1,0 +1,35 @@
+# 02 语音标准化（avp_normalize_audio）
+# 所有阈值/系数必须来自本文件，processor.py 里不得出现魔法数字。
+
+operator:
+  id: avp_normalize_audio
+  name: 语音标准化
+  tag: 语音标准化
+  version: v1.0.0
+  number: 2
+
+io:
+  # 输入接口：01 算子的语料表（也接受目录，自动找同名文件）
+  input_filename: "001_corpus.jsonl"
+  # 标准化后音频目录（相对 ctx.out_dir）
+  output_subdir: "002_audio"
+  # 报告里最多列出的样本/剔除/失败条数（统计数仍是全量）
+  max_listed: 200
+
+normalize:
+  # 目标采样率枚举（params.sample_rate 必须来自这里）；16k 为默认规则，8k 用于窄带场景
+  allowed_sample_rates: [16000, 8000]
+  # 本期只做单声道
+  allowed_channels: [1]
+  # 目标格式固定 WAV（PCM 16bit）；字段值与接口 paramsSpec 一致
+  allowed_formats: ["wav_pcm16"]
+  default_format: "wav_pcm16"
+  # 时长边界判定容差（秒）：吸收 PCM 帧数/采样率换算产生的亚毫秒浮点噪声；
+  # 只在边界上生效，不改变「超范围剔除、不裁剪」的口径。
+  duration_tolerance_sec: 0.001
+  snr:
+    # 标准化产物无干净参考，只能盲估；盲估只作报告里的补充质量信号，不参与剔除
+    enabled: true
+    # 盲估偏置（dB）。common.audio 实测系统性偏高约 1.0–2.5 dB；
+    # 本数据集未做标定，保持 0，不伪造"修正后精确值"。
+    bias_db: 0.0

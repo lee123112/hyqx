@@ -1,0 +1,80 @@
+{
+  "video": [
+    {
+      "id": "f0",
+      "timestamp_sec": 0.0
+    },
+    {
+      "id": "f1",
+      "timestamp_sec": 1.0
+    },
+    {
+      "id": "f2",
+      "timestamp_sec": 2.0
+    }
+  ],
+  "audio": [
+    {
+      "id": "a0",
+      "start_sec": 0.04,
+      "end_sec": 0.94
+    },
+    {
+      "id": "a1",
+      "start_sec": 1.03,
+      "end_sec": 1.93
+    },
+    {
+      "id": "a2",
+      "start_sec": 2.01,
+      "end_sec": 2.91
+    }
+  ],
+  "text": [
+    {
+      "id": "t0",
+      "start_sec": 0.01,
+      "end_sec": 0.86
+    },
+    {
+      "id": "t1",
+      "start_sec": 1.0,
+      "end_sec": 1.85
+    },
+    {
+      "id": "t2",
+      "start_sec": 2.0,
+      "end_sec": 2.85
+    }
+  ],
+  "temporal_anchors": [
+    {
+      "video_sec": 0.0,
+      "source_sec": 0.0
+    },
+    {
+      "video_sec": 2.0,
+      "source_sec": 2.0
+    }
+  ],
+  "temporal_bindings": [
+    {
+      "binding_id": "b0",
+      "video": "f0",
+      "audio": "a0",
+      "text": "t0"
+    },
+    {
+      "binding_id": "b1",
+      "video": "f1",
+      "audio": "a1",
+      "text": "t1"
+    },
+    {
+      "binding_id": "b2",
+      "video": "f2",
+      "audio": "a2",
+      "text": "t2"
+    }
+  ]
+}

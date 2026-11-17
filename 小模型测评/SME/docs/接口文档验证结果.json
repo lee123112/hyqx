@@ -1,0 +1,108 @@
+{
+  "date": "2026-11-12",
+  "document": "09_接口说明与联调测试.md",
+  "scope": "Isolated native Uvicorn HTTP; exact curl block executed with Git Bash; Docker/Linux execution not performed",
+  "jsonExamplesParsed": 17,
+  "total": 17,
+  "passed": 17,
+  "failed": 0,
+  "durationSeconds": 20.407,
+  "results": [
+    {
+      "id": "N01",
+      "status": "passed",
+      "http": 401,
+      "errorCode": null
+    },
+    {
+      "id": "N02",
+      "status": "passed",
+      "http": 400,
+      "errorCode": "INVALID_UNIQUE_ID"
+    },
+    {
+      "id": "N03",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "UNKNOWN_OPERATOR"
+    },
+    {
+      "id": "N04",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "OPERATOR_TYPE_MISMATCH"
+    },
+    {
+      "id": "N05",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "MEASUREMENTS_REQUIRED"
+    },
+    {
+      "id": "N06",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "ASSET_MISSING"
+    },
+    {
+      "id": "N07",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "CONFIG_INVALID"
+    },
+    {
+      "id": "N08",
+      "status": "passed",
+      "http": 404,
+      "errorCode": "NOT_FOUND"
+    },
+    {
+      "id": "N09",
+      "status": "passed",
+      "description": "Repeated workspace cleanup returns count=0"
+    },
+    {
+      "id": "N10",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "DEMO_ONLY_DATASET"
+    },
+    {
+      "id": "N11",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "REQUEST_INVALID"
+    },
+    {
+      "id": "N12",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "BASELINE_UNVERIFIED"
+    },
+    {
+      "id": "B01",
+      "status": "passed",
+      "description": "Business import/create/run: completed, mean gap 4, accepted=false"
+    },
+    {
+      "id": "B02",
+      "status": "passed",
+      "description": "Business image engine task and audit completed"
+    },
+    {
+      "id": "B03",
+      "status": "passed",
+      "description": "Business imported media URI returns bytes"
+    },
+    {
+      "id": "B04",
+      "status": "passed",
+      "description": "Incremental logs, JSON/Markdown report envelopes and SSE done verified"
+    },
+    {
+      "id": "CURL01",
+      "status": "passed",
+      "description": "Exact documentation curl block uploads/predicts/downloads/verifies/removes successfully"
+    }
+  ]
+}

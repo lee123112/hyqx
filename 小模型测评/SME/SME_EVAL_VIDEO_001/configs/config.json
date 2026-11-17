@@ -1,0 +1,45 @@
+{
+  "operatorId": "SME_eval_video",
+  "package": "SME_EVAL_VIDEO_001",
+  "version": "1.1.0",
+  "type": "video",
+  "config": {
+    "thresholds": {
+      "clarity": 80,
+      "alignment": 80,
+      "trust": 80,
+      "safety": 80,
+      "integrity": 80
+    },
+    "weights": [
+      25,
+      25,
+      20,
+      15,
+      15
+    ],
+    "grades": {
+      "AA": 95,
+      "A": 85,
+      "B": 70
+    },
+    "highValue": false,
+    "frameSamples": 12,
+    "sampling": {
+      "strategy": "uniform-midpoint",
+      "minFrames": 4,
+      "maxFrames": 24
+    }
+  },
+  "engine": {
+    "module": "app.engines.video.VideoEngine",
+    "mode": "demo|measured",
+    "version": "video-vqa-v2"
+  },
+  "modelAssets": {
+    "root": "models",
+    "manifest": "models/manifest.json",
+    "packaged": true,
+    "sharedWeightRequired": false
+  }
+}

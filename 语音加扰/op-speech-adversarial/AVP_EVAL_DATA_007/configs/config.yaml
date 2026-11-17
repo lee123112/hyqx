@@ -1,0 +1,74 @@
+# 07 评测结果接收（avp_ingest_eval_result）
+# 所有阈值/系数/枚举必须来自本文件，processor.py 里不得出现魔法数字。
+
+operator:
+  id: avp_ingest_eval_result
+  name: 评测结果接收
+  tag: 评测结果接收
+  version: v1.0.0
+  number: 7
+
+io:
+  # 输入：外部「数据集评测」回传的评测结果；主用 .jsonl，兼容单文件 .json（对象/数组）
+  input_exts: [".jsonl", ".json"]
+  # 目录输入时优先挑名字里带该关键词的文件（inference.py 未传 inputFile 时会传目录）
+  preferred_input_keyword: "eval"
+  output_results: "007_eval_results.jsonl"
+  output_parse_failed: "007_parse_failed.jsonl"
+  output_report: "007_eval_report.json"
+  # 报告里最多列出的失败/告警明细条数（统计数始终是全量）
+  max_listed: 200
+  # 失败记录中原始行预览的最大字符数（防止把整条大 JSON 抄进失败文件）
+  raw_preview_len: 160
+
+versions:
+  # 版本库来源优先级：params.known_versions > params.registry_path > 本键（相对路径按任务工作目录解析）
+  default_registry_path: ""
+  # 006 版本注册表里「已回滚」的状态值（与 006 状态机保持一致）
+  rolled_back_status: "已回滚"
+  # 仅在 known_versions 里、没有注册表状态时的推定状态：能被评测拉取说明当时已发布
+  default_status: "已发布"
+
+validation:
+  # ID / 枚举类字段的最大长度
+  max_id_len: 128
+  # metrics 与 dimensions[].cer/wer/ser 的单位是「百分比（0–100）」，不是 0–1 的小数
+  metric_min: 0.0
+  metric_max: 100.0
+  min_samples_per_value: 1
+  ratio_min: 0.0
+  ratio_max: 1.0
+  # 样本级错误形态：sub=替换 / del=删除 / ins=插入 / unk=未识别 / none=该样本识别正确
+  error_types: ["sub", "del", "ins", "unk", "none"]
+  # 外部回传可能给中文错误类型，先归一化成契约码再校验
+  error_type_aliases:
+    替换: sub
+    删除: del
+    插入: ins
+    未识别: unk
+    正确: none
+    无错误: none
+  # 样本缺 error_type 时用字符级最小编辑脚本推导；并列时按此顺序取主导类型
+  edit_type_tie_order: ["sub", "del", "ins"]
+  # 样本给的是 errors 计数字典时，按此优先级取主导类型（并列取靠前者）
+  error_type_priority: ["sub", "del", "ins", "unk"]
+  # 同一 external_task_id 重推（对方重试）的落库策略：last_wins=保留最后一条
+  duplicate_policy: "last_wins"
+  # ratio 与 samples/total 的允许偏差，超出只告警不改数
+  ratio_tolerance: 0.01
+  # 契约六项必填不可放宽；params.required_fields 只能在此之上追加
+  required_fields: ["external_task_id", "version_id", "metrics", "dimensions", "error_mix", "sample_results"]
+
+ids:
+  # eval_id 生成规则：{prefix}-{external_task_id}，同一外部任务重推得到同一 eval_id
+  eval_id_prefix: "EV"
+
+precision:
+  # ratio 落盘小数位（占比是 0–1 的小数）
+  ratio_digits: 4
+  # 报告里展示的平均值小数位
+  report_digits: 2
+
+logs:
+  # 每处理多少行打一条进度日志
+  progress_step: 200

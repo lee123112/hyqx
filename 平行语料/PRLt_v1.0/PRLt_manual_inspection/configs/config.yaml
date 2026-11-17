@@ -1,0 +1,61 @@
+# 算子20：人工抽检复核配置
+operator:
+  name: manual_spot_check_review
+  version: v1.1.0
+
+# ---- 输入输出 ----
+# 上游已完成编码归一，本节点默认只接受严格 UTF-8。
+input_encodings: [utf-8]
+input_format: auto
+queue_name: 20_review_queue.jsonl
+reviewed_name: 20_reviewed.jsonl
+reject_name: 20_review_rejects.jsonl
+state_file_name: review_state.json
+# 只统计文本长度与证据字段，绝不复制完整原文。
+text_fields: [source, target]
+record_id_fields: [record_id, id]
+
+# ---- 抽检策略 ----
+# 触发命中的记录一定入队，不受 sample_ratio 影响；其余候选按比例随机抽样。
+# random_seed 固定，且候选按 (record_id, line) 排序后抽样，因此抽样数量可复算。
+sample_ratio: 0.1
+min_sample_count: 1
+max_sample_count: 0        # 0 表示不设上限
+random_seed: 20261005
+governance_policy_version: risk_review_v2
+# false 表示普通随机抽检不阻塞交付；规则触发异常始终强制复核并阻塞。
+ordinary_sample_blocking: false
+# low_relevance：11 号（领域相关性校验）判为低于阈值，trigger_reason 由 11 号直接写入。
+trigger_reasons: [grade_c, low_confidence, low_relevance, conflict, review_required, entity_conflict, model_unavailable, unknown_domain, upstream_waiting_manual]
+trigger_fields: [trigger_reason, review_reason, risk_reason, risk_flags, review_flags]
+grade_fields: [quality_grade, grade]
+c_grade_values: [C]
+low_confidence_fields: [low_confidence, low_confidence_flag]
+confidence_fields: [alignment_confidence, confidence, sentence_pair_confidence]
+low_confidence_threshold: 0.7
+conflict_fields: [review_conflict, conflict_flag, conflict]
+review_required_field: review_required
+
+# ---- 队列记录 ----
+# 队列记录恒为 waiting_manual，待人工处理；不含完整原文，只留证据摘要与 source_ref。
+queue_status: waiting_manual
+evidence_fields: [quality_grade, grade, alignment_confidence, confidence,
+                  sentence_pair_confidence, semantic_score, fluency_score,
+                  domain_confidence, low_confidence, conflict_flag,
+                  review_required, language_pair]
+max_evidence_items: 8
+max_evidence_chars: 200
+max_reason_chars: 500
+
+# ---- 人工结果回写 ----
+# 工程侧显式提供；不提供时只生成队列。强制复核未完成才返回 waiting_manual，
+# 普通风险抽检默认不阻塞顶层状态。
+review_payload_file: null
+review_payload: []
+review_statuses: [accepted, rejected, needs_revision, waiting_manual]
+require_reviewer: true
+require_reviewed_at: true
+require_review_reason: true
+validate_reviewed_at: true
+require_known_target: true
+mask_reviewer_id: true

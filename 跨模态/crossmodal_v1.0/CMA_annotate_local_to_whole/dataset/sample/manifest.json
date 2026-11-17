@@ -1,0 +1,23 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "media/demo.png",
+      "role": "media"
+    },
+    {
+      "path": "media/clip.wav",
+      "role": "media"
+    },
+    {
+      "path": "media/transcript.json",
+      "role": "media"
+    }
+  ],
+  "note": "跨模态 demo_10.6 算子 #17 样例：media/absent.png 故意缺失，用于演示原始隔离"
+}

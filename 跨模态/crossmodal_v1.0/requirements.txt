@@ -1,0 +1,38 @@
+# 跨模态算子包 · 上层统一依赖（多算子打包：一个镜像装全部 26 个算子的依赖）
+#
+# 生成口径：合并 26 个算子目录的 requirements.txt + requirements-model.txt
+#          （原文件已按上传结构移出，见 README 第 4.1 节「归档」）。
+# 上层 Dockerfile 直接 `pip install -r requirements.txt`。
+#
+# 说明：权重随包分发，各算子自带 weight/，.dockerignore 不排除（见其内注释），
+#       `pip install -r requirements.txt` 之后无需再拉模型即可单算子运行；
+#       如需把权重放到镜像外，设 MODEL_ROOT 指向挂载目录即可覆盖算子本地 weight/。
+
+# ---- 服务与接口（26 个算子共用）----
+fastapi==0.128.8
+starlette==0.49.3
+uvicorn==0.39.0
+python-multipart==0.0.20
+pydantic==2.13.5
+PyYAML==6.0.1
+httpx==0.28.1
+
+# ---- 测试与冒烟（生产镜像可裁剪）----
+pytest==8.4.2
+
+# ---- 基础数值 / 图像 / 表格 / 中文分词 ----
+numpy==1.26.4
+scipy==1.10.1
+Pillow==9.4.0
+opencv-python-headless>=4.8
+openpyxl==3.1.3
+jieba==0.42.1
+
+# ---- 模型运行时（#08/#12/#13/#14/#16/#17/#18/#20）----
+# CPU 部署请把 torch/torchvision 换成官方 CPU 轮子（+cpu 通道）
+torch==2.3.1
+torchvision==0.18.1
+open_clip_torch==2.26.1
+safetensors==0.4.3
+transformers==4.41.2
+ultralytics==8.4.129

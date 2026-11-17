@@ -1,0 +1,19 @@
+# 语音加扰（语音对抗平台）算子包 · 运行依赖
+# 版本与本机 Python 3.9.7 实测环境一致，Docker 基础镜像 python:3.9-slim 对齐。
+# 运行时禁止联网 / pip install / 模型下载。
+
+numpy==1.26.4
+scipy==1.10.1
+librosa==0.11.0
+soundfile==0.13.1
+soxr==1.1.0
+numba==0.60.0
+
+fastapi==0.128.8
+uvicorn==0.39.0
+pydantic==2.13.5
+python-multipart==0.0.20
+
+PyYAML==6.0.1
+# 11 号算子出 PDF 报告用；STSong-Light 是 reportlab 自带 CID 字体，不需要外挂中文字体文件
+reportlab==5.0.1

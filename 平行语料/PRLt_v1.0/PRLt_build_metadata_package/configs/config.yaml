@@ -1,0 +1,105 @@
+# 算子18：元数据构建与数据集打包 配置
+operator:
+  name: metadata_dataset_packaging
+  version: v1.0.0
+
+# ---- 输入输出 ----
+# 上游算子 3/4 已完成编码归一，这里只接受严格 UTF-8。
+input_encodings: [utf-8]
+# 上游默认产物名；阶段内实际路径由 /predict 的 inputFile 指定。
+input_file_name: 16_domain_checked.jsonl
+dataset_jsonl_name: 18_dataset.jsonl
+dataset_tsv_name: 18_dataset.tsv
+manifest_name: 18_manifest.json
+package_name: 18_delivery.zip
+reject_name: 18_rejects.jsonl
+# [无血缘改造 2026-10-19] 不再读取上游血缘文件；operator_versions 仅取显式配置
+# operator_versions（无配置时 {} 且 operator_versions_source=unavailable，绝不伪造版本号）。
+# upstream_lineage_file: lineage.jsonl
+
+# ---- 入库门禁 ----
+grade_fields: [quality_grade, grade]
+allowed_grades: [S, A]
+allow_c: false
+# true 时允许“任务明确许可”的 waiting_manual 记录进入交付集（delivery_status=waiting_manual）
+allow_waiting_manual: false
+# [2026-11-04 最小长度门禁] 最终兜底：源/目标去空白后少于该字符数即拒收（too_short_source /
+# too_short_target）。上游 10 号已加碎片门禁，这里防任何漏网的超短片段进入交付包。
+# 5 = 至少 5 个字符（即 <=4 字的碎片被拦）；0 表示关闭。
+min_source_chars: 5
+min_target_chars: 5
+# [2026-11-04] 纯长度会把「增编/Addendum」「缅甸/Myanmar」这类真术语对一起砍掉。
+# fragment_only（默认）：短记录还须呈碎片形态才拒（源文以顿号/逗号/分号/左括号收尾、
+#   译文小写开头、译文逗号/分号收尾、译文是裸日期）；放行的记 metadata.short_record_exempt=term_pair。
+# always：退回旧的纯长度硬门，短即拒。
+short_record_policy: fragment_only
+waiting_manual_values: [waiting_manual, waiting_quality]
+review_status_fields: [review_status]
+status_fields:
+  semantic: [quality_status, semantic_status]
+  fluency: [fluency_status]
+  domain: [domain_status]
+accepted_status_map:
+  semantic: [accepted, passed]
+  fluency: [accepted]
+  domain: [accepted]
+# 算子15 未完成 Gold 校准前输出 waiting_calibration；规范 4.15 要求它只作辅助证据，
+# 不作为放行/拦截的最终依据。enforce=严格门禁；evidence_only_until_gold=仅当
+# fluency_business_gate_approved 明确为 false 时，把 waiting_calibration 作为非阻塞证据。
+fluency_gate_mode: evidence_only_until_gold
+fluency_approval_fields: [fluency_business_gate_approved]
+fluency_evidence_statuses: [waiting_calibration]
+require_status_fields: true
+respect_delivery_eligible: true
+delivery_eligible_fields: [delivery_eligible]
+# 实体一致性硬门禁：不一致记录即使处于 waiting_manual 也不得进入临时包。
+entity_status_fields: [entity_consistency_status]
+accepted_entity_statuses: [consistent]
+reject_inconsistent_entities: true
+
+# ---- 元数据完整性 ----
+# 上游必须已提供的字段；缺失即 missing_metadata，不用空值补齐。
+required_fields: [id, source, target, source_lang, target_lang, quality_grade, quality_score, alignment_confidence, domain, source_ref]
+# language_pair / operator_versions / created_at 由本节点构建；
+# [无血缘改造 2026-10-19] lineage_refs 恒为 [] 且 lineage_refs_source=unavailable（不再读上游血缘）。
+derive_language_pair: true
+language_pair_fields: [language_pair]
+language_pair_separator: "-"
+# 顶层字段与 metadata 同名键不一致时的比较范围；默认 reject，绝不静默覆盖。
+conflict_check_fields: [id, source, target, source_lang, target_lang, quality_grade, quality_score, alignment_confidence, domain, language_pair]
+metadata_conflict_policy: reject   # reject | prefer_top_level | prefer_metadata
+quality_score_fields: [quality_score]
+alignment_confidence_fields: [alignment_confidence]
+quality_score_range: [0.0, 100.0]
+alignment_confidence_range: [0.0, 1.0]
+duplicate_id_policy: reject        # reject | keep
+require_operator_versions: false
+# [无血缘改造 2026-10-19] 不再有血缘引用，lineage_refs 不再作为必填校验项。
+# require_lineage_refs: false
+
+# ---- 版本与来源（manifest 用；不伪造上游版本） ----
+operator_versions: {}
+pipeline_version: v1.0.0
+package_version: v1.0.0
+manifest_version: v1.0.0
+default_unit_type: sentence
+unit_type_fields: [granularity]
+model_version_fields: [model_version, semantic_model_version, fluency_model_version, domain_model_version]
+rule_version_fields: [grade_rule_version, confidence_version, score_conversion_version]
+source_type_fields: [source_type, source_batch]
+
+# ---- 打包 ----
+tsv_fields: [id, source, target, source_lang, target_lang, language_pair, quality_grade, quality_score, alignment_confidence, domain, source_ref, created_at]
+tsv_delimiter: "\t"
+# [无血缘改造 2026-10-19] 交付包只含业务产物，不再包含 lineage.jsonl。
+zip_members: [18_dataset.jsonl, 18_dataset.tsv, 18_manifest.json]
+zip_compression: deflated
+# 无记录通过门禁时：partial=产出空数据集并标记部分完成（默认；输入>0 的零交付是严格门禁的
+# 正常裁定，与"输入为 0"的 failed 语义区分）；failed=不产出交付数据集（严格模式）。
+empty_delivery_policy: partial
+
+# ---- 索引（首版未连接 MongoDB/Elasticsearch/Parquet，只在 manifest 预留描述） ----
+indexes:
+  mongodb: {enabled: false, mode: reserved}
+  elasticsearch: {enabled: false, mode: reserved}
+  parquet: {enabled: false, mode: reserved}

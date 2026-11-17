@@ -1,0 +1,25 @@
+{
+  "format": "crossmodal-quality-report-v1",
+  "operator": "alignment_qc",
+  "operator_version": "v1.0.0",
+  "report_id": "qr-batch-A-0001",
+  "batch_id": "batch-A",
+  "created_at": "2026-10-08T10:00:00+08:00",
+  "checks": {
+    "openable": true,
+    "min_modalities": true,
+    "blank_text": false
+  },
+  "statistics": {
+    "input": 18,
+    "valid": 16,
+    "rejected": 2
+  },
+  "status": "waiting_writeback",
+  "version_state": "pending_release",
+  "writeback": {
+    "completed": false,
+    "operator": "auto_review",
+    "completedAt": null
+  }
+}

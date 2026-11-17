@@ -1,0 +1,448 @@
+{
+  "generatedFrom": "dataset-evaluation.js.下载",
+  "generatedAt": "2026-11-02T04:15:39.093Z",
+  "TEMPLATES": {
+    "text": {
+      "name": "预训练文本",
+      "model": "BERT-base",
+      "baseline": "公开语料基线",
+      "task": "文本分类 / 命名实体识别",
+      "description": "比较下游准确率、F1，并通过损失波动回溯分块和清洗过程。",
+      "metrics": [
+        {
+          "key": "accuracy",
+          "name": "准确率",
+          "unit": "%",
+          "direction": "higher",
+          "threshold": 80
+        },
+        {
+          "key": "f1",
+          "name": "F1",
+          "unit": "%",
+          "direction": "higher",
+          "threshold": 80
+        },
+        {
+          "key": "lossCv",
+          "name": "损失变异系数",
+          "unit": "",
+          "direction": "lower",
+          "threshold": 0.2
+        }
+      ],
+      "steps": [
+        "数据与切分检查",
+        "小范围预训练",
+        "下游任务验证",
+        "基线对比与损失分析",
+        "质量报告与反馈"
+      ]
+    },
+    "image": {
+      "name": "预训练图像",
+      "model": "轻量图像验证模型",
+      "baseline": "原始图像处理基线",
+      "task": "图像分类 / 分割边界验证",
+      "description": "逐步校验清晰度、语义完整性与 IoU，未达标时生成回退处理建议。",
+      "metrics": [
+        {
+          "key": "iou",
+          "name": "分割 IoU",
+          "unit": "",
+          "direction": "higher",
+          "threshold": 0.85
+        },
+        {
+          "key": "clarity",
+          "name": "清晰度",
+          "unit": "分",
+          "direction": "higher",
+          "threshold": 80
+        },
+        {
+          "key": "semantic",
+          "name": "语义完整性",
+          "unit": "分",
+          "direction": "higher",
+          "threshold": 80
+        },
+        {
+          "key": "accuracy",
+          "name": "场景识别准确率",
+          "unit": "%",
+          "direction": "higher",
+          "threshold": 80
+        }
+      ],
+      "steps": [
+        "图像与标注检查",
+        "处理步骤质量校验",
+        "轻量模型验证",
+        "场景回溯与人工复核",
+        "参数反馈与质量报告"
+      ]
+    },
+    "video": {
+      "name": "预训练视频",
+      "model": "多维质量评分方案",
+      "baseline": "数据处理前质量基线",
+      "task": "加权评分 / 动态分级",
+      "description": "清晰度、图文对齐度、来源可信度、安全等级、完整性加权分级，保留高价值 AA 级。",
+      "metrics": [
+        {
+          "key": "clarity",
+          "name": "清晰度",
+          "unit": "分",
+          "direction": "higher",
+          "threshold": 80
+        },
+        {
+          "key": "alignment",
+          "name": "图文对齐度",
+          "unit": "分",
+          "direction": "higher",
+          "threshold": 80
+        },
+        {
+          "key": "trust",
+          "name": "来源可信度",
+          "unit": "分",
+          "direction": "higher",
+          "threshold": 80
+        },
+        {
+          "key": "safety",
+          "name": "安全等级",
+          "unit": "分",
+          "direction": "higher",
+          "threshold": 80
+        },
+        {
+          "key": "integrity",
+          "name": "完整性",
+          "unit": "分",
+          "direction": "higher",
+          "threshold": 80
+        }
+      ],
+      "steps": [
+        "视频与来源检查",
+        "五维质量评分",
+        "加权计算与动态分级",
+        "高价值场景复核",
+        "分级应用与报告"
+      ]
+    },
+    "audio": {
+      "name": "预训练语音",
+      "model": "CNN-LSTM",
+      "baseline": "通用语音基线",
+      "task": "ASR / 说话人识别 / 领域指令识别",
+      "description": "用 CER、说话人准确率和领域指令 F1 验证实用性，定位场景和发音人缺口。",
+      "metrics": [
+        {
+          "key": "cer",
+          "name": "字错误率 CER",
+          "unit": "%",
+          "direction": "lower",
+          "threshold": 12
+        },
+        {
+          "key": "speakerAccuracy",
+          "name": "说话人识别准确率",
+          "unit": "%",
+          "direction": "higher",
+          "threshold": 85
+        },
+        {
+          "key": "domainF1",
+          "name": "领域指令 F1",
+          "unit": "%",
+          "direction": "higher",
+          "threshold": 85
+        }
+      ],
+      "steps": [
+        "音频与转写检查",
+        "轻量语音模型验证",
+        "通用及垂直场景评测",
+        "场景与发音人回溯",
+        "补采清洗与质量报告"
+      ]
+    },
+    "benchmark": {
+      "name": "后训练评测语料",
+      "model": "基础模型 / 优化模型",
+      "baseline": "已知能力基础模型",
+      "task": "能力区分度验证",
+      "description": "比较已知能力模型的得分，检查难度分布与复杂样本比例是否有区分度。",
+      "metrics": [
+        {
+          "key": "score",
+          "name": "模型评测得分",
+          "unit": "分",
+          "direction": "higher",
+          "threshold": 5
+        }
+      ],
+      "steps": [
+        "评测题与标准检查",
+        "基础模型测试",
+        "优化模型测试",
+        "得分差异与难度分析",
+        "语料调整与质量报告"
+      ]
+    }
+  },
+  "MODEL_PROFILES": {
+    "text": [
+      {
+        "id": "bert-base",
+        "name": "BERT-base",
+        "version": "1.0",
+        "baseline": "公开语料基线",
+        "task": "文本分类 / 命名实体识别"
+      }
+    ],
+    "image": [
+      {
+        "id": "image-validator",
+        "name": "轻量图像验证模型",
+        "version": "1.0",
+        "baseline": "原始图像处理基线",
+        "task": "图像分类 / 分割边界验证"
+      }
+    ],
+    "video": [
+      {
+        "id": "video-quality",
+        "name": "多维质量评分方案",
+        "version": "1.0",
+        "baseline": "数据处理前质量基线",
+        "task": "加权评分 / 动态分级"
+      }
+    ],
+    "audio": [
+      {
+        "id": "cnn-lstm",
+        "name": "CNN-LSTM",
+        "version": "1.0",
+        "baseline": "通用语音基线",
+        "task": "ASR / 说话人识别 / 领域指令识别"
+      },
+      {
+        "id": "small-transformer",
+        "name": "小型 Transformer",
+        "version": "1.0",
+        "baseline": "通用语音基线",
+        "task": "ASR / 说话人识别 / 领域指令识别"
+      }
+    ],
+    "benchmark": [
+      {
+        "id": "benchmark-pair",
+        "name": "基础模型 / 优化模型",
+        "version": "1.0",
+        "baseline": "已知能力基础模型",
+        "task": "能力区分度验证"
+      }
+    ]
+  },
+  "DEFAULT_WEIGHTS": [
+    25,
+    25,
+    20,
+    15,
+    15
+  ],
+  "GRADE_USE": {
+    "AA": "高价值场景核心训练",
+    "A": "预训练与微调核心阶段",
+    "B": "数据增强或次要任务训练",
+    "C": "仅保留用于错误分析"
+  },
+  "DEFAULT_CONFIG": {
+    "text": {
+      "thresholds": {
+        "accuracy": 80,
+        "f1": 80,
+        "lossCv": 0.2
+      },
+      "weights": [
+        25,
+        25,
+        20,
+        15,
+        15
+      ],
+      "grades": {
+        "AA": 95,
+        "A": 85,
+        "B": 70
+      },
+      "highValue": false
+    },
+    "image": {
+      "thresholds": {
+        "iou": 0.85,
+        "clarity": 80,
+        "semantic": 80,
+        "accuracy": 80
+      },
+      "weights": [
+        25,
+        25,
+        20,
+        15,
+        15
+      ],
+      "grades": {
+        "AA": 95,
+        "A": 85,
+        "B": 70
+      },
+      "highValue": false
+    },
+    "video": {
+      "thresholds": {
+        "clarity": 80,
+        "alignment": 80,
+        "trust": 80,
+        "safety": 80,
+        "integrity": 80
+      },
+      "weights": [
+        25,
+        25,
+        20,
+        15,
+        15
+      ],
+      "grades": {
+        "AA": 95,
+        "A": 85,
+        "B": 70
+      },
+      "highValue": false
+    },
+    "audio": {
+      "thresholds": {
+        "cer": 12,
+        "speakerAccuracy": 85,
+        "domainF1": 85
+      },
+      "weights": [
+        25,
+        25,
+        20,
+        15,
+        15
+      ],
+      "grades": {
+        "AA": 95,
+        "A": 85,
+        "B": 70
+      },
+      "highValue": false
+    },
+    "benchmark": {
+      "thresholds": {
+        "score": 5
+      },
+      "weights": [
+        25,
+        25,
+        20,
+        15,
+        15
+      ],
+      "grades": {
+        "AA": 95,
+        "A": 85,
+        "B": 70
+      },
+      "highValue": false
+    }
+  },
+  "BASELINE_PLANS": [
+    {
+      "id": "demo-baseline-text-bert-base",
+      "type": "text",
+      "modelId": "bert-base",
+      "name": "通用文本理解对比",
+      "description": "与公开语料参考表现对比，观察文本分类、实体识别及训练稳定性。",
+      "version": "1.0",
+      "mode": "demo",
+      "status": "published",
+      "validationVersion": "validation-v1",
+      "seed": 42,
+      "reference": "demo://baseline/text/bert-base"
+    },
+    {
+      "id": "demo-baseline-image-image-validator",
+      "type": "image",
+      "modelId": "image-validator",
+      "name": "图像处理效果对比",
+      "description": "对比处理前后图像质量，检查边界、清晰度和场景识别效果。",
+      "version": "1.0",
+      "mode": "demo",
+      "status": "published",
+      "validationVersion": "validation-v1",
+      "seed": 42,
+      "reference": "demo://baseline/image/image-validator"
+    },
+    {
+      "id": "demo-baseline-video-video-quality",
+      "type": "video",
+      "modelId": "video-quality",
+      "name": "视频质量分级对比",
+      "description": "对比处理前后五维质量评分，自动给出样本等级。",
+      "version": "1.0",
+      "mode": "demo",
+      "status": "published",
+      "validationVersion": "validation-v1",
+      "seed": 42,
+      "reference": "demo://baseline/video/video-quality"
+    },
+    {
+      "id": "demo-baseline-audio-cnn-lstm",
+      "type": "audio",
+      "modelId": "cnn-lstm",
+      "name": "通用语音能力对比",
+      "description": "检查识别错误率、说话人识别和指令理解表现。",
+      "version": "1.0",
+      "mode": "demo",
+      "status": "published",
+      "validationVersion": "validation-v1",
+      "seed": 42,
+      "reference": "demo://baseline/audio/cnn-lstm"
+    },
+    {
+      "id": "demo-baseline-audio-small-transformer",
+      "type": "audio",
+      "modelId": "small-transformer",
+      "name": "通用语音能力对比",
+      "description": "检查识别错误率、说话人识别和指令理解表现。",
+      "version": "1.0",
+      "mode": "demo",
+      "status": "published",
+      "validationVersion": "validation-v1",
+      "seed": 42,
+      "reference": "demo://baseline/audio/small-transformer"
+    },
+    {
+      "id": "demo-baseline-benchmark-benchmark-pair",
+      "type": "benchmark",
+      "modelId": "benchmark-pair",
+      "name": "模型能力区分度对比",
+      "description": "对比基础模型与优化模型得分，判断题目是否有区分度。",
+      "version": "1.0",
+      "mode": "demo",
+      "status": "published",
+      "validationVersion": "validation-v1",
+      "seed": 42,
+      "reference": "demo://baseline/benchmark/benchmark-pair"
+    }
+  ]
+}

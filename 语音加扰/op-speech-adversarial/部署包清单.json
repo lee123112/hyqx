@@ -1,0 +1,466 @@
+{
+  "formatVersion": 1,
+  "package": "op-speech-adversarial",
+  "packagedAt": "2026-11-13",
+  "sourcePackage": "AVP",
+  "containerName": "op-speech-adversarial",
+  "hostPort": 17023,
+  "containerPort": 8000,
+  "operators": 11,
+  "runtimeDataIncluded": false,
+  "asrModelWeightsIncluded": false,
+  "requiredNoiseWavs": 5,
+  "fileCountExcludingManifest": 88,
+  "payloadBytesExcludingManifest": 9522101,
+  "manifestExcludesItself": true,
+  "files": [
+    {
+      "path": ".dockerignore",
+      "bytes": 390,
+      "sha256": "f7968a0a5417a63ca0d50bad1a0c3f37562697d6df7b0e0c12b6f26770a7db9f"
+    },
+    {
+      "path": "AVP_ADVICE_DATA_009/configs/config.yaml",
+      "bytes": 4278,
+      "sha256": "80a5c22e09671c9829a8e972ae72209551d26095ea5cde3c19e7e6bd7fccc7ef"
+    },
+    {
+      "path": "AVP_ADVICE_DATA_009/dataset/DATA_SCHEMA.md",
+      "bytes": 9315,
+      "sha256": "04fdb40bf6987b2253a73d52b1f13357898b779306f67c56b8b279cfee143875"
+    },
+    {
+      "path": "AVP_ADVICE_DATA_009/OPERATOR_MANUAL.md",
+      "bytes": 11488,
+      "sha256": "3e940f66efa5ea03d266c54e4d00e18101d95aa7f54a53e5da342aa52d728980"
+    },
+    {
+      "path": "AVP_ADVICE_DATA_009/processor.py",
+      "bytes": 29014,
+      "sha256": "a525c708b198ef27442c3c1283a8b95a42a33397ffc0b127c1b5a3e47b28a408"
+    },
+    {
+      "path": "AVP_ADVICE_DATA_009/README.md",
+      "bytes": 1051,
+      "sha256": "2d2e8bb1260e58f405a606333e18c04f7a35e05426b35ff394ebf10f587750b0"
+    },
+    {
+      "path": "AVP_ASSET_DATA_010/configs/config.yaml",
+      "bytes": 3103,
+      "sha256": "e6eee561a3964eb301227312eb33a81dc340f9d3a6242b2b2d6ef9cfa6f2bac6"
+    },
+    {
+      "path": "AVP_ASSET_DATA_010/dataset/DATA_SCHEMA.md",
+      "bytes": 9121,
+      "sha256": "9febf24cfcbdf1e9273d6726bfed134f2d0865c84ba8731a2b142e35b6459753"
+    },
+    {
+      "path": "AVP_ASSET_DATA_010/OPERATOR_MANUAL.md",
+      "bytes": 9595,
+      "sha256": "c3619a6ae4b232549fc22a3dd139e8f5ce91d6abddaa36a1f675dc9c853bbd50"
+    },
+    {
+      "path": "AVP_ASSET_DATA_010/processor.py",
+      "bytes": 26338,
+      "sha256": "3fa9a55d2684d6a701132ba13d6e8cd565da112292dbb97b1c14ca54e1d626b9"
+    },
+    {
+      "path": "AVP_ASSET_DATA_010/README.md",
+      "bytes": 1016,
+      "sha256": "2e53166aa5c5c5d825cad707ea9a6dbc739a7abb171488b979c0dca5eb6a778e"
+    },
+    {
+      "path": "AVP_ATTRIBUTE_DATA_008/configs/config.yaml",
+      "bytes": 2111,
+      "sha256": "3978d5551bf3cab49979725e1452defd3f7422b54ff8c1509f9097242669afa7"
+    },
+    {
+      "path": "AVP_ATTRIBUTE_DATA_008/dataset/DATA_SCHEMA.md",
+      "bytes": 12511,
+      "sha256": "b9bb17329154da5642dc698314eddb2d383a90def410212b1ad722e3840c853f"
+    },
+    {
+      "path": "AVP_ATTRIBUTE_DATA_008/OPERATOR_MANUAL.md",
+      "bytes": 10588,
+      "sha256": "a09771786577b7bc29e440181ca97eea8ba772a9e7791b258fd86a81d69adce4"
+    },
+    {
+      "path": "AVP_ATTRIBUTE_DATA_008/processor.py",
+      "bytes": 42694,
+      "sha256": "cb0a735351cb2dcba9c3a2d56d7aca023ec1d2ebdedfac2e11aee0bad2e4f191"
+    },
+    {
+      "path": "AVP_ATTRIBUTE_DATA_008/README.md",
+      "bytes": 1086,
+      "sha256": "94994c377e35d6cdf6c0175b593e8f06d74e3cbf09ff32a9aa3d456a137df590"
+    },
+    {
+      "path": "AVP_EVAL_DATA_007/configs/config.yaml",
+      "bytes": 3088,
+      "sha256": "78c9bb9d2c323404eb106010c0041f82181a7d0bbb0c977110a42e45d8aa2716"
+    },
+    {
+      "path": "AVP_EVAL_DATA_007/dataset/DATA_SCHEMA.md",
+      "bytes": 10392,
+      "sha256": "c0eb1a60be2bcd4d5ff19a2e0e60f6d7f946442f3705069419a8ebabf2daa90f"
+    },
+    {
+      "path": "AVP_EVAL_DATA_007/OPERATOR_MANUAL.md",
+      "bytes": 10950,
+      "sha256": "952f319acb29d91c4cbe0eb7e6d813e652e18da0b0bcbdb4c6a91b6b8e9894ba"
+    },
+    {
+      "path": "AVP_EVAL_DATA_007/processor.py",
+      "bytes": 45499,
+      "sha256": "7e8a822dd3e69f5891911cf6eed0f76805d1f1e8f917e8c3f0e082266c216d97"
+    },
+    {
+      "path": "AVP_EVAL_DATA_007/README.md",
+      "bytes": 1090,
+      "sha256": "7ecf705176258119c6fa9bfb617b79b0ecb68add14b663ea2a4c769c7b8e53cf"
+    },
+    {
+      "path": "AVP_INGEST_AUD_001/configs/config.yaml",
+      "bytes": 1166,
+      "sha256": "7ff824e1bddf36d2097216f364b32b1e991f687f9a42f4846c0423b97cb32f21"
+    },
+    {
+      "path": "AVP_INGEST_AUD_001/dataset/DATA_SCHEMA.md",
+      "bytes": 7100,
+      "sha256": "ae6dfbc12226149f7ea47622df55e70ee96c772de0d1913a310bbe2c1a4c426e"
+    },
+    {
+      "path": "AVP_INGEST_AUD_001/OPERATOR_MANUAL.md",
+      "bytes": 10103,
+      "sha256": "48c8e71c79449f5544731c339f571ff79de7e8dbd03b5e2108aad419a761cdef"
+    },
+    {
+      "path": "AVP_INGEST_AUD_001/processor.py",
+      "bytes": 20578,
+      "sha256": "b4210a6d65432c6c212be014973459a81ae3fd0ae4e513fb35f694c58c68b8e4"
+    },
+    {
+      "path": "AVP_INGEST_AUD_001/README.md",
+      "bytes": 1099,
+      "sha256": "92ec8a93448c3808766cafd3af0d6425047e53541a66e19453c6b4e5856ad9ee"
+    },
+    {
+      "path": "AVP_NORMALIZE_AUD_002/configs/config.yaml",
+      "bytes": 1457,
+      "sha256": "4e8e594a8b02c1ad5930afc17bb4c6496f9ffe62199566dcfbddadab4a284387"
+    },
+    {
+      "path": "AVP_NORMALIZE_AUD_002/dataset/DATA_SCHEMA.md",
+      "bytes": 5525,
+      "sha256": "8bcce0fb08ad5e23563808b4a346649c5d3841128206b888d0f40bafe536d49d"
+    },
+    {
+      "path": "AVP_NORMALIZE_AUD_002/OPERATOR_MANUAL.md",
+      "bytes": 7919,
+      "sha256": "994d15690b2459652490fa80604539ea4ac2e31d32a9f92ffeca3531da21c2b6"
+    },
+    {
+      "path": "AVP_NORMALIZE_AUD_002/processor.py",
+      "bytes": 21596,
+      "sha256": "d40101ea0a75035f54d5d185bcd2d4e18a02e48a10680ed953c61e54ed7b083e"
+    },
+    {
+      "path": "AVP_NORMALIZE_AUD_002/README.md",
+      "bytes": 1089,
+      "sha256": "4576ae653aa05cd41b72bd69c3e08330afb16cb95fddaa975cb773fc89d91c19"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_003/configs/config.yaml",
+      "bytes": 1303,
+      "sha256": "9aa47ee524ce0821af20d2dda4efbb88f5bf1b1196bc550f74d5b6a3765752ec"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_003/dataset/DATA_SCHEMA.md",
+      "bytes": 6954,
+      "sha256": "c1cfc5bda832e857fcc26c3b9067c328ff002378c40eebf1d88a9c69e57fdabc"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_003/OPERATOR_MANUAL.md",
+      "bytes": 7519,
+      "sha256": "29f3ba418d6f3b92da6909fe5b10ed94c849e93e669714e096347970549afe26"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_003/processor.py",
+      "bytes": 21400,
+      "sha256": "1485347e8016278fa12150d9fe807f683abd327e8fce54a8c59ab612e602a4b3"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_003/README.md",
+      "bytes": 1031,
+      "sha256": "47ffced3f345ac9f6808e27a3a957c2deb496bfbeee5f8fc2c18b367fcebce1c"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_004/configs/config.yaml",
+      "bytes": 921,
+      "sha256": "b57f606953401c4a124710937726f234616c846674c35960327862b5e07847b1"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_004/dataset/DATA_SCHEMA.md",
+      "bytes": 5852,
+      "sha256": "e175f3d7f9b4495dfc27db5180d0403d657fb3c2d738afa448565cdf8bb73c5b"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_004/OPERATOR_MANUAL.md",
+      "bytes": 7054,
+      "sha256": "b19f28dc797d28e9f01d9a9ead936abfdc3aae405be5fb02eb9ab8e099b09391"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_004/processor.py",
+      "bytes": 20720,
+      "sha256": "037c2c8fc6aaaf25d00ae5e7646d71705e17fcab24c6e32d254b7c2f7f01161d"
+    },
+    {
+      "path": "AVP_PERTURB_AUD_004/README.md",
+      "bytes": 1039,
+      "sha256": "96dee1a61eec54efbc982e7055e687336da3960ab2e0b5899c6bce00eeb7a8e8"
+    },
+    {
+      "path": "AVP_QC_AUD_005/configs/config.yaml",
+      "bytes": 2164,
+      "sha256": "7f0c81f19d6cb3cdf78a3fcad0e30e6b34b4a45d6963bda12694e3523007f451"
+    },
+    {
+      "path": "AVP_QC_AUD_005/dataset/DATA_SCHEMA.md",
+      "bytes": 12325,
+      "sha256": "385fd65fdd76f7ca4a55948b864f678e3fe9c5df27846d3876e6b380af88fa53"
+    },
+    {
+      "path": "AVP_QC_AUD_005/OPERATOR_MANUAL.md",
+      "bytes": 10455,
+      "sha256": "730401a113e6392803b68e6a89eaa5084f5b4d06bd9e67995bea5394b9d6c698"
+    },
+    {
+      "path": "AVP_QC_AUD_005/processor.py",
+      "bytes": 37459,
+      "sha256": "fdebb31110912ab2d23e9baa9899ef2925639ab248442345436735b6629b2081"
+    },
+    {
+      "path": "AVP_QC_AUD_005/README.md",
+      "bytes": 1159,
+      "sha256": "fac982ed52c788506890027439a0609e49c037737d1d5c47bb9283e04269d0a0"
+    },
+    {
+      "path": "AVP_REPORT_DATA_011/avp_report_pdf.py",
+      "bytes": 9736,
+      "sha256": "a6d2c5448dcb9b4bdf7d0e5b8a0e7c85181f1c46f16f3bae23e298359dd273a0"
+    },
+    {
+      "path": "AVP_REPORT_DATA_011/configs/config.yaml",
+      "bytes": 4564,
+      "sha256": "2a22471e02d2e18a8b04f9ea65db3c561fbf47c025b4793e099fba2896ef3bfb"
+    },
+    {
+      "path": "AVP_REPORT_DATA_011/dataset/DATA_SCHEMA.md",
+      "bytes": 11425,
+      "sha256": "0085168ff80051c0f3e80c4d2a66d603c2857f2270ccb6b110170913625ba686"
+    },
+    {
+      "path": "AVP_REPORT_DATA_011/OPERATOR_MANUAL.md",
+      "bytes": 11558,
+      "sha256": "c93b1f9f7ce6f00d1dc3660216d0c77524f8ab3db53dd18c1b0d1809f1f6f656"
+    },
+    {
+      "path": "AVP_REPORT_DATA_011/processor.py",
+      "bytes": 100928,
+      "sha256": "93a0aa6158a9da174141602e05088f48be571955242f37109dddbdd4bef9acec"
+    },
+    {
+      "path": "AVP_REPORT_DATA_011/README.md",
+      "bytes": 1137,
+      "sha256": "8c422c6a688026f3fe80208cebb28055a59f1ba26c0f7c67e585d3d2381b0855"
+    },
+    {
+      "path": "AVP_VERSION_DATA_006/configs/config.yaml",
+      "bytes": 1515,
+      "sha256": "5797d061c748eab805d04566a2f4472b56e27509e374153b3cfbb51b2eca693f"
+    },
+    {
+      "path": "AVP_VERSION_DATA_006/dataset/DATA_SCHEMA.md",
+      "bytes": 10873,
+      "sha256": "83421aa8c749d0ccafb8a1f06030c8c054f1668c3c52fe7f45976a4f55145d2c"
+    },
+    {
+      "path": "AVP_VERSION_DATA_006/OPERATOR_MANUAL.md",
+      "bytes": 11018,
+      "sha256": "2a4495d848e43b590a553ff60ceb197384af52bb3d10ef2f20803c358754c188"
+    },
+    {
+      "path": "AVP_VERSION_DATA_006/processor.py",
+      "bytes": 39347,
+      "sha256": "4de9e7738f5580841e41a4c50bf01580194a66b245bbead489b722391c7c8d82"
+    },
+    {
+      "path": "AVP_VERSION_DATA_006/README.md",
+      "bytes": 1056,
+      "sha256": "b4eb47afc7ec205b950927dfc8e0bfbf6a873ed2098292d97df94f5c30e15735"
+    },
+    {
+      "path": "common/__init__.py",
+      "bytes": 1102,
+      "sha256": "c5dad4cd4babe9b74b3dfb53831d197ae99076627a1caaf21d50509be4037b23"
+    },
+    {
+      "path": "common/audio.py",
+      "bytes": 13963,
+      "sha256": "26642207a72fda1ef205220c7fd4136435cdddeb22340069e5f70cbf826a352a"
+    },
+    {
+      "path": "common/config.py",
+      "bytes": 3361,
+      "sha256": "0146258e0e0ace5a708051c84e1f6ebbd4d5b84de470e5cd26eedae55d161c71"
+    },
+    {
+      "path": "common/context.py",
+      "bytes": 2371,
+      "sha256": "eb926135b88100e9fab9b5d919bcf3546451f9898d3abe7e774309cdb31f6fe2"
+    },
+    {
+      "path": "common/iofs.py",
+      "bytes": 15608,
+      "sha256": "a317e449e7f68dab1acb4101fb0e44a39f10572a5bc9f152bf9dce101f4559d3"
+    },
+    {
+      "path": "common/lineage.py",
+      "bytes": 4949,
+      "sha256": "01a06c8a7e6eff19519f550d795e661bf8523397fe46cb4d05fc764d7237dae7"
+    },
+    {
+      "path": "common/logger.py",
+      "bytes": 6247,
+      "sha256": "cd4c96dc629f45daf1329c668d0e71fc936c21b112aed5ee81f715b3b51cac85"
+    },
+    {
+      "path": "common/schemas.py",
+      "bytes": 7041,
+      "sha256": "466a7fc5ebaa73b330b18b4a092cd60c6b6f471c68a52e082e61ede1809815fd"
+    },
+    {
+      "path": "docker-compose.yml",
+      "bytes": 610,
+      "sha256": "738dd07c217e11566ebf6875c51ffb07b69856614b7f4597a6530e47ce277ddf"
+    },
+    {
+      "path": "Dockerfile",
+      "bytes": 1793,
+      "sha256": "58abe846bfddd5b00cbe2ce2e73c2a413cc206ddc8cd606ed4aeb37e519796c5"
+    },
+    {
+      "path": "docs/downloadFile与远程链路修复-2026-11-13.md",
+      "bytes": 6863,
+      "sha256": "bca62c45928d9ee2865ca20bf7ea8147cd998e5cff4d28d05d47c5d3b8894d4f"
+    },
+    {
+      "path": "docs/downloadFile验证记录-2026-11-13.md",
+      "bytes": 2625,
+      "sha256": "51d00ee436407a8dc53be31d85ccf9301702b5530432b20260bdfe7894a3afa7"
+    },
+    {
+      "path": "docs/启动日志级别修复-2026-11-13.md",
+      "bytes": 2046,
+      "sha256": "b3ec03242b09c8e2776322b9521d9172c61e7cff011fe3be2457cebf256ae164"
+    },
+    {
+      "path": "docs/部署包验收记录-2026-11-12.md",
+      "bytes": 3250,
+      "sha256": "06491462a672ce25365eb861c1014e4ce7ce1f7a2645c52f567858bb51958af9"
+    },
+    {
+      "path": "inference.py",
+      "bytes": 29155,
+      "sha256": "370ca825fb48d706d2bc28dae325f3e5a702c6fbc6a0e219f8c72565a9623d3d"
+    },
+    {
+      "path": "map.json",
+      "bytes": 28403,
+      "sha256": "df0609304bc5c6837cdfdee9840ca03bdd4ffec051e8f109a94c927073bfcc58"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4562,
+      "sha256": "7ea545cd6976d89b44d3122f1f9ce323de5e5293241c991edf89c7a069169d98"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 530,
+      "sha256": "674dd859670e398b6952d0d96ecae6d02d53cc4f4c87ed2603e8e7ffc1dd9e79"
+    },
+    {
+      "path": "tools/http_smoke.py",
+      "bytes": 8488,
+      "sha256": "89f2c944722bc180787667d267e16f3c3b6eb851518498cbf8a4c1124db2ef53"
+    },
+    {
+      "path": "weight/assets/ATTRIBUTION.md",
+      "bytes": 2492,
+      "sha256": "e1048d1caa67352caa969ce59b88f233e4c207ec015f80e4c03b31d0cd42ba87"
+    },
+    {
+      "path": "weight/assets/env/街道.wav",
+      "bytes": 1920044,
+      "sha256": "8f34bbc229d2f5f1d5741986dbd96625e86fdc4e24f308204769ac85868dec93"
+    },
+    {
+      "path": "weight/assets/env/车内.wav",
+      "bytes": 1920044,
+      "sha256": "c99fdb28730013ba4b25e2f92b4a0f05e7be1881d402c6e7d1a40330d61e5a35"
+    },
+    {
+      "path": "weight/assets/noise/交通噪声.wav",
+      "bytes": 1920044,
+      "sha256": "8f34bbc229d2f5f1d5741986dbd96625e86fdc4e24f308204769ac85868dec93"
+    },
+    {
+      "path": "weight/assets/noise/人群嘈杂.wav",
+      "bytes": 1920044,
+      "sha256": "3ff85438bf75920f5637bb01f37c745c6a6729f22d4d1a0b46a4efd9083ff944"
+    },
+    {
+      "path": "weight/assets/noise/白噪.wav",
+      "bytes": 960044,
+      "sha256": "5a625addeb8157be07ee527f32044e7d5025f725c2fa9de52b3173863d419095"
+    },
+    {
+      "path": "weight/assets/README.md",
+      "bytes": 1328,
+      "sha256": "136dc84e87f15637a959c2d62dc3d43ae825456dde7696b306ecd31d91044051"
+    },
+    {
+      "path": "weight/assets/real_noise_manifest.json",
+      "bytes": 2478,
+      "sha256": "03234a13039cd5ea0aa1c3add6608b97f872726ed6200412eebada31c4fca585"
+    },
+    {
+      "path": "交接说明.md",
+      "bytes": 4046,
+      "sha256": "4401b20d47902add31a67eef5d668edd91fa27e20c427ec404e6c7c18335eb59"
+    },
+    {
+      "path": "接口文档-前端联调.md",
+      "bytes": 20143,
+      "sha256": "3e70fd600c0cfd6eb0672026a4aaf63d08fb983cf91bf699ba72e11edac0f6e7"
+    },
+    {
+      "path": "服务器部署说明.md",
+      "bytes": 10582,
+      "sha256": "a79f1d14e3ce05dae8af4c03c94f60697787eb3a587daa7d0de745ae2f3c9d21"
+    },
+    {
+      "path": "语音加扰算子-接口与对接说明.md",
+      "bytes": 34983,
+      "sha256": "ef3859f70ca7603f4214fe9ebc6f3305025641ad76a2352affc11ae993b16a9a"
+    }
+  ],
+  "fixes": [
+    "Normalize Python LOG_LEVEL to uppercase; default Compose LOG_LEVEL=INFO",
+    "Add GET /downloadFile?path=full-returned-path with stream responses; verify re-upload and 01->02 remote-path chaining"
+  ],
+  "apiRevision": "2026-11-13-download-v1",
+  "capabilities": {
+    "downloadFile": true
+  }
+}

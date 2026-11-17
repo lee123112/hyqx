@@ -1,0 +1,73 @@
+# 算子17：数字与实体一致性检测配置
+# 上游算子3/4 已完成编码归一；本节点默认只接受严格 UTF-8。
+input_encodings: [utf-8]
+
+# 上游默认产物名（阶段内实际路径由 /predict 的 inputFile 指定）。
+input_file_name: 16_domain_checked.jsonl
+
+# 参与一致性检测的字段：第一个为源侧，第二个为目标侧；只读，不改写原文。
+text_fields: [source, target]
+
+# 任务声明的语言方向；记录 language_pair（或 source_lang + target_lang）必须与之一致。
+source_lang: zh
+target_lang: en
+language_check: true
+
+# 启用的抽取类别：number/percentage/currency/date/time/unit/entity。
+enabled_categories: [number, percentage, currency, date, time, unit, entity]
+
+# 数值近似匹配容差，仅对 number / percentage / unit 生效；0 表示必须完全相等。
+# 容差判据：|a-b| <= absolute_tolerance + relative_tolerance * max(|a|,|b|)
+numeric_absolute_tolerance: 0.0
+numeric_relative_tolerance: 0.0
+
+# 单位换算白名单开关；关闭后仍抽取单位，但只按字面单位键比较，不做任何换算。
+unit_conversion: true
+
+# 不参与换算的量纲（仍会抽取，但换算被禁用，只按字面单位比较）。
+disabled_dimensions: []
+
+# 额外单位别名：别名 -> 规范单位键（规范键见 utils/units.py 的 CANONICAL_KEYS）。
+unit_aliases: {}
+
+# 货币别名：符号/词 -> ISO 代码。￥ 与 ¥ 默认按 CNY 处理（如需 JPY 请显式覆盖）。
+currency_aliases: {}
+
+# 实体模式：实体名 -> 正则列表；编译时统一加 re.IGNORECASE。
+# 默认仅两条低误报模式（产品编码、模型版本号），可按任务替换或置空。
+entity_patterns:
+  product_code:
+    - '(?<![A-Za-z0-9])[A-Z]{2,4}-\d{3,6}(?![A-Za-z0-9])'
+  model_version:
+    - '(?<![A-Za-z0-9])v\d+(?:\.\d+){1,3}(?![A-Za-z0-9])'
+
+# 实体是否区分大小写；false 时按 NFC + casefold 归一后比较。
+entity_case_sensitive: false
+
+# ---- 后端门禁 ----
+# rule=仅规则（默认，表格指定「规则归一化」）；auto=有模型用模型、无模型按 fallback_policy；
+# model=必须用模型（不可用即结构化失败，绝不静默降级）。
+backend: rule
+model_service_url: null
+model_path: null
+model_version: null
+model_timeout_seconds: 30
+# 本地模型适配器入口函数名（check_consistency(source, target)）。
+model_entrypoint: check_consistency
+# 模型不可用时：rule=降级为规则后端并标记 degraded；fail=结构化失败。
+fallback_policy: rule
+# 模型返回的 confidence 小于该阈值时不采纳其「不一致」结论，改判 waiting_manual。
+model_confidence_threshold: 0.5
+# 单次任务允许的模型错误条数，超过即整次失败，不静默截断。
+max_model_errors: 20
+
+# ---- 记录去向 ----
+# mark_and_keep=写入主输出并在异常清单留审计；move_to_rejects=只写异常清单。
+inconsistent_policy: mark_and_keep
+waiting_manual_policy: mark_and_keep
+
+# ---- 证据规模与扫描上限 ----
+max_conflicts_per_record: 20
+max_unparsed_per_record: 20
+# 单字段扫描上限（字符）；超长字段只扫描前 N 个字符并标记 scan_truncated（记录判为 waiting_manual）。
+max_text_scan_chars: 20000

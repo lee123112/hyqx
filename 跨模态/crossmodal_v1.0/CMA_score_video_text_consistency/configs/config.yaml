@@ -1,0 +1,63 @@
+# 算子 14 评分视文语义一致性（表1 #14）默认配置。
+# 表1 冻结项（enabled / max_frames_per_segment 范围 1–8 / 低分阈值 0.25 / 模型族 CLIP-ViT/B-32）
+# 不可被 /predict 覆盖为其它口径。
+
+operator:
+  name: video_text_scoring
+  version: v1.0.0
+
+# S3 数据加工阶段（表1 第 3 环节），中间节点。
+stage_id: S3
+
+# 表1 总开关：默认关闭。关闭时不加载模型、不写视文评分文件、不隔离。
+# 跨算子约束：图文评分关闭时 #13/#14 至少一条开启，由任务创建侧拦截，本算子只管自己这一项。
+enabled: false
+
+# 表1 低分阈值：复用图文评分低分阈值（可配 0.20–0.40）。
+# [round10 标定] 0.25→0.23：round9 同源 62 条最低分 0.2313，0.23 时正例零误隔离；
+# 36 条错配负例 88.9% 被隔离、其余落人工复核带、0 条达到自动对齐（见 阈值标定.md）。
+# [2026-11-05 全量标定] 0.23→0.20：全流程效果测试集 1600 条视文正样本（200 个视频），
+# 0.23 误隔离 44 条（2.75%）、0.22 误隔离 14 条、0.21 误隔离 2 条、0.20 误隔离 0 条；
+# 30 条负样本隔离率 66.7%/66.7%/60%/46.7%。正样本最低分 0.2033，只有定义域下限 0.20
+# 能保住全部正样本；负样本最高分 0.2927，到不了 0.32 自动档，低分线只决定"自动隔离"
+# 还是"转人工复核"，故向下取 0.20，并与 #12 的 0.20 保持一致（表1「复用图文阈值」）。
+# 任一段段均值低于该阈值 → 整段不通过 → 样本进样本隔离库（交 #21）。
+low_score_threshold: 0.20
+
+# 表1：**整段视频合计**最多取 8 帧（范围 1–8），逐帧复用 CLIP-ViT/B-32 后取均值。
+# 2026-10-23 口径修正：多语义段视频把该帧预算分配到各段（总帧数 ≤ 上限），
+# 不再是「每个语义段各 8 帧」；配置键名保持不变以兼容既有配置。
+max_frames_per_segment: 8
+
+# 送模型的文本上限（资源保护；表1 #9 描述为 5–500 字，此处按字符数截断并记录）。
+max_text_chars: 500
+
+# [2026-11-05] 时序路线边界：记录自带 timeline / temporal_bindings / temporal_anchors
+# 时，#14 判 not_applicable（不评分、不隔离，写 14_not_applicable.jsonl），
+# 时序结论由 #15 给。此前这些窗口按整段视频语义分判定，普遍低于 0.23 被隔离，
+# 而同一批窗口 #15 判 0.0s 偏差通过——两个算子结论互相矛盾。
+# 置 false 只有回归对比用途（复现旧行为）。
+temporal_route_exclusion: true
+
+# 依赖/权重缺失时的行为：
+#   false（默认）→ 整个任务显式失败（status=failed），绝不伪造分数；
+#   true        → 显式降级：进入待处理台账，video_text_score/segment_mean 为 null，不隔离。
+allow_degraded: false
+
+# 复用图文评分的 CLIP-ViT/B-32：只从本地路径加载权重，运行期绝不联网下载。
+# 权重随本算子目录交付：`<算子目录>/weight/clip/ViT-B-32.pt`（见 weight/README.md）；
+# 相对路径未设 MODEL_ROOT 时默认按 <算子目录>/weight 解析，因此单算子拷到包外也能加载；
+# MODEL_ROOT 只作覆盖（例如指向外部只读模型库 /models）。
+clip:
+  # auto → 依次尝试 open_clip / clip / transformers；也可显式指定其一
+  library: auto
+  # 表1 固定架构 ViT-B-32（仅接受等价别名，如 CLIP-ViT/B-32）
+  model_name: ViT-B-32
+  # 权重路径：相对路径按 MODEL_ROOT 解析；未设 MODEL_ROOT 时默认 <算子目录>/weight
+  # （随算子目录交付，见 weight/README.md），MODEL_ROOT 只作覆盖；绝对路径原样使用；
+  # null 表示尚未部署权重（此时按 allow_degraded 显式失败/降级）
+  weights: clip/ViT-B-32.pt
+  # cpu / cuda / auto
+  device: cpu
+  # 批量大小：一次 forward 的最大样本数（段内帧批量）
+  batch_size: 8

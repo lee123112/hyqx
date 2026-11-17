@@ -1,0 +1,43 @@
+# 算子 18「标注局部对局部」配置（表1 #18）
+#
+# - enabled 默认 false：工具默认关闭，开启后才做词-区域细粒度对应；
+# - min_clip_score 默认 0.25，允许范围 0.20–0.40（超出直接报错，不用 demo 阈值替代）；
+# - tokenizer: pretrained（优先复用预训练文本产线分词）/ jieba（结巴分词，会写进日志）；
+# - merge_phrases 默认 true：把相邻「修饰语 + 名词」合并成名词短语，作为该词的上下文
+#   变体参与打分（词仍是匹配单元，一词一框不变）；置 false 时只用词本身；
+# - crop.padding_ratio / crop.background_suppression：裁图扩边与框外背景抑制，默认关闭
+#   （0 / none）。772 条回放实测：扩边不提升一致性，抑制背景提高一致性但降低覆盖，
+#   故默认保持紧贴框 + 词/短语双变体；
+# - allow_degraded 默认 false：CLIP 不可用时**显式失败**；置 true 才允许显式降级为待人工，
+#   且降级时不会产生任何相似度分数（禁止伪造分数）；
+# - clip.weights 默认加载本算子内置 weight/clip/ViT-B-32.pt（相对 MODEL_ROOT 解析）；
+#   可空=复用环境共享实例；为空且未降级即失败。
+operator:
+  name: phrase_region_annotation
+  version: v1.0.0
+stage_id: S3
+enabled: false
+min_clip_score: 0.25
+tokenizer: pretrained
+max_tokens: 64
+max_text_chars: 500
+merge_phrases: true
+# 按类别校准（v1.0.1）：none | znorm | prior（默认 prior）。
+# - znorm：按框的检测类别做「列方向」标准化（该类所有框在该描述各词上的均分/标准差）；
+# - prior：原始余弦 + class_prior_weight × cos(匹配文本, 框类别名)，把「词说的类别」
+#   作为二次排序项（yellow surfboard 不会再被 person 框抢走）。
+# 两者都只用于一词一框的**指派**；落盘 clip_score 仍是原始余弦，
+# min_clip_score（0.25）判定与分流规则一律不变。
+class_calibration: prior
+# 类别名先验权重（0–0.5，默认 0.05）：越大越依赖类别名，越小越依赖原始 CLIP 分。
+class_prior_weight: 0.05
+allow_degraded: false
+crop:
+  padding_ratio: 0.0            # 0.00–0.25；0 = 紧贴检测框
+  background_suppression: none  # none | mean（框内均值）| gray（中性灰）；需 padding_ratio > 0
+clip:
+  library: auto          # auto | open_clip（复用 #12/#14 的 open_clip 配方）
+  model_name: ViT-B-32   # 等价写法 CLIP-ViT/B-32
+  weights: clip/ViT-B-32.pt  # 默认加载本算子 weight（相对 MODEL_ROOT；未设时为本算子 weight/）；null=复用环境共享实例
+  device: cpu
+  batch_size: 8

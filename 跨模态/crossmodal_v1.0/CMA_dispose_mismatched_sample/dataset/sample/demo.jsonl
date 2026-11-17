@@ -1,0 +1,18 @@
+{"sample_id": "s-pass-1", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "样本-评分：通过", "action": "keep", "destination": "样本池", "record": {"image": {"path": "media/pass_ok.png"}}}
+{"sample_id": "s-pass-2", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "样本-评分：入池", "action": "keep", "destination": "样本池", "record": {"audio": {"path": "media/pass_ok.wav"}}}
+{"sample_id": "s-proc-1", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "样本-评分：待人工", "action": "keep", "destination": "人工队列"}
+{"sample_id": "s-proc-2", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "流程-未配对", "action": "keep", "destination": "产线"}
+{"sample_id": "s-na-1", "batch_id": "BATCH-21-A"}
+{"sample_id": "s-origin-1", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "原始文件-损坏", "action": "isolate", "destination": "原始隔离区", "record": {"image": {"path": "media/origin_broken.png"}}}
+{"sample_id": "s-origin-2", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "原始文件-编码异常", "action": "isolate", "destination": "raw_isolation"}
+{"sample_id": "s-sample-1", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "样本-语义不通", "action": "isolate", "destination": "样本隔离库", "record": {"image": {"path": "media/sample_bad.png"}}}
+{"sample_id": "s-sample-2", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "样本-敏感", "action": "isolate", "destination": "sample_isolation"}
+{"sample_id": "s-lock-1", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "action": "return", "destination": "09_准备候选描述", "retry_count": 2, "label": "流程-待补描述"}
+{"sample_id": "s-ret-1", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "action": "return", "destination": "09_准备候选描述", "retry_count": 0, "label": "流程-待补描述"}
+{"sample_id": "s-ret-2", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "action": "return", "destination": "01_接入多模态批次", "retry_count": 1, "label": "流程-待补描述", "record": {"operator_21": {"return_count": 1}}}
+{"sample_id": "s-manual-1", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "样本-评分：待人工", "action": "keep", "destination": "人工队列", "requires_human_confirmation": true}
+{"sample_id": "s-dup", "operator": "image_text_scoring", "stage": "S3", "event_time": "2026-10-07T09:00:00+08:00", "batch_id": "BATCH-21-A", "label": "样本-评分：通过", "action": "keep", "destination": "样本池", "record": {"image": {"path": "media/pass_ok.png"}}}
+
+{"sample_id": "broken-1", "label": "样本-语义不通"
+[1, 2, 3]
+{"label": "样本-语义不通", "action": "isolate"}

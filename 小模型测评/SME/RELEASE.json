@@ -1,0 +1,23 @@
+{
+  "release": "SME-2026.11.12-server",
+  "date": "2026-11-12",
+  "entryContainer": "op-pre-eva",
+  "httpPort": 17024,
+  "internalBackendContainer": "op-pre-eva-backend",
+  "internalBackendPort": 6289,
+  "computeDefault": "CPU",
+  "python": "3.11",
+  "operators": 5,
+  "privateModelFiles": 47,
+  "privateModelBytes": 3774682017,
+  "frontend": "Vue source and production dist; same-origin API",
+  "excluded": [
+    "weight",
+    "historical runtime databases",
+    "caches",
+    "node_modules",
+    "test outputs",
+    "placeholder output/model",
+    "local .env"
+  ]
+}

@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SME 接口说明与联调测试</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#17212b;font-family:"Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;line-height:1.8;font-size:15px}
+main{max-width:1120px;margin:32px auto;background:white;padding:44px 56px;border:1px solid #e1e6ec;border-radius:8px}
+h1,h2,h3{color:#000;line-height:1.4;scroll-margin-top:20px}h1{font-size:30px;margin:0 0 20px}h2{font-size:23px;margin:38px 0 16px}h3{font-size:18px;margin:25px 0 12px}p{margin:12px 0}a{color:#1755a6;text-decoration:none}a:hover{text-decoration:underline}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;table-layout:auto}th,td{border:1px solid #d9dfe7;padding:9px 12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#edf2f8;color:#0c223c;font-weight:650}tbody tr:nth-child(even){background:#f8fafc}
+code{font-family:Consolas,"Noto Sans Mono",monospace;font-size:.9em;overflow-wrap:anywhere}p code,td code,li code{background:#f0f3f6;padding:2px 4px;border-radius:3px}pre{position:relative;overflow:auto;line-height:1.55;background:#f4f6f8;border:1px solid #dce2e9;border-radius:5px;padding:18px 20px;margin:16px 0;tab-size:2}pre code{font-size:13px;overflow-wrap:normal;white-space:pre}li{margin:5px 0}.toc{background:#f7f9fc;border:1px solid #dfe6ef;padding:18px 24px;margin:24px 0}.toctitle{font-weight:bold}.toc ul{margin:4px 0;padding-left:22px}.toc li{margin:2px 0}
+.copy{position:absolute;right:8px;top:8px;background:#fff;color:#36465a;border:1px solid #ccd5df;border-radius:4px;padding:3px 10px;cursor:pointer;font-size:12px}footer{color:#667384;font-size:12px;margin-top:36px}
+@media(max-width:800px){body{font-size:14px}main{margin:0;border:0;border-radius:0;padding:24px 18px}h1{font-size:25px}table{font-size:12px}th,td{padding:7px}pre{padding:15px 10px}}
+@media print{body{background:#fff;font-size:10pt}main{max-width:none;border:0;margin:0;padding:0}.copy{display:none}h2,h3{break-after:avoid}thead{display:table-header-group}tr{break-inside:avoid}pre{white-space:pre-wrap;overflow:visible}pre code{white-space:pre-wrap;overflow-wrap:anywhere}a{color:inherit}footer{display:none}}
+</style></head><body><main><h1 id="sme">SME 接口说明与联调测试</h1>
+<p>版本：SME-2026.11.12-server。更新日期：2026年11月12日。适用人员：平台后端、前端、服务器部署与联调测试人员。</p>
+<p>本服务提供五类数据集测评算子，以及数据集管理、评测任务、基线方案、结果报告等业务接口。工程侧调用算子时使用“上传、执行、下载、清理”四步；前端使用业务数据集与任务接口。本文给出当前交付版本的实际参数、ZIP约定、可执行命令和验收口径。</p>
+<div class="toc"><span class="toctitle">内容导航</span><ul>
+<li><a href="#1">1 部署入口</a></li>
+<li><a href="#2">2 公共约定</a><ul>
+<li><a href="#21">2.1 鉴权</a></li>
+<li><a href="#22">2.2 请求和响应</a></li>
+<li><a href="#23-id">2.3 ID 路径和容量</a></li>
+<li><a href="#24">2.4 执行与结果状态</a></li>
+</ul>
+</li>
+<li><a href="#3">3 算子和测评方法</a></li>
+<li><a href="#4">4 工程侧算子接口</a><ul>
+<li><a href="#41">4.1 上传输入</a></li>
+<li><a href="#42">4.2 执行测评</a></li>
+<li><a href="#43">4.3 下载产物</a></li>
+<li><a href="#44">4.4 清理工作区</a></li>
+</ul>
+</li>
+<li><a href="#5-zip">5 输入 ZIP 标准</a><ul>
+<li><a href="#51">5.1 通用规则</a></li>
+<li><a href="#52">5.2 导入已有指标</a></li>
+<li><a href="#53">5.3 引擎测量</a></li>
+<li><a href="#54">5.4 训练对比协议</a></li>
+</ul>
+</li>
+<li><a href="#6">6 前端业务接口</a><ul>
+<li><a href="#61">6.1 推荐调用顺序</a></li>
+<li><a href="#62">6.2 普通数据集导入</a></li>
+<li><a href="#63">6.3 创建普通测评任务</a></li>
+<li><a href="#64">6.4 任务状态 日志和报告</a></li>
+<li><a href="#65">6.5 训练任务入口</a></li>
+<li><a href="#66">6.6 基线方案</a></li>
+<li><a href="#67">6.7 其他业务接口</a></li>
+</ul>
+</li>
+<li><a href="#7">7 服务器联调准备</a></li>
+<li><a href="#8">8 使用随包工具完成联调</a><ul>
+<li><a href="#81-compose">8.1 Compose内执行</a></li>
+<li><a href="#82">8.2 从外部机器执行</a></li>
+</ul>
+</li>
+<li><a href="#9-curl">9 curl完整调用示例</a></li>
+<li><a href="#10">10 正向测试用例</a></li>
+<li><a href="#11">11 异常和业务流程测试</a></li>
+<li><a href="#12">12 常见错误处理</a></li>
+<li><a href="#13">13 联调验收和记录</a><ul>
+<li><a href="#131">13.1 接口验收</a></li>
+<li><a href="#132">13.2 已有交付验证</a></li>
+<li><a href="#133">13.3 服务器验收记录模板</a></li>
+</ul>
+</li>
+<li><a href="#14">14 相关文件</a></li>
+</ul>
+</div>
+<h2 id="1">1 部署入口</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>当前约定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>对外入口容器名</td>
+<td><code>op-pre-eva</code></td>
+</tr>
+<tr>
+<td>对外访问端口</td>
+<td><code>17024</code></td>
+</tr>
+<tr>
+<td>页面地址</td>
+<td><code>http://服务器IP:17024/</code></td>
+</tr>
+<tr>
+<td>业务和算子接口基地址</td>
+<td><code>http://服务器IP:17024</code></td>
+</tr>
+<tr>
+<td>健康检查</td>
+<td><code>GET /health</code></td>
+</tr>
+<tr>
+<td>Swagger</td>
+<td><code>/docs</code></td>
+</tr>
+<tr>
+<td>OpenAPI</td>
+<td><code>/openapi.json</code>，以运行服务返回的schema为准</td>
+</tr>
+<tr>
+<td>内部后端容器</td>
+<td><code>op-pre-eva-backend</code>，容器内监听<code>6289</code></td>
+</tr>
+<tr>
+<td>运行数据</td>
+<td>宿主<code>runtime/</code>挂载到后端<code>/app/data</code></td>
+</tr>
+<tr>
+<td>服务器业务数据</td>
+<td>宿主<code>dataset/business/</code>挂载到后端<code>/app/dataset/business/</code></td>
+</tr>
+</tbody>
+</table>
+<p>页面与API共用17024端口；6289未发布到宿主机。外部调用不要将<code>backend:6289</code>或容器本机<code>127.0.0.1:6289</code>作为服务器地址。包内Compose联调包装脚本已处理内部地址。</p>
+<p>以下命令默认在解压后的<code>SME</code>目录、Linux Bash中执行。远程调用时将<code>BASE_URL</code>改成服务器IP或域名。</p>
+<h2 id="2">2 公共约定</h2>
+<h3 id="21">2.1 鉴权</h3>
+<p>部署环境变量<code>SME_API_KEY</code>为空时不校验Key；设置后，下列请求带请求头：</p>
+<pre><code class="language-http">X-API-Key: 与服务器SME_API_KEY相同的值
+</code></pre>
+<p>受保护请求是<code>/uploadFile</code>、<code>/predict</code>、<code>/removeFile</code>，以及<code>/api/v1/</code>下除GET、HEAD、OPTIONS以外的请求。只读浏览、健康检查、文档和当前下载接口不要求Key。前端在设置中填写相同Key。</p>
+<p>Key错误时HTTP为401，响应为：</p>
+<pre><code class="language-json">{&quot;code&quot;:401,&quot;msg&quot;:&quot;缺少或错误的 X-API-Key&quot;,&quot;data&quot;:null}
+</code></pre>
+<h3 id="22">2.2 请求和响应</h3>
+<p>JSON请求使用<code>Content-Type: application/json</code>，文件上传使用<code>multipart/form-data</code>。正常JSON响应为：</p>
+<pre><code class="language-json">{&quot;code&quot;:0,&quot;msg&quot;:&quot;success&quot;,&quot;data&quot;:{}}
+</code></pre>
+<p>业务错误同时返回非2xx HTTP状态和错误信封，例如：</p>
+<pre><code class="language-json">{
+  &quot;code&quot;: 422,
+  &quot;msg&quot;: &quot;实测模式缺少逐条指标&quot;,
+  &quot;data&quot;: {&quot;errorCode&quot;:&quot;MEASUREMENTS_REQUIRED&quot;,&quot;details&quot;:null}
+}
+</code></pre>
+<p>下载接口成功返回文件二进制，SSE返回事件流；二者不使用普通JSON成功信封。报告接口的<code>format=md</code>仍返回JSON信封，<code>data</code>是Markdown字符串。</p>
+<h3 id="23-id">2.3 ID 路径和容量</h3>
+<ul>
+<li>算子<code>uniqueId</code>是1至64位字符串，以英文字母或数字开头，后续允许英文字母、数字、下划线和连字符；不要传中文、空格、斜线。</li>
+<li>每次独立测试生成新的<code>uniqueId</code>。它隔离工作区，不提供请求幂等或重复执行保护；<code>attempt</code>也不提供自动去重。</li>
+<li>上传返回的<code>inputFile</code>和执行返回的<code>outputPath</code>是服务逻辑路径，必须原样回传；浏览器和工程调用方不需要读取服务器磁盘路径。</li>
+<li>默认上传文件上限200MB、普通批次样本上限5000、ZIP条目上限5000。Nginx请求上限256MB。200MB是上传文件大小限制，不是已实现的解压总量限制。</li>
+<li>输入数据ZIP不放模型权重。完整交付包中的47个模型文件保留在各算子的<code>models/</code>内。</li>
+</ul>
+<h3 id="24">2.4 执行与结果状态</h3>
+<p><code>POST /predict</code>同步执行，调用方等待完成响应；训练请求应预留较长超时。包内客户端和Nginx代理使用1800秒。请求超时后不能认定服务端已停止；先核对任务和日志，再决定是否重新运行。</p>
+<p>业务<code>POST /api/v1/eval/tasks</code>的<code>autoRun=true</code>在后台执行，创建接口返回后应查询任务状态。两种调用方式的状态不可混用。</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP 200、<code>code=0</code></td>
+<td>请求成功返回</td>
+</tr>
+<tr>
+<td><code>/predict data.status=succeeded</code></td>
+<td>本次算子计算和产物生成成功</td>
+</tr>
+<tr>
+<td>业务任务<code>status=completed</code></td>
+<td>后台任务执行结束，不代表指标达标</td>
+</tr>
+<tr>
+<td><code>report.accepted=true/false</code></td>
+<td>普通测评批次按本次规则的业务判定</td>
+</tr>
+<tr>
+<td>训练协议<code>accepted=null</code></td>
+<td>当前业务接受阈值未配置，结果待业务判定</td>
+</tr>
+<tr>
+<td><code>qualityConclusionEligible</code></td>
+<td>该证据是否具备作质量比较结论的资格，不等于自动验收通过</td>
+</tr>
+</tbody>
+</table>
+<p>当前<code>/predict</code>成功响应中的<code>gate_status=PASS</code>、<code>quality_status=PENDING</code>为适配字段；判断质量必须读取<code>data.report.accepted</code>或<code>data.result.summary.accepted</code>。例如后训练区分度样例执行成功，但平均得分差4分低于5分，<code>accepted=false</code>。</p>
+<h2 id="3">3 算子和测评方法</h2>
+<table>
+<thead>
+<tr>
+<th>类型type</th>
+<th>operatorId</th>
+<th>所属目录</th>
+<th>支持方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td><code>SME_eval_text</code></td>
+<td>SME_EVAL_TEXT_001</td>
+<td>指标导入、引擎测量、训练协议</td>
+</tr>
+<tr>
+<td>image</td>
+<td><code>SME_eval_image</code></td>
+<td>SME_EVAL_IMAGE_001</td>
+<td>指标导入、引擎测量、训练协议</td>
+</tr>
+<tr>
+<td>audio</td>
+<td><code>SME_eval_audio</code></td>
+<td>SME_EVAL_AUDIO_001</td>
+<td>指标导入、引擎测量、训练协议</td>
+</tr>
+<tr>
+<td>video</td>
+<td><code>SME_eval_video</code></td>
+<td>SME_EVAL_VIDEO_001</td>
+<td>指标导入、引擎测量</td>
+</tr>
+<tr>
+<td>benchmark</td>
+<td><code>SME_eval_benchmark</code></td>
+<td>SME_EVAL_BENCHMARK_001</td>
+<td>成对分数导入</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>ZIP根文件</th>
+<th><code>/predict params</code></th>
+<th>计算范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>导入已有指标</td>
+<td>samples.json</td>
+<td><code>mode=measured</code>、<code>measurementSource=import</code></td>
+<td>校验两侧已有分数，比较、汇总和判定，不重新运行上游模型</td>
+</tr>
+<tr>
+<td>引擎测量</td>
+<td>samples.json</td>
+<td><code>mode=measured</code>、<code>measurementSource=engine</code></td>
+<td>当前模态引擎读取真实输入产生指标</td>
+</tr>
+<tr>
+<td>训练对比协议</td>
+<td>protocol.json</td>
+<td><code>mode=measured</code>、<code>protocol=true</code></td>
+<td>分别使用D_ours、D_ref训练，在固定E上比较；文本另有共同下游训练集T</td>
+</tr>
+</tbody>
+</table>
+<p>真实联调显式写<code>mode=measured</code>；省略mode会默认进入Demo。普通数据包不放<code>protocol</code>参数；<code>protocol=false</code>也不是普通模式开关，应直接省略这个字段。</p>
+<p>引擎测量ZIP不预填<code>measurements</code>：当前算子入口遇到完整指标时会直接消费已有分数。业务任务入口选择engine时会去掉已存分数后重新测量；为使两个入口含义一致，统一使用不含分数的引擎包。</p>
+<h2 id="4">4 工程侧算子接口</h2>
+<p>调用顺序：<code>uploadFile → predict → downloadFile → removeFile</code>。下载并验证产物后再清理。</p>
+<h3 id="41">4.1 上传输入</h3>
+<p><code>POST /uploadFile?uniqueId=IT-001</code>，multipart字段：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>位置</th>
+<th>必填</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uniqueId</td>
+<td>Query</td>
+<td>是</td>
+<td>本次调用工作区ID</td>
+</tr>
+<tr>
+<td>file</td>
+<td>multipart</td>
+<td>是</td>
+<td>本次数据集ZIP或兼容清单文件</td>
+</tr>
+</tbody>
+</table>
+<p>成功响应示例：</p>
+<pre><code class="language-json">{
+  &quot;code&quot;: 0,
+  &quot;msg&quot;: &quot;success&quot;,
+  &quot;data&quot;: {
+    &quot;inputFile&quot;: &quot;/workspace/IT-001/input/dataset.zip&quot;,
+    &quot;fileName&quot;: &quot;dataset.zip&quot;,
+    &quot;size&quot;: 520,
+    &quot;sha256&quot;: &quot;文件实际SHA256&quot;
+  }
+}
+</code></pre>
+<p>示例中的<code>sha256</code>表示动态值。<code>inputFile</code>必须取当前上传响应，不自行按示例拼接，也不传<code>G:\...</code>。</p>
+<h3 id="42">4.2 执行测评</h3>
+<p><code>POST /predict</code>，JSON请求：</p>
+<pre><code class="language-json">{
+  &quot;uniqueId&quot;: &quot;IT-001&quot;,
+  &quot;operatorId&quot;: &quot;SME_eval_benchmark&quot;,
+  &quot;inputFile&quot;: &quot;/workspace/IT-001/input/dataset.zip&quot;,
+  &quot;params&quot;: {
+    &quot;mode&quot;: &quot;measured&quot;,
+    &quot;measurementSource&quot;: &quot;import&quot;,
+    &quot;seed&quot;: 42,
+    &quot;registerTask&quot;: true,
+    &quot;taskName&quot;: &quot;后训练区分度接口联调&quot;
+  },
+  &quot;isLastOperator&quot;: false
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>必填或默认</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uniqueId</td>
+<td>必填</td>
+<td>与本次上传一致</td>
+</tr>
+<tr>
+<td>operatorId</td>
+<td>必填</td>
+<td>使用第3节的精确ID</td>
+</tr>
+<tr>
+<td>inputFile</td>
+<td>必填</td>
+<td>上传响应的逻辑路径</td>
+</tr>
+<tr>
+<td>params.mode</td>
+<td>实测必填</td>
+<td>measured；省略时默认demo</td>
+</tr>
+<tr>
+<td>params.measurementSource</td>
+<td>普通测评指定</td>
+<td>import或engine；训练协议不需要</td>
+</tr>
+<tr>
+<td>params.protocol</td>
+<td>训练ZIP必填true</td>
+<td>从ZIP查找唯一protocol.json；普通测评省略</td>
+</tr>
+<tr>
+<td>params.seed</td>
+<td>默认42</td>
+<td>整数；显式指定时须与协议首个种子一致</td>
+</tr>
+<tr>
+<td>params.config</td>
+<td>可选</td>
+<td>完整阈值等配置；不传则使用模态默认值</td>
+</tr>
+<tr>
+<td>params.registerTask</td>
+<td>建议true</td>
+<td>将本次结果登记到前端任务列表；否则taskId可为空</td>
+</tr>
+<tr>
+<td>params.taskName</td>
+<td>可选</td>
+<td>登记任务名称</td>
+</tr>
+<tr>
+<td>isLastOperator</td>
+<td>建议false</td>
+<td>true将输出ZIP编码成Base64放在响应中；false返回逻辑路径</td>
+</tr>
+</tbody>
+</table>
+<p>训练ZIP的params示例：</p>
+<pre><code class="language-json">{&quot;mode&quot;:&quot;measured&quot;,&quot;protocol&quot;:true,&quot;registerTask&quot;:true,&quot;taskName&quot;:&quot;图像小预算训练联调&quot;}
+</code></pre>
+<p>完整<code>config</code>结构可从<code>GET /api/v1/eval/templates</code>的<code>defaultConfig[type]</code>获取后修改。不要只假定任意一个阈值字段能在算子入口自动合并；基线页面和算子入口的配置合并逻辑不同。</p>
+<p><code>/predict</code>不通过<code>params.baseline</code>选择平台基线方案。工程侧若要复用方案阈值，先读基线方案，将其<code>config</code>传给<code>params.config</code>；前端业务任务使用第6节的<code>baselineConfig</code>。</p>
+<p>成功响应主要字段如下，示例为节选，动态路径以实际响应为准：</p>
+<pre><code class="language-json">{
+  &quot;code&quot;: 0,
+  &quot;msg&quot;: &quot;success&quot;,
+  &quot;data&quot;: {
+    &quot;status&quot;: &quot;succeeded&quot;,
+    &quot;taskId&quot;: &quot;IT-001&quot;,
+    &quot;outputFile&quot;: &quot;/workspace/IT-001/SME_eval_benchmark/run/output.zip&quot;,
+    &quot;outputPath&quot;: &quot;/workspace/IT-001/SME_eval_benchmark/run/output.zip&quot;,
+    &quot;outputIsBase64&quot;: false,
+    &quot;gate_status&quot;: &quot;PASS&quot;,
+    &quot;quality_status&quot;: &quot;PENDING&quot;,
+    &quot;rowsIn&quot;: 2,
+    &quot;rowsOut&quot;: 2,
+    &quot;report&quot;: {&quot;total&quot;:2,&quot;passed&quot;:1,&quot;issues&quot;:1,&quot;accepted&quot;:false},
+    &quot;missingMetrics&quot;: []
+  }
+}
+</code></pre>
+<p>实际响应另含<code>jobId</code>、血缘记录、日志、耗时和结果摘要。<code>isLastOperator=true</code>时<code>outputFile</code>改为Base64，<code>outputIsBase64=true</code>，但<code>outputPath</code>仍可用于下载。</p>
+<h3 id="43">4.3 下载产物</h3>
+<p>推荐<code>GET /downloadFile?uniqueId=...&amp;path=...</code>。path使用执行响应的<code>data.outputPath</code>，客户端必须做URL编码。也支持POST，JSON如下：</p>
+<pre><code class="language-json">{&quot;uniqueId&quot;:&quot;IT-001&quot;,&quot;path&quot;:&quot;/workspace/IT-001/SME_eval_benchmark/run/output.zip&quot;}
+</code></pre>
+<p>下载成功为ZIP二进制。不要对成功响应调用JSON解析器。下载失败才按HTTP状态及错误信封排查。</p>
+<p>输出ZIP通常包含<code>result.json</code>、<code>manifest.json</code>、<code>report.md</code>、<code>summary.md</code>、<code>metrics.csv</code>、<code>measurements.jsonl</code>、<code>run.log</code>、血缘文件和<code>inputs/</code>中的输入副本；训练另保留完整协议。数据集级训练不生成虚构逐条分数，逐条文件可能为空。</p>
+<p><code>manifest.json</code>记录产物文件散列。资源使用包内相对路径，私有模型使用逻辑标识；模型实体不重复复制到输出ZIP。下载后移除服务端工作区，输出包内保留的输入和协议仍可读取。</p>
+<h3 id="44">4.4 清理工作区</h3>
+<p><code>POST /removeFile</code>，JSON：</p>
+<pre><code class="language-json">{&quot;uniqueId&quot;:&quot;IT-001&quot;}
+</code></pre>
+<p>不传path时清理整个本次算子工作区；传path时清理指定文件或目录。响应<code>data</code>包含<code>removed</code>列表和<code>count</code>。已不存在的整个工作区再次清理返回<code>count=0</code>。</p>
+<p>此操作不删除算子私有模型，也不删除业务任务记录。清理后重跑需要重新上传输入；需要继续在前端查看输入或复评时先保留工作区。</p>
+<h2 id="5-zip">5 输入 ZIP 标准</h2>
+<h3 id="51">5.1 通用规则</h3>
+<p>JSON和JSONL使用UTF-8；根目录直接放主清单，不额外套一层同名目录。包内路径使用<code>/</code>和相对路径。普通媒体同时提供<code>input</code>和<code>file</code>，二者指向同一个资源。样本ID非空且唯一，布尔值使用JSON的true/false。</p>
+<p>模态和运行方式由请求决定，给samples.json增加type/mode不会自动选择算子。不要把samples.json和protocol.json两类入口混在一个包中等待自动切换。</p>
+<h3 id="52">5.2 导入已有指标</h3>
+<pre><code class="language-text">dataset.zip
+├─ samples.json
+└─ assets/                 可选的原始媒体
+</code></pre>
+<p>文本结构示例：</p>
+<pre><code class="language-json">{
+  &quot;samples&quot;: [
+    {
+      &quot;id&quot;: &quot;S001&quot;,
+      &quot;input&quot;: &quot;企业发布了季度经营报告。&quot;,
+      &quot;measurements&quot;: {
+        &quot;baseline&quot;: {&quot;accuracy&quot;:77,&quot;f1&quot;:78,&quot;lossCv&quot;:0.18},
+        &quot;candidate&quot;: {&quot;accuracy&quot;:85,&quot;f1&quot;:86,&quot;lossCv&quot;:0.15}
+      }
+    }
+  ]
+}
+</code></pre>
+<p>每条两侧完整填写：</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>指标字段</th>
+<th>数值单位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>accuracy、f1、lossCv</td>
+<td>前两项0至100；lossCv为0至1</td>
+</tr>
+<tr>
+<td>image</td>
+<td>iou、clarity、semantic、accuracy</td>
+<td>iou为0至1，其余0至100</td>
+</tr>
+<tr>
+<td>audio</td>
+<td>cer、speakerAccuracy、domainF1</td>
+<td>CER为非负有限百分数，可超过100；其余0至100</td>
+</tr>
+<tr>
+<td>video</td>
+<td>clarity、alignment、trust、safety、integrity</td>
+<td>均为0至100</td>
+</tr>
+<tr>
+<td>benchmark</td>
+<td>score</td>
+<td>0至100，同一道题两侧真实分数</td>
+</tr>
+</tbody>
+</table>
+<p>音频每侧可另提供<code>cerEdits</code>和<code>cerReferenceChars</code>；全部样本两侧都提供完整有效计数时采用语料级CER，否则按现有逐句聚合口径。80%的准确率写80，IoU 0.85写0.85。</p>
+<p>导入指标记录来源为imported，不核验上游训练协议。前端选定“基线方案”也不能替代样本中的<code>measurements.baseline</code>。</p>
+<h3 id="53">5.3 引擎测量</h3>
+<pre><code class="language-text">dataset.zip
+├─ samples.json
+└─ assets/
+   ├─ sample-001.jpg
+   └─ sample-002.jpg
+</code></pre>
+<p>图像清单示例，不带measurements：</p>
+<pre><code class="language-json">{
+  &quot;samples&quot;: [
+    {&quot;id&quot;:&quot;IMG001&quot;,&quot;input&quot;:&quot;assets/sample-001.jpg&quot;,&quot;file&quot;:&quot;assets/sample-001.jpg&quot;},
+    {&quot;id&quot;:&quot;IMG002&quot;,&quot;input&quot;:&quot;assets/sample-002.jpg&quot;,&quot;file&quot;:&quot;assets/sample-002.jpg&quot;}
+  ]
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>模态</th>
+<th>输入与标注要求</th>
+<th>当前测量口径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本</td>
+<td>input为真实文本；至少两个规范化后不同的内容组</td>
+<td>内部划分验证集，默认使用私有BERT进行MLM代理测量，不是CLUE下游成绩</td>
+</tr>
+<tr>
+<td>图像</td>
+<td>可解码图片及相对路径</td>
+<td>像素规则和处理一致性代理；不消费人工mask计算真实标注IoU</td>
+</tr>
+<tr>
+<td>音频</td>
+<td>音频、transcript、speaker、domain</td>
+<td>固定ASR CER和声学特征留一代理诊断，不是两份语料分别训练Whisper</td>
+</tr>
+<tr>
+<td>视频</td>
+<td>可解码视频，可附caption、source、expectedDuration、expectedFrames、highValue</td>
+<td>五维规则/代理评分；CLIP对齐须配置启用，默认是关键词规则</td>
+</tr>
+</tbody>
+</table>
+<p>音频若要求三项指标完整，speaker和domain各自至少两类、每类至少两条。推荐WAV/PCM。单条示例：</p>
+<pre><code class="language-json">{&quot;id&quot;:&quot;AUD001&quot;,&quot;input&quot;:&quot;assets/A001.wav&quot;,&quot;file&quot;:&quot;assets/A001.wav&quot;,&quot;transcript&quot;:&quot;请打开客厅的灯。&quot;,&quot;speaker&quot;:&quot;spk01&quot;,&quot;domain&quot;:&quot;home&quot;,&quot;language&quot;:&quot;zh&quot;}
+</code></pre>
+<p>引擎两侧的含义按模态而定：图像是原图与确定性处理的比较；音频CER目前两侧相同；视频默认两侧描述同一输入。它们不能直接作为D_ours与D_ref训练收益的证据。benchmark没有现场自动答题评分流程。</p>
+<h3 id="54">5.4 训练对比协议</h3>
+<pre><code class="language-text">training.zip
+├─ protocol.json
+├─ ours/
+├─ ref/
+├─ eval/
+└─ task/                   仅文本另有共同下游训练数据
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>模态</th>
+<th>protocol中的路径字段</th>
+<th>数据内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本</td>
+<td>oursCorpus、refCorpus、trainFile、evalFile</td>
+<td>两份继续预训练语料、共同下游任务训练集T、固定测试集E</td>
+</tr>
+<tr>
+<td>图像</td>
+<td>oursDir、refDir、evalDir</td>
+<td>三份按类别目录组织的图片</td>
+</tr>
+<tr>
+<td>音频</td>
+<td>oursManifest、refManifest、evalManifest</td>
+<td>三份JSONL清单和对应本地音频</td>
+</tr>
+</tbody>
+</table>
+<p>图像protocol.json示例：</p>
+<pre><code class="language-json">{
+  &quot;protocol&quot;: {
+    &quot;oursDir&quot;: &quot;ours&quot;,
+    &quot;refDir&quot;: &quot;ref&quot;,
+    &quot;evalDir&quot;: &quot;eval&quot;,
+    &quot;proxyModel&quot;: &quot;resnet18&quot;,
+    &quot;trainingMode&quot;: &quot;full&quot;,
+    &quot;epochs&quot;: 1,
+    &quot;batchSize&quot;: 4,
+    &quot;seeds&quot;: [42],
+    &quot;purpose&quot;: &quot;exploration&quot;
+  }
+}
+</code></pre>
+<p>图像每份数据结构如<code>ours/cat/O001.jpg</code>、<code>ours/dog/O002.jpg</code>，三个集合至少两类、类别名一致，ours/ref每类条数相同。当前比较分类top1/macroF1，不是分割训练。</p>
+<p>文本语料JSONL每行<code>{"id":"O001","text":"真实语料"}</code>；下游TNEWS每行<code>{"id":"T001","text":"新闻内容","label":0}</code>。可选任务为tnews、afqmc、cluener，其字段见输入规范。两侧先分别继续预训练，再共用T训练下游任务，最终在同一E测试。</p>
+<p>音频清单每行如下，audio相对当前清单解析：</p>
+<pre><code class="language-json">{&quot;id&quot;:&quot;O001&quot;,&quot;audio&quot;:&quot;audio/O001.wav&quot;,&quot;text&quot;:&quot;请打开客厅的灯。&quot;,&quot;speaker&quot;:&quot;train-spk01&quot;}
+</code></pre>
+<p>音频两侧训练条数一致，总时长默认差距不超过5%；E与训练两侧的说话人和音频独立，单条0.05至30秒。当前协议训练Whisper并比较CER。</p>
+<p>训练ZIP省略modelPath/modelWeight/modelDir，默认读取所属算子私有模型。E不能参与训练、调参或模型选择。小预算样例均为单种子exploration；quality至少三个种子，formal至少五个种子，并须通过相应审计，仍需业务接受标准。</p>
+<h2 id="6">6 前端业务接口</h2>
+<h3 id="61">6.1 推荐调用顺序</h3>
+<ol>
+<li><code>GET /api/v1/eval/templates</code>获取模态、modelProfiles、defaultConfig。</li>
+<li><code>GET /api/v1/eval/baselines?type=image</code>获取方案；选择同type/modelId/mode、已published或verified的方案。</li>
+<li><code>POST /api/v1/datasets/import</code>上传普通ZIP，得到数据集id、version、sampleHash。</li>
+<li><code>POST /api/v1/eval/tasks</code>创建任务；autoRun=true立即后台执行，false保存草稿。</li>
+<li>查询任务详情或接收SSE，等待completed/failed。</li>
+<li>读取结果、报告，按需复核和复评。</li>
+</ol>
+<h3 id="62">6.2 普通数据集导入</h3>
+<p><code>POST /api/v1/datasets/import</code>，multipart字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必填</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>file</td>
+<td>是</td>
+<td>samples清单ZIP或兼容文件</td>
+</tr>
+<tr>
+<td>type</td>
+<td>是</td>
+<td>text/image/audio/video/benchmark</td>
+</tr>
+<tr>
+<td>mode</td>
+<td>建议指定</td>
+<td>已有指标measured；引擎原始数据unmeasured；演示demo</td>
+</tr>
+<tr>
+<td>name</td>
+<td>否</td>
+<td>数据集展示名</td>
+</tr>
+</tbody>
+</table>
+<p>注意：<code>unmeasured</code>是数据集导入状态；执行引擎测量时创建的任务仍为<code>mode=measured</code>。</p>
+<p>成功<code>data</code>是已登记数据集对象，常用字段为<code>id</code>、<code>name</code>、<code>type</code>、<code>mode</code>、<code>count</code>、<code>version</code>、<code>sampleHash</code>、<code>samples</code>。媒体引用转换为<code>/api/v1/datasets/.../assets/...</code>形式，前端按返回URI展示。</p>
+<h3 id="63">6.3 创建普通测评任务</h3>
+<p><code>POST /api/v1/eval/tasks</code>。下例动态ID、version、sampleHash须替换为刚导入的数据；示例内置图像方案ID来自当前交付快照，实际前端仍应动态查询：</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;图像引擎联调&quot;,
+  &quot;type&quot;: &quot;image&quot;,
+  &quot;mode&quot;: &quot;measured&quot;,
+  &quot;source&quot;: {
+    &quot;kind&quot;: &quot;raw&quot;,
+    &quot;id&quot;: &quot;刚导入返回的数据集ID&quot;,
+    &quot;version&quot;: &quot;刚导入返回的version&quot;,
+    &quot;sampleHash&quot;: &quot;刚导入返回的sampleHash&quot;
+  },
+  &quot;modelId&quot;: &quot;image-validator&quot;,
+  &quot;baselineConfig&quot;: {&quot;id&quot;:&quot;CFG261106MVC6HY&quot;},
+  &quot;measurementSource&quot;: &quot;engine&quot;,
+  &quot;seed&quot;: 42,
+  &quot;autoRun&quot;: true
+}
+</code></pre>
+<p>本版本内置且带证据的方案会按id从服务端重新读取；通用前端建议将选中基线对象完整传入baselineConfig，尤其是自定义方案，不能只伪造status。指定自己的config时保留完整规则，表示使用自定义参数。</p>
+<p>已有指标任务将measurementSource改为import，数据集导入使用measured，其余流程相同。source.version/sampleHash是可选并发校验字段；传入后与当前数据不一致会返回409 DATASET_CHANGED。</p>
+<p>modelId是前端档案标识，不等于磁盘模型路径：text为bert-base，image为image-validator，video为video-quality，audio为cnn-lstm或small-transformer，benchmark为benchmark-pair。页面模型名称不保证现场运行了同名算法，实际实现以结果engine和训练协议记录为准。</p>
+<h3 id="64">6.4 任务状态 日志和报告</h3>
+<table>
+<thead>
+<tr>
+<th>方法和路径</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET /api/v1/eval/tasks/{taskId}</td>
+<td>完整任务，读取status、error、result.summary</td>
+</tr>
+<tr>
+<td>POST /api/v1/eval/tasks/{taskId}/run</td>
+<td>启动草稿或可重启任务，已完成任务不能直接再次run</td>
+</tr>
+<tr>
+<td>GET /api/v1/eval/tasks/{taskId}/logs?after=0</td>
+<td>增量日志；响应items、lastSeq，下一轮after用lastSeq</td>
+</tr>
+<tr>
+<td>GET /api/v1/eval/tasks/{taskId}/events</td>
+<td>SSE，事件status、log、done；单连接约300秒后结束，长任务重连或轮询</td>
+</tr>
+<tr>
+<td>GET /api/v1/eval/tasks/{taskId}/report?format=json</td>
+<td>JSON信封，data为报告对象</td>
+</tr>
+<tr>
+<td>GET /api/v1/eval/tasks/{taskId}/report?format=md</td>
+<td>JSON信封，data为Markdown字符串</td>
+</tr>
+<tr>
+<td>POST /api/v1/eval/tasks/{taskId}/pause</td>
+<td>请求暂停</td>
+</tr>
+<tr>
+<td>POST /api/v1/eval/tasks/{taskId}/resume</td>
+<td>恢复已暂停任务</td>
+</tr>
+<tr>
+<td>POST /api/v1/eval/tasks/{taskId}/rerun</td>
+<td>创建复评子任务，可传autoRun和修改内容</td>
+</tr>
+</tbody>
+</table>
+<p>任务状态为draft/running/paused/completed/failed。暂停控制在任务流程步骤之间生效，不是训练batch级检查点，也不保证立即打断正在执行的模型计算。报告要求任务已完成。</p>
+<h3 id="65">6.5 训练任务入口</h3>
+<p>当前前端训练表单提交服务器路径对象，例如：</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;图像服务器目录训练联调&quot;,
+  &quot;type&quot;: &quot;image&quot;,
+  &quot;mode&quot;: &quot;measured&quot;,
+  &quot;seed&quot;: 42,
+  &quot;protocol&quot;: {
+    &quot;oursDir&quot;: &quot;/app/dataset/business/image/ours&quot;,
+    &quot;refDir&quot;: &quot;/app/dataset/business/image/ref&quot;,
+    &quot;evalDir&quot;: &quot;/app/dataset/business/image/eval&quot;,
+    &quot;proxyModel&quot;: &quot;resnet18&quot;,
+    &quot;epochs&quot;: 1,
+    &quot;seeds&quot;: [42],
+    &quot;purpose&quot;: &quot;exploration&quot;
+  },
+  &quot;autoRun&quot;: true
+}
+</code></pre>
+<p>这些路径必须在后端容器中存在。业务任务的相对路径以SME上级项目目录为准；为了部署清晰，表单使用容器业务数据绝对路径。前端表单当前未自动完成训练ZIP上传解包；若输入是训练ZIP，使用第4节uploadFile/predict流程。不要把protocol=true直接提交给业务tasks接口，它要求协议对象。</p>
+<h3 id="66">6.6 基线方案</h3>
+<p>前端基线方案保存阈值、版本、模型档案等信息，不会自动建立D_ref/E，不会自动训练模型。<code>measurements.baseline</code>则是每条实际参考分数，两者职责不同。</p>
+<p>自定义后训练区分度判定方案示例：</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;后训练区分度联调方案&quot;,
+  &quot;type&quot;: &quot;benchmark&quot;,
+  &quot;modelId&quot;: &quot;benchmark-pair&quot;,
+  &quot;mode&quot;: &quot;measured&quot;,
+  &quot;status&quot;: &quot;published&quot;,
+  &quot;version&quot;: &quot;1.0&quot;,
+  &quot;seed&quot;: 42,
+  &quot;config&quot;: {&quot;thresholds&quot;:{&quot;score&quot;:5}}
+}
+</code></pre>
+<p>提交到<code>POST /api/v1/eval/baselines</code>后，使用返回对象创建任务。published表示方案可选，不代表已在新服务器完成真实模型实验。内置方案不可修改或删除。</p>
+<h3 id="67">6.7 其他业务接口</h3>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>方法和路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>列表和概览</td>
+<td>GET /api/v1/eval/tasks、GET /api/v1/eval/overview</td>
+</tr>
+<tr>
+<td>数据集</td>
+<td>GET /api/v1/datasets、GET /api/v1/datasets/{kind}/{id}、DELETE同路径</td>
+</tr>
+<tr>
+<td>产线注册</td>
+<td>POST /api/v1/datasets/production</td>
+</tr>
+<tr>
+<td>补充指标</td>
+<td>POST /api/v1/datasets/{kind}/{id}/measurements</td>
+</tr>
+<tr>
+<td>模板</td>
+<td>GET /api/v1/datasets/template?type=image，返回Demo示例，不可当成真实测量证据</td>
+</tr>
+<tr>
+<td>媒体</td>
+<td>GET /api/v1/datasets/{kind}/{id}/assets/{path}</td>
+</tr>
+<tr>
+<td>样本复核</td>
+<td>PATCH /api/v1/eval/tasks/{taskId}/samples/{sampleId}</td>
+</tr>
+<tr>
+<td>问题回溯</td>
+<td>GET /api/v1/eval/feedback、GET/PATCH /api/v1/eval/feedback/{id}</td>
+</tr>
+<tr>
+<td>方案维护</td>
+<td>GET/POST /api/v1/eval/baselines、PATCH/DELETE /api/v1/eval/baselines/{id}</td>
+</tr>
+<tr>
+<td>周期报告</td>
+<td>GET /api/v1/eval/reports/period?period=week，另支持month/quarter</td>
+</tr>
+</tbody>
+</table>
+<p>kind为raw或production。任务列表分页page从1开始，pageSize为1至200。样本复核status为pending/confirmed/returned。任务只允许删除draft或failed；已完成任务通过rerun创建复评。</p>
+<h2 id="7">7 服务器联调准备</h2>
+<pre><code class="language-sh">python3 tools/verify_package.py
+sh tools/deploy.sh up
+curl -sS http://127.0.0.1:17024/health
+sh tools/deploy.sh environment
+sh tools/deploy.sh models
+</code></pre>
+<p>检查顺序是包文件、服务状态、依赖原生模块、模型散列。health应为code=0、operatorCount=5。health中的port表示后端监听端口，在Compose下为6289，不能据此把外部地址改成6289。</p>
+<h2 id="8">8 使用随包工具完成联调</h2>
+<h3 id="81-compose">8.1 Compose内执行</h3>
+<pre><code class="language-sh">sh tools/deploy.sh smoke --case import-benchmark --download
+sh tools/deploy.sh smoke --case engine-image --download
+sh tools/deploy.sh smoke --case training-text --download
+sh tools/deploy.sh smoke --all --download --cleanup
+</code></pre>
+<p>最后一条实际执行全部12例。脚本检查输入散列、执行状态、产物CRC和成员散列，训练样例核对固定E计数。cleanup会先保存产物，再清理服务端对应工作区；任务记录仍保留。</p>
+<h3 id="82">8.2 从外部机器执行</h3>
+<p>在有完整SME样例目录的机器上，使用Python3.11，无须额外安装HTTP客户端库：</p>
+<pre><code class="language-sh">export SME_API_KEY=''
+python3 tools/run_example.py --url http://服务器IP:17024 --all --download --output ./联调结果
+</code></pre>
+<p>启用Key时填写真实值。需要下载后自动清理时另加--cleanup。脚本全部成功返回0，任一用例失败返回1。</p>
+<p>报告位于<code>runtime/manual_tests/run-*/summary.json</code>，或--output指定目录；每例包含response.json、case-summary.json，下载时包含output.zip。若要在前端继续查看输入或复评，不加--cleanup。</p>
+<h2 id="9-curl">9 curl完整调用示例</h2>
+<p>这一段可整体复制到SME根目录执行，依赖curl和Python3。默认调用后训练区分度导入样例，成功下载后清理。修改BASE_URL和SME_API_KEY适配服务器；动态路径由响应提取，不需要手工拼接。</p>
+<pre><code class="language-bash">set -eu
+BASE_URL=&quot;${BASE_URL:-http://127.0.0.1:17024}&quot;
+SME_API_KEY=&quot;${SME_API_KEY:-}&quot;
+PYTHON=&quot;${PYTHON:-python3}&quot;
+export UNIQUE_ID=&quot;IT-$(&quot;$PYTHON&quot; -c 'import uuid; print(uuid.uuid4().hex)')&quot;
+mkdir -p &quot;runtime/curl-tests/$UNIQUE_ID&quot;
+export TEST_OUT=&quot;runtime/curl-tests/$UNIQUE_ID&quot;
+
+curl -sS --max-time 120 -H &quot;X-API-Key: $SME_API_KEY&quot; \
+  -F 'file=@examples/input_zips/导入已有指标/后训练区分度_2条.zip;filename=dataset.zip' \
+  &quot;$BASE_URL/uploadFile?uniqueId=$UNIQUE_ID&quot; -o &quot;$TEST_OUT/upload.json&quot;
+
+&quot;$PYTHON&quot; - &lt;&lt;'PY'
+import json, os, pathlib
+folder = pathlib.Path(os.environ['TEST_OUT'])
+upload = json.loads((folder / 'upload.json').read_text(encoding='utf-8'))
+assert upload['code'] == 0, upload
+payload = {
+    'uniqueId': os.environ['UNIQUE_ID'],
+    'operatorId': 'SME_eval_benchmark',
+    'inputFile': upload['data']['inputFile'],
+    'params': {'mode': 'measured', 'measurementSource': 'import', 'registerTask': True},
+    'isLastOperator': False
+}
+(folder / 'predict.json').write_text(json.dumps(payload), encoding='utf-8')
+PY
+
+curl -sS --max-time 1800 -H &quot;X-API-Key: $SME_API_KEY&quot; \
+  -H 'Content-Type: application/json' --data-binary &quot;@$TEST_OUT/predict.json&quot; \
+  &quot;$BASE_URL/predict&quot; -o &quot;$TEST_OUT/response.json&quot;
+
+&quot;$PYTHON&quot; - &lt;&lt;'PY'
+import json, os, pathlib
+folder = pathlib.Path(os.environ['TEST_OUT'])
+response = json.loads((folder / 'response.json').read_text(encoding='utf-8'))
+assert response['code'] == 0, response
+result = response['data']
+assert result['status'] == 'succeeded', result
+assert result['rowsIn'] == result['rowsOut'] == 2, result
+assert result['report']['accepted'] is False, result
+download = {'uniqueId': os.environ['UNIQUE_ID'], 'path': result['outputPath']}
+(folder / 'download.json').write_text(json.dumps(download), encoding='utf-8')
+(folder / 'remove.json').write_text(json.dumps({'uniqueId': os.environ['UNIQUE_ID']}), encoding='utf-8')
+PY
+
+curl -sS --max-time 120 -H &quot;X-API-Key: $SME_API_KEY&quot; \
+  -H 'Content-Type: application/json' --data-binary &quot;@$TEST_OUT/download.json&quot; \
+  &quot;$BASE_URL/downloadFile&quot; -o &quot;$TEST_OUT/output.zip&quot;
+
+&quot;$PYTHON&quot; - &lt;&lt;'PY'
+import hashlib, json, os, pathlib, zipfile
+folder = pathlib.Path(os.environ['TEST_OUT'])
+with zipfile.ZipFile(folder / 'output.zip') as archive:
+    assert archive.testzip() is None
+    manifest = json.loads(archive.read('manifest.json'))
+    for item in manifest['files']:
+        assert hashlib.sha256(archive.read(item['name'])).hexdigest() == item['sha256']
+print('Downloaded output ZIP verified')
+PY
+
+curl -sS -H &quot;X-API-Key: $SME_API_KEY&quot; -H 'Content-Type: application/json' \
+  --data-binary &quot;@$TEST_OUT/remove.json&quot; &quot;$BASE_URL/removeFile&quot; -o &quot;$TEST_OUT/remove-response.json&quot;
+
+&quot;$PYTHON&quot; - &lt;&lt;'PY'
+import json, os, pathlib, zipfile
+folder = pathlib.Path(os.environ['TEST_OUT'])
+removed = json.loads((folder / 'remove-response.json').read_text(encoding='utf-8'))
+assert removed['code'] == 0, removed
+with zipfile.ZipFile(folder / 'output.zip') as archive:
+    assert archive.testzip() is None
+print('Call passed; quality accepted=false is expected for this fixture')
+PY
+</code></pre>
+<p>该样例baseline均分65、candidate均分69、变化4；默认分差阈值5，因此接口通过且业务未达标是预期结果。切换其他方法优先使用第8节工具，避免手工同时修改算子ID、ZIP和params。</p>
+<h2 id="10">10 正向测试用例</h2>
+<p>文件路径均相对<code>examples/input_zips/</code>。每例要求HTTP成功、code=0、status=succeeded，并可下载通过校验的输出ZIP；不要求所有业务分数达标。</p>
+<table>
+<thead>
+<tr>
+<th>用例ID</th>
+<th>ZIP路径</th>
+<th>方式</th>
+<th>预期rowsIn/rowsOut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>import-benchmark</td>
+<td>导入已有指标/后训练区分度_2条.zip</td>
+<td>导入</td>
+<td>2 / 2</td>
+</tr>
+<tr>
+<td>import-image</td>
+<td>导入已有指标/图像_3条.zip</td>
+<td>导入</td>
+<td>3 / 3</td>
+</tr>
+<tr>
+<td>import-text</td>
+<td>导入已有指标/文本_3条.zip</td>
+<td>导入</td>
+<td>3 / 3</td>
+</tr>
+<tr>
+<td>import-video</td>
+<td>导入已有指标/视频_2条.zip</td>
+<td>导入</td>
+<td>2 / 2</td>
+</tr>
+<tr>
+<td>import-audio</td>
+<td>导入已有指标/音频_8条.zip</td>
+<td>导入</td>
+<td>8 / 8</td>
+</tr>
+<tr>
+<td>engine-image</td>
+<td>引擎测量/图像_3条.zip</td>
+<td>引擎</td>
+<td>3 / 3</td>
+</tr>
+<tr>
+<td>engine-text</td>
+<td>引擎测量/文本_6条.zip</td>
+<td>引擎</td>
+<td>6 / 1</td>
+</tr>
+<tr>
+<td>engine-video</td>
+<td>引擎测量/视频_2条.zip</td>
+<td>引擎</td>
+<td>2 / 2</td>
+</tr>
+<tr>
+<td>engine-audio</td>
+<td>引擎测量/音频_8条.zip</td>
+<td>引擎</td>
+<td>8 / 8</td>
+</tr>
+<tr>
+<td>training-text</td>
+<td>训练对比协议/文本_小预算训练.zip</td>
+<td>训练</td>
+<td>4 / 4</td>
+</tr>
+<tr>
+<td>training-image</td>
+<td>训练对比协议/图像_小预算训练.zip</td>
+<td>训练</td>
+<td>20 / 20</td>
+</tr>
+<tr>
+<td>training-audio</td>
+<td>训练对比协议/音频_小预算训练.zip</td>
+<td>训练</td>
+<td>2 / 2</td>
+</tr>
+</tbody>
+</table>
+<p>文本引擎只把独立验证子集计入质量汇总，当前样例及seed=42下rowsOut为1，不是漏处理。三个训练样例按固定E计数，不能是0；HTTP响应、result.json和manifest.json三个位置应一致。训练报告scope=dataset、accepted=null，不能把passed=0解释为训练失败。</p>
+<h2 id="11">11 异常和业务流程测试</h2>
+<p>所有写入测试使用新ID和联调数据，不对正在运行的业务任务执行清理。</p>
+<table>
+<thead>
+<tr>
+<th>用例</th>
+<th>操作</th>
+<th>预期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N01 鉴权</td>
+<td>启用Key后不带Key调用predict</td>
+<td>HTTP401，data=null</td>
+</tr>
+<tr>
+<td>N02 非法ID</td>
+<td>上传时uniqueId含斜线或空格</td>
+<td>HTTP400，INVALID_UNIQUE_ID</td>
+</tr>
+<tr>
+<td>N03 未知算子</td>
+<td>正常ID，operatorId为未注册值</td>
+<td>HTTP422，UNKNOWN_OPERATOR</td>
+</tr>
+<tr>
+<td>N04 模态不匹配</td>
+<td>图像算子params.type=text</td>
+<td>HTTP422，OPERATOR_TYPE_MISMATCH</td>
+</tr>
+<tr>
+<td>N05 缺指标</td>
+<td>不带measurements的文本样本，选择import</td>
+<td>HTTP422，MEASUREMENTS_REQUIRED</td>
+</tr>
+<tr>
+<td>N06 缺媒体</td>
+<td>图像清单引用包中不存在的文件，选择engine</td>
+<td>HTTP422，ASSET_MISSING</td>
+</tr>
+<tr>
+<td>N07 不支持的训练类型</td>
+<td>video使用protocol=true和有效协议ZIP</td>
+<td>HTTP422，CONFIG_INVALID</td>
+</tr>
+<tr>
+<td>N08 下载不存在文件</td>
+<td>正常ID，path指向不存在文件</td>
+<td>HTTP404，NOT_FOUND</td>
+</tr>
+<tr>
+<td>N09 重复清理</td>
+<td>同一工作区成功清理后再清理</td>
+<td>HTTP200、code=0、count=0</td>
+</tr>
+<tr>
+<td>N10 Demo误当实测</td>
+<td>measured任务使用preset来源</td>
+<td>HTTP422，DEMO_ONLY_DATASET</td>
+</tr>
+<tr>
+<td>N11 报告时机</td>
+<td>获取尚未完成的草稿任务报告</td>
+<td>HTTP422，REQUEST_INVALID</td>
+</tr>
+<tr>
+<td>N12 未发布方案</td>
+<td>以draft状态基线对象创建measured任务</td>
+<td>HTTP422，BASELINE_UNVERIFIED</td>
+</tr>
+<tr>
+<td>B01 指标导入业务链</td>
+<td>业务导入benchmark ZIP，选匹配方案，创建/启动任务</td>
+<td>completed；summary.accepted=false且分差4</td>
+</tr>
+<tr>
+<td>B02 引擎业务链</td>
+<td>导入image unmeasured，创建engine任务</td>
+<td>completed，保留引擎审计与样本结果</td>
+</tr>
+<tr>
+<td>B03 媒体展示</td>
+<td>按业务导入返回的uri读取媒体</td>
+<td>HTTP200，可解码媒体；不使用宿主绝对路径</td>
+</tr>
+<tr>
+<td>B04 日志与报告</td>
+<td>读取logs、report(json/md)、已完成任务events</td>
+<td>日志游标可用；md位于JSON data；SSE有done</td>
+</tr>
+</tbody>
+</table>
+<p>固定E泄漏、训练量不匹配、ZIP大小/条数上限、真实服务器重启和浏览器页面流程，还应在目标数据及部署环境中验证。它们不因12个小样本通过就自动获得正式验收结论。</p>
+<h2 id="12">12 常见错误处理</h2>
+<table>
+<thead>
+<tr>
+<th>HTTP或errorCode</th>
+<th>处理建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>401</td>
+<td>核对前端设置或X-API-Key与服务器一致</td>
+</tr>
+<tr>
+<td>INVALID_UNIQUE_ID</td>
+<td>按第2节生成合法新ID</td>
+</tr>
+<tr>
+<td>UNKNOWN_OPERATOR</td>
+<td>使用精确operatorId，检查health注册数</td>
+</tr>
+<tr>
+<td>REQUEST_INVALID / CONFIG_INVALID</td>
+<td>检查字段类型、布尔值、未知协议字段、配置范围</td>
+</tr>
+<tr>
+<td>DATASET_INVALID</td>
+<td>检查根清单、合法JSON、UTF-8和ZIP完整性</td>
+</tr>
+<tr>
+<td>MEASUREMENTS_REQUIRED / MEASUREMENTS_INCOMPLETE</td>
+<td>导入方式补齐每条两侧指标，或改用正确引擎包</td>
+</tr>
+<tr>
+<td>MODEL_ASSET_MISSING / ASR_ASSET_MISSING</td>
+<td>运行models、environment，核对私有模型与依赖</td>
+</tr>
+<tr>
+<td>ASSET_MISSING</td>
+<td>检查媒体文件、相对路径、解码器或容器挂载路径</td>
+</tr>
+<tr>
+<td>DATASET_CHANGED</td>
+<td>重新读取数据集version/sampleHash再创建任务</td>
+</tr>
+<tr>
+<td>BASELINE_UNVERIFIED / BASELINE_MISMATCH</td>
+<td>选择已发布且匹配模态、模型档案和mode的方案</td>
+</tr>
+<tr>
+<td>BUDGET_MISMATCH / PROTOCOL_MISMATCH</td>
+<td>核对两侧训练条数、类别数量、时长与训练预算</td>
+</tr>
+<tr>
+<td>LEAKAGE_DETECTED / OOD_MISMATCH</td>
+<td>核对固定E独立性、近重复和数据分布，不通过改ID绕过</td>
+</tr>
+<tr>
+<td>AUDIT_INCOMPLETE</td>
+<td>审计达到比对上限，不能解释为审计通过</td>
+</tr>
+<tr>
+<td>NOT_FOUND</td>
+<td>检查ID、资源路径、是否已清理；先区分任务与算子工作区</td>
+</tr>
+<tr>
+<td>PAYLOAD_TOO_LARGE / HTTP413</td>
+<td>对照后端与Nginx限制；Nginx拒绝时响应可能是HTML，不是JSON</td>
+</tr>
+<tr>
+<td>500</td>
+<td>保存响应、任务ID、对应日志后定位；不要将未完成请求误报为指标不达标</td>
+</tr>
+</tbody>
+</table>
+<h2 id="13">13 联调验收和记录</h2>
+<h3 id="131">13.1 接口验收</h3>
+<p>接口验收检查服务可访问、鉴权正确、五算子注册、输入解析、执行成功、产物可下载、计数一致，以及清理后下载副本仍完整。原始媒体必须真实可解码。</p>
+<p>指标验收另读accepted、指标方向、阈值和证据来源。导入结果不能证明本服务执行过上游模型；图像/音频/视频代理诊断不能替代有标签下游成绩。训练探索结果、资格标记和业务接受阈值分别记录。</p>
+<h3 id="132">13.2 已有交付验证</h3>
+<p>2026年11月12日，当前交付目录在隔离Windows Python3.11环境启动真实Uvicorn服务，使用17024进行HTTP验证：五算子注册、鉴权、9次普通业务ZIP导入、12个算子用例及全部下载清理校验通过，三个训练固定E计数为4/20/2。文本引擎使用私有BERT且SME_TEXT_FAST=0；CLIP另做真实前向验证。47个模型散列匹配。</p>
+<p>本文另在独立临时库执行了12项异常检查、4条业务流程和第9节原样curl脚本，共17项通过；17个JSON示例均可解析。核对记录见<a href="接口文档验证结果.json">接口文档验证结果</a>。</p>
+<p>上述记录对应本机HTTP服务验证。构建机没有Docker/WSL，Linux容器、Nginx进程、目标服务器网络和重启持久化由工程侧现场验收。12个算子样例的详细记录见根目录<code>交付验收.json</code>。</p>
+<h3 id="133">13.3 服务器验收记录模板</h3>
+<table>
+<thead>
+<tr>
+<th>记录项</th>
+<th>工程侧填写</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务器地址与系统架构</td>
+<td>实际地址、Linux版本、x86_64或其他架构</td>
+</tr>
+<tr>
+<td>交付版本和传输散列</td>
+<td>RELEASE.json版本、ZIP SHA-256</td>
+</tr>
+<tr>
+<td>Docker与Compose版本</td>
+<td>实际版本</td>
+</tr>
+<tr>
+<td>服务状态</td>
+<td>op-pre-eva及op-pre-eva-backend健康状态</td>
+</tr>
+<tr>
+<td>接口基地址</td>
+<td>http://实际服务器IP:17024</td>
+</tr>
+<tr>
+<td>Key是否启用</td>
+<td>仅记录启用状态，不把真实Key写入记录</td>
+</tr>
+<tr>
+<td>单例和全量联调</td>
+<td>运行时间、通过数、summary.json保存位置</td>
+</tr>
+<tr>
+<td>训练和计数</td>
+<td>文本4、图像20、音频2是否在三个产物位置一致</td>
+</tr>
+<tr>
+<td>前端联调</td>
+<td>上传、基线选择、任务列表/详情、媒体、日志、报告</td>
+</tr>
+<tr>
+<td>重启持久化</td>
+<td>重建服务后任务与业务数据是否保留</td>
+</tr>
+<tr>
+<td>问题记录</td>
+<td>请求时间、uniqueId/taskId、HTTP状态、errorCode、日志位置</td>
+</tr>
+</tbody>
+</table>
+<h2 id="14">14 相关文件</h2>
+<ul>
+<li><a href="服务器部署联调.md">服务器部署联调</a></li>
+<li><a href="07_各模态输入与ZIP打包规范.md">各模态输入与ZIP打包规范</a></li>
+<li><a href="../examples/README.md">随包样例说明</a></li>
+<li><a href="../examples/index.json">12个样例索引和SHA</a></li>
+<li><a href="openapi.json">完整OpenAPI快照</a>，在线<code>/openapi.json</code>优先</li>
+<li><a href="../交付验收.json">当日交付验收</a></li>
+</ul>
+<p>本文接口语义以当前app/api、app/eval、算子实际响应和随包样例为依据。docs/02_接口契约.md保留历史说明；与其不一致时，以本版本实际服务及本文核对后的约定为准。</p><footer>接口说明与联调测试 · SME-2026.11.12-server · 2026年11月12日 · 文档与请求示例随部署包交付</footer></main>
+<script>document.querySelectorAll('pre').forEach(function(pre){var button=document.createElement('button');button.className='copy';button.textContent='复制';button.onclick=async function(){var value=pre.querySelector('code').textContent;try{await navigator.clipboard.writeText(value);button.textContent='已复制';setTimeout(function(){button.textContent='复制'},1200)}catch(e){var range=document.createRange();range.selectNodeContents(pre.querySelector('code'));var selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);button.textContent='已选中'}};pre.appendChild(button)});</script></body></html>

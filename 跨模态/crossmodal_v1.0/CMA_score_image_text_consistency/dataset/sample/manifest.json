@@ -1,0 +1,12 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "operator": "generate_candidate_pairs",
+  "entrypoint": "pairs.jsonl",
+  "artifacts": [
+    {
+      "path": "pairs.jsonl",
+      "role": "main",
+      "records": 11
+    }
+  ]
+}

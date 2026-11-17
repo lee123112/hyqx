@@ -1,0 +1,10 @@
+operator_version: v1.0.0
+source_high_resource_lang: en
+target_low_resource_lang: null
+anchor_lang: zh
+model_name: Qwen/Qwen3.5-9B
+model_version: siliconflow/Qwen3.5-9B
+model_service_url: https://api.siliconflow.cn/v1/chat/completions
+model_path: null
+model_timeout_seconds: 180
+human_review_required: true

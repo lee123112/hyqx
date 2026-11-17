@@ -1,0 +1,2 @@
+{"line": 12, "reason": "missing_field: sample_id", "label": "原始文件-无法解析", "action": "隔离", "destination": "原始隔离区", "operator": "candidate_description", "event_time": "2026-11-11T15:28:42+08:00"}
+{"line": 13, "reason": "json_parse_error", "label": "原始文件-无法解析", "action": "隔离", "destination": "原始隔离区", "operator": "candidate_description", "event_time": "2026-11-11T15:28:42+08:00"}

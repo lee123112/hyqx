@@ -1,0 +1,26 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "demo.jsonl",
+  "artifacts": [
+    {
+      "path": "demo.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "demo_degraded.jsonl",
+      "role": "auxiliary"
+    },
+    {
+      "path": "demo_strict.jsonl",
+      "role": "auxiliary"
+    },
+    {
+      "path": "media/hc-0003.png",
+      "role": "media"
+    },
+    {
+      "path": "make_sample.py",
+      "role": "generator"
+    }
+  ]
+}

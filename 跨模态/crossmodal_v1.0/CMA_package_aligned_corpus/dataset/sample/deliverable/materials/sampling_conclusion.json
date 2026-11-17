@@ -1,0 +1,21 @@
+{
+  "format": "crossmodal-sampling-conclusion-v1",
+  "operator": "auto_review",
+  "batch_id": "batch-A",
+  "sampling_rate": 0.1,
+  "layers": {
+    "image_text": 7,
+    "audio_text": 1,
+    "video_text": 2
+  },
+  "conclusion": {
+    "judged_wrong": 1,
+    "passed": 9,
+    "isolated": 3
+  },
+  "status": "written_back",
+  "writeback": {
+    "completed": true,
+    "completedAt": "2026-10-08T11:30:00+08:00"
+  }
+}

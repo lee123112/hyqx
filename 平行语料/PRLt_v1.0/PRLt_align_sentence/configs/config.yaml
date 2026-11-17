@@ -1,0 +1,88 @@
+# 算子10：句子级对齐配置
+operator:
+  name: sentence_alignment
+  version: v1.0.0
+
+# 任务声明的语言方向；段落记录自带的 source_lang/target_lang 优先透传
+source_lang: zh
+target_lang: en
+
+# 本地 Qwen3-Embedding-0.6B 权重（1024 维）。路径相对本算子目录，
+# 加载时强制 local_files_only，禁止回退到远程模型服务。
+model_name: ../models/Qwen3-Embedding-0.6B
+model_service_url: null
+model_timeout_seconds: 30
+# qwen3_embedding=强制本地 Qwen3-Embedding 后端，权重/依赖不可用即失败，不静默降级
+# labse=旧配置兼容别名，等价于 qwen3_embedding（避免上游旧配置失效）
+# auto=优先模型后端，不可用时按 allow_degraded 处理
+# rule_degraded=显式使用长度+证据规则后端，状态标记 degraded
+model_backend: qwen3_embedding
+device: cpu
+batch_size: 32
+
+# 段落内单调 DP：|源句序号 - 目标句序号| > window 的句对不参与评分
+window: 5
+min_confidence: 0.55
+# 最优配对与次优配对总分差 <= ambiguity_margin 时判为多候选歧义
+ambiguity_margin: 0.02
+# 跳过一句的代价；仅在配对得分低于该代价时才选择跳过
+skip_penalty: 0.35
+
+# 置信度权重：只对实际可用的分项按比例重新归一，规则降级下语义分恒为 null
+semantic_weight: 0.65
+length_weight: 0.25
+evidence_weight: 0.10
+
+allow_1_to_2: true
+allow_2_to_1: true
+# 仅在 model_backend=auto 且 Qwen3-Embedding 不可用时生效
+allow_degraded: true
+
+# [2026-11-05 不静默丢句对] 低置信/多候选句对的去向（与算子08 同名同义）。
+# 旧行为 drop 只写异常清单：一段里所有句对都低置信时，整段对下游不可见，
+# 算子10 拿不到这些句子，缺陷也就无从检出（Fullflow-Effect-Bench-v1 里
+# defect-10-009 p5/p7/p8 就是这样丢的）。mark_and_keep 仍写入通过输出，
+# 标记 review_status=needs_review + low_confidence_reason，异常清单照旧留审计。
+low_confidence_policy: mark_and_keep
+
+# [2026-11-05 译文残留编辑注记] 句对文本里带「后半句缺失」「未翻译」「[sic]」这类
+# 编辑注记时，长度比和语义分都发现不了（注记很短、语义分照旧很高），但注记本身
+# 就是「这一对不完整」的直接证据。命中即把置信度压到 residual_note_confidence_cap
+# （低于 min_confidence），按 residual_note_policy 处理：mark_and_keep 默认打
+# needs_review 标记并保留句对，drop 只写异常清单，ignore 关闭该门禁。
+# 自然语料实测：1560 条英文译文句里 0 条命中默认正则集。
+residual_note_patterns:
+  - "(?:first|second|last|other|remaining)\\s+(?:half|part|portion)\\s+of\\s+the\\s+(?:sentence|paragraph|text|line)[^.]{0,40}?\\b(?:is|was|has\\s+been|had\\s+been)\\s+(?:missing|omitted|cut|lost|absent|dropped)\\b"
+  - "\\bnot\\s+(?:been\\s+)?(?:translated|transcribed)\\b"
+  - "\\buntranslated\\b"
+  - "\\bmissing\\s+translation\\b"
+  - "\\btranslation\\s+(?:is\\s+|was\\s+)?missing\\b"
+  - "\\[\\s*(?:\\.{2,}|…|sic)\\s*\\]"
+  - "(?:前半句|后半句|前半部分|后半部分|其余部分)(?:缺失|遗漏|未译|漏译)"
+  - "未翻译|漏译|未译出"
+residual_note_policy: mark_and_keep
+residual_note_confidence_cap: 0.45
+
+# [2026-11-05 句界完整性] 两条句子的句界没对上、或句子在中途被截断时，语义分依然
+# 很高（两边说的确实是同一件事），长度比也正常，融合分发现不了。这里补两个文本证据：
+#   boundary_mismatch = 一侧以续接标点结尾、另一侧不是（引语/列举跨了句界）；
+#   unclosed_quote    = 引号/括号不配对且没有句末终止符（句子被截断）。
+# 命中即把置信度压到 boundary_confidence_cap，并打 needs_review 标记，不删句对。
+# 实测误报：flores 543 条 0 条；holdout 399 条 1 条（0.25%）；粤语会话 holdout 391 条
+# 7 条（1.79%，逐条看过都是引语跨句界的真错误对）。
+boundary_gate: true
+boundary_continuation_marks: ["，", ",", "、", "：", ":", "—", "–", "-", "（", "(", "「", "“"]
+boundary_closing_marks: ["\"", "'", "”", "’", "）", ")", "》", "】", "」", "』"]
+boundary_terminal_marks: ["。", "！", "？", "；", "…", ".", "!", "?"]
+boundary_confidence_cap: 0.45
+
+# 单条段落模型错误记入异常清单后继续；累计超过上限即整次执行结构化失败
+max_model_errors: 20
+
+# 本节点要求严格 UTF-8（上游已完成编码归一）
+input_encodings: [utf-8]
+text_fields: [source, target]
+
+# 中文按终止符切句；英文句点需满足空格/大写规则，缩写和小数点不断句
+zh_terminators: ["。", "！", "？", "；", "…"]
+en_terminators: [".", "!", "?", "…"]

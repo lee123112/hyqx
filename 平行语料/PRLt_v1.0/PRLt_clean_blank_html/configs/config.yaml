@@ -1,0 +1,23 @@
+# 算子4：空白与 HTML 清理配置
+operator:
+  name: whitespace_html_cleanup
+  version: v1.1.0
+
+# 算子3 已完成编码归一；本节点默认只接受严格 UTF-8。
+input_encodings: [utf-8]
+
+# 只清理句对文本字段，避免改写 id、语言声明和业务元数据。
+text_fields: [source, target]
+
+# 去除标签、注释、script/style 内容，并将 HTML 实体还原为文字。
+strip_html: true
+
+# 删除零宽空格、BOM 等不可见格式字符。
+remove_invisible: true
+
+# 将连续空白（含换行、制表符和 nbsp）折叠为一个普通空格并首尾裁剪。
+normalize_whitespace: true
+
+# linewise=逐行规整水平空白并保留算子5所需的换行；global=全局折叠；
+# trim=只裁剪整个字段首尾；preserve=完全保留。
+whitespace_mode: linewise

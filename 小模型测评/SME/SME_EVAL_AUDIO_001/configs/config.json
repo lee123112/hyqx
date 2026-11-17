@@ -1,0 +1,35 @@
+{
+  "operatorId": "SME_eval_audio",
+  "package": "SME_EVAL_AUDIO_001",
+  "type": "audio",
+  "config": {
+    "thresholds": {
+      "cer": 12,
+      "speakerAccuracy": 85,
+      "domainF1": 85
+    },
+    "weights": [
+      25,
+      25,
+      20,
+      15,
+      15
+    ],
+    "grades": {
+      "AA": 95,
+      "A": 85,
+      "B": 70
+    },
+    "highValue": false
+  },
+  "engine": {
+    "module": "app.engines.audio.AudioEngine",
+    "mode": "demo|measured"
+  },
+  "modelAssets": {
+    "root": "models",
+    "manifest": "models/manifest.json",
+    "packaged": true,
+    "sharedWeightRequired": false
+  }
+}

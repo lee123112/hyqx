@@ -1,0 +1,71 @@
+# 算子19：数据质量报告 配置
+operator:
+  name: data_quality_report
+  version: v1.0.0
+
+# ---- 输入输出 ----
+# 上游 3/4 已完成编码归一；本节点只接受严格 UTF-8，并按后缀自动识别 JSONL/JSON。
+input_encodings: [utf-8]
+input_format: auto                      # auto | jsonl | json
+report_name: 19_quality_report.json
+group_detail_name: 19_quality_report.jsonl
+reject_name: 19_rejects.jsonl
+write_group_detail: true
+
+# ---- 版本与统计口径 ----
+report_version: v1.0.0
+config_version: v1.0.0
+# 计划规定 unit_type 默认 sentence_pair；上游 18 可能写 sentence，用别名归一避免误判不一致。
+default_unit_type: sentence_pair
+unit_type_aliases:
+  sentence: sentence_pair
+  paragraph: paragraph_pair
+  clause: clause_pair
+  phrase: phrase_pair
+  document: document_pair
+default_pipeline_type: parallel_corpus
+default_pipeline_version: v1.0.0
+
+# ---- 阶段与口径 ----
+# [无血缘改造 2026-10-19] 配置不再包含血缘专用项。
+stage_order: [输入核验, 通用粗清洗, 多粒度双语对齐处理, 双语质量检测过滤, 数据集交付]
+# 首末阶段之间缺环即 lineage_broken:<阶段>（阶段链连续性，属业务口径，保留）。
+require_stage_continuity: true
+# 阶段名不在 stage_order 内视为口径不一致。
+require_known_stage: true
+# 每个阶段统计记录必须提供的业务单元计数；禁止用文件大小替代。
+stage_required_fields: [input_units, output_units, filtered_units, failed_units, duplicate_units, low_confidence_units, manual_rejected_units]
+# 缺关键字段的处理：failed=整体失败（计划要求）；partial=只记录告警；skip=只进拒绝清单。
+missing_field_policy: failed
+# 输入 == 输出 + 过滤 + 失败 + 重复 + 低置信 + 人工驳回 的守恒校验；口径未确认，默认关闭。
+stage_balance_check: false
+# [无血缘改造 2026-10-19] require_lineage 已停用（不再读取/生成血缘文件）。
+# require_lineage: true
+# 转化率分母「产线首个有效输入」固定取该阶段；该阶段统计缺失 -> missing_denominator_source 并 failed。
+low_quality_input_stage: 输入核验
+
+# ---- 指标与阈值（计划固定值 0.85 / 0.90）----
+low_quality_conversion_threshold: 0.85
+high_quality_retention_threshold: 0.90
+# 高品质等级口径：S/A 视为最终治理前的高质量候选。
+high_quality_grades: [S, A]
+rate_precision: 6
+# 指标不达标时的状态：partial（报告已生成，仅指标不达标）| failed。
+below_threshold_status: partial
+
+# ---- 一致性 ----
+require_source_consistency: true
+require_group_consistency: true
+# 一期链路 09→10→11 切换统计单元（句对→子句对）：true=混合单元降级为 warning 并分阶段报告；
+# false=维持旧的 unit_type_inconsistent 硬阻断。
+allow_mixed_unit_types: true
+group_dimensions: [task_id, language_pair, source_type, domain]
+task_id_field: task_id
+task_id_prefix_separator: "_"
+
+# ---- 侧输入（工程侧可选；按 <输入文件同目录>/<任务目录>/<算子目录> 查找）----
+stage_statistics_file: stage_statistics.json
+manifest_file: 18_manifest.json
+# [无血缘改造 2026-10-19] 血缘侧输入配置已停用。
+# upstream_lineage_file: lineage.json
+# use_lineage_statistics: true

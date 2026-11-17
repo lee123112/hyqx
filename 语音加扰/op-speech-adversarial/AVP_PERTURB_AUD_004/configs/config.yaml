@@ -1,0 +1,27 @@
+# 04 语速变换加扰（avp_speed_perturb）
+# 所有阈值/系数必须来自本文件，processor.py 里不得出现魔法数字。
+
+operator:
+  id: avp_speed_perturb
+  name: 语速变换加扰
+  tag: 语速变换
+  version: v1.0.0
+  number: 4
+
+io:
+  # 输入接口：02 算子的标准语料表（也接受目录，自动找同名文件）
+  input_filename: "002_std.jsonl"
+  # 变速产物目录（相对 ctx.out_dir）
+  output_subdir: "004_audio"
+  max_listed: 200
+
+speed:
+  # 业务允许的语速倍率（接口 values 的唯一合法枚举）
+  allowed_values: ["0.8x", "1.0x", "1.2x"]
+  # 原样透传倍率：输出 PCM 必须与输入逐字节一致
+  passthrough_value: "1.0x"
+  # 输出时长误差上限（%）：超过即记为违规，批次 partial
+  max_duration_error_pct: 1.0
+  # per_value 缺省：true = 每条语音 × 每个倍率各产一条
+  per_value_default: true
+  default_seed: 20261102

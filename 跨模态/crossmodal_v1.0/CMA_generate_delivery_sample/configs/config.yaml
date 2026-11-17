@@ -1,0 +1,53 @@
+# 算子 26「生成交付样例」默认配置（表1 #26 冻结口径）
+#
+# 只读口径（请求不可放宽，写错即启动失败，见 utils/schemas.py）：
+#   format                = xlsx          （表1：导出 Excel 样例清单）
+#   source_status         = 可交付        （表1：只从可交付语料包抽样）
+#   max_samples_per_route ∈ [1, 10]      （表1：每条已开启路线最多抽 10 条）
+#   transport.format      = crossmodal-files-v1（共享契约）
+
+operator:
+  number: 26
+  id: delivery_sample
+  name: 生成交付样例
+  label: 生成交付样例
+  version: v1.0.0
+  enabled: true
+  # 兼容计划文档写法：key=value 字符串数组（会被提升为顶层配置，不覆盖显式项）
+  settings:
+    - "format=xlsx"
+    - "source_status=可交付。"
+    - "max_samples_per_route=10"
+
+# 表1 第 8 环节「交付样例」（V4.2 §4.26 修正原 S7）
+stage_id: S8
+enabled: true
+
+# ---- 业务（表1 #26 冻结项） ----
+format: xlsx
+source_status: 可交付
+max_samples_per_route: 10
+
+# ---- 抽样策略（确定性、可复现） ----
+sampling_mode: random      # random | first
+sampling_seed: 26
+
+# ---- 样例清单字段加工 ----
+description_summary_chars: 120
+max_embedded_record_bytes: 32768
+
+# ---- 门禁策略 ----
+require_deliverable_source: false   # true：来源包非「可交付」直接判 failed
+require_deliverable_record: true    # true：记录缺少 #23 可交付标记即排除
+route_source: package               # package | config：启用路线以包内版本说明为准
+
+# ---- 路线开关（仅当包内未声明 enabled_routes 时生效） ----
+routes:
+  image_text: true
+  audio_text: false
+  video_text: false
+
+# ---- 传输（共享契约） ----
+transport:
+  format: crossmodal-files-v1
+  max_response_bytes: 67108864

@@ -1,0 +1,198 @@
+{
+  "operatorId": "SME_eval_image",
+  "package": "SME_EVAL_IMAGE_001",
+  "type": "image",
+  "config": {
+    "thresholds": {
+      "iou": 0.85,
+      "clarity": 80,
+      "semantic": 80,
+      "accuracy": 80
+    },
+    "weights": [
+      25,
+      25,
+      20,
+      15,
+      15
+    ],
+    "grades": {
+      "AA": 95,
+      "A": 85,
+      "B": 70
+    },
+    "highValue": false
+  },
+  "engine": {
+    "module": "app.engines.image.ImageEngine",
+    "mode": "demo|measured"
+  },
+  "protocol": {
+    "name": "image-classification-quality-v1",
+    "protocolVersion": "1.0",
+    "declarative": true,
+    "declarativeNote": "本块是包级协议声明，运行时 CLI/API 不读取；默认值以 app/experiments/image_protocol.py 为准，tests/test_processor.py 有一致性断言防漂移",
+    "experiment": "image-quality-protocol",
+    "task": "classification",
+    "proxyModels": [
+      "resnet18",
+      "mobilenet_v2"
+    ],
+    "defaultProxyModel": "resnet18",
+    "implementedProxyModels": [
+      "resnet18",
+      "resnet50",
+      "mobilenet_v2"
+    ],
+    "optionalProxyModels": [
+      "deit_tiny"
+    ],
+    "implementedOptionalProxyModels": [
+      "deit_tiny"
+    ],
+    "optionalProxyModelDependency": {
+      "deit_tiny": "timm；未安装时返回 422 ENGINE_UNAVAILABLE。当前仅支持随机初始化，未实现自定义 --model-weight 改写（本机当前未安装 timm）"
+    },
+    "proxyBackbone": "ResNet/MobileNet 优先加载 weight/<model>/ 下的本地权重，缺失时随机初始化并在 protocol.pretrained=false 中记录；deit_tiny 仅随机初始化路径，不支持自定义权重",
+    "benchmarks": [
+      "mlperftiny",
+      "cifar10",
+      "imagenet_subset",
+      "datacomp_clip"
+    ],
+    "defaultBenchmark": "mlperftiny",
+    "benchmarkTaskMapping": {
+      "mlperftiny": "visual_wake_words",
+      "default": "classification"
+    },
+    "benchmarkTaskNote": "mlperftiny 仅标记 VWW 口径；任意类别不是 VWW 任务，引用结果时必须同时改写任务说明",
+    "benchmarkNumbersProduced": false,
+    "benchmarkNote": "benchmarks 只声明对标口径；本包不下载基准数据、不产出任何基准分数，DataComp-CLIP 38 任务结果未产出",
+    "metrics": [
+      "top1",
+      "macroF1"
+    ],
+    "metricDirection": {
+      "top1": "higher",
+      "macroF1": "higher"
+    },
+    "metricUnit": "百分比 0-100",
+    "trainingModes": [
+      "full",
+      "linear_probe"
+    ],
+    "defaultTrainingMode": "full",
+    "implementedTrainingModes": [
+      "full",
+      "linear_probe"
+    ],
+    "trainingModeNote": "full 为全量微调；linear_probe 冻结 backbone 只训练线性头，不得把 linear_probe 结果写成全量微调",
+    "defaults": {
+      "seed": 42,
+      "epochs": 10,
+      "batchSize": 32,
+      "learningRate": 0.001,
+      "imageSize": 128
+    },
+    "seeds": [
+      42
+    ],
+    "entrypoints": {
+      "cli": "python tools\\run_image_protocol.py",
+      "api": "POST /api/v1/eval/image/protocol",
+      "coreModule": "app/experiments/image_protocol.py",
+      "legacyLinearProbe": "tools/run_image_classification.py"
+    },
+    "dataLayout": {
+      "ours": "D_ours/<class>/*.jpg|.jpeg|.png|.webp|.bmp",
+      "ref": "D_ref/<class>/*.jpg|.jpeg|.png|.webp|.bmp",
+      "eval": "E/<class>/*.jpg|.jpeg|.png|.webp|.bmp"
+    },
+    "dataAlignment": {
+      "classDirs": "D_ours、D_ref、E 的类别目录集合与顺序完全一致",
+      "trainVolume": "D_ours 与 D_ref 总条数相同，且每类条数相同",
+      "onViolation": "422 DATASET_INVALID / 422 PROTOCOL_MISMATCH"
+    },
+    "ood": {
+      "policy": "distribution-match-first",
+      "order": "先审计 D_ours/D_ref 与固定 E 的分布匹配，再比较 top1/macroF1；不匹配时不得用数据规模解释 delta",
+      "checks": [
+        "类别分布 Jensen-Shannon divergence",
+        "冻结 backbone 特征的 RBF-kernel MMD²"
+      ],
+      "thresholds": {
+        "labelJSD": 0.25,
+        "featureMMD": 0.35
+      },
+      "metricNote": "labelJSD 取 max(D_ours vs E, D_ref vs E)；featureMMD 同口径；0 表示完全匹配，阈值 0-1",
+      "featureMMDRequiresPretrained": true,
+      "featureMMDNote": "随机初始化 backbone 时 featureMMD 只作诊断，不作为门槛；加载本地预训练权重后才强制阈值",
+      "onViolation": "严格模式返回 422 OOD_MISMATCH；非严格模式返回 valid=false 的诊断分数",
+      "enforcedAutomatically": true
+    },
+    "leakage": {
+      "policy": "leakage-safe-split",
+      "checks": [
+        "E 与 D_ours/D_ref 的精确 SHA256 重复",
+        "E 与训练集的 average-hash 近重复",
+        "训练集内部精确重复（只告警，统计有效样本量时应聚合）",
+        "增强只作用于训练集；E 不参与训练、增强与调参"
+      ],
+      "nearDuplicateHamming": 5,
+      "hash": "256-bit average hash（16x16 灰度，8 向翻转/旋转归一化；8x8 在 CIFAR 小图上跨类冲突明显）",
+      "pairLimit": 4000000,
+      "onViolation": "严格模式返回 422 LEAKAGE_DETECTED；pair 比对达到上限被截断时同样判未通过",
+      "enforcedAutomatically": true
+    },
+    "augmentation": {
+      "appliesTo": "train",
+      "trainOnly": true,
+      "allowedOnEval": false,
+      "enabledInTrainingModes": [
+        "full"
+      ],
+      "trainTransform": [
+        "RandomResizedCrop(imageSize, scale=0.7-1.0, ratio=0.8-1.25)",
+        "RandomHorizontalFlip",
+        "ToTensor",
+        "Normalize(ImageNet)"
+      ],
+      "evalTransform": [
+        "Resize((imageSize, imageSize))",
+        "ToTensor",
+        "Normalize(ImageNet)"
+      ],
+      "note": "linear_probe 走确定性特征，不做随机增强；E 只用 evalTransform"
+    },
+    "fixedEval": {
+      "enabled": true,
+      "datasetKey": "eval",
+      "holdout": true,
+      "sharedAcrossSides": true,
+      "reuseAcrossRuns": true,
+      "note": "D_ours 与 D_ref 两侧都在同一个固定 E 上评测，E 不参与训练、增强与调参"
+    },
+    "testTimeAugmentation": false,
+    "strictMode": {
+      "default": true,
+      "onLeakage": "422 LEAKAGE_DETECTED",
+      "onOod": "422 OOD_MISMATCH",
+      "onAuditIncomplete": "422 AUDIT_INCOMPLETE（pair 上限截断，不能用 LEAKAGE_DETECTED 冒充已发现重复）",
+      "nonStrict": "返回 valid=false 的完整诊断记录，分数不能写成数据质量结论"
+    },
+    "legacyMetrics": [
+      "iou",
+      "clarity",
+      "semantic",
+      "accuracy"
+    ],
+    "legacyMetricsUsableForNewProtocol": false,
+    "legacyMetricsNote": "iou/clarity/semantic/accuracy 是在线兼容代理（proxy/measured_rule），保留用于平台对接与历史对比，不能作为本分类协议的结论"
+  },
+  "modelAssets": {
+    "root": "models",
+    "manifest": "models/manifest.json",
+    "packaged": true,
+    "sharedWeightRequired": false
+  }
+}

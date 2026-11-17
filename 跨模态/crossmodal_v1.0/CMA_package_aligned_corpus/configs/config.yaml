@@ -1,0 +1,56 @@
+# 算子 23「压缩交付对齐语料包」默认配置
+# 表1 v4.1 #23 冻结口径：默认开启、必须、系统功能、P0、模型列 = --（无模型）
+# 未知键会被严格拒绝（extra=forbid），避免配置写错后静默跑偏。
+
+operator:
+  number: 23
+  id: delivery_package
+  name: delivery_package
+  label: 压缩交付对齐语料包
+  version: v1.0.0
+  enabled: true            # 必须为 true，置 false 直接配置失败
+
+# 表1 第 6 环节「数据集交付」（与 #19=S3、#20=#21=S4 的编号习惯一致，待主 agent 确认）
+stage_id: S6
+
+enabled: true              # 必须为 true
+
+# 表1 #23「压缩成什么格式」：下拉框，默认 zip，只有 zip
+archive_format: zip
+
+# 表1 #23「已在隔离区的样本不进入语料包」：只读，必须为 true
+exclude_isolated: true
+
+# 表1 #23「待发布 / 可交付」：只读字面值，不可改写
+status_before_review: 待发布
+status_after_review: 可交付
+
+# 交付包内是否随包携带记录声明的相对媒体（demo 便于端到端验收）
+# 置 false 时只登记引用清单（大包由工程侧 OSS/分片承载，本算子不做 OSS 上传）
+include_media: true
+
+# 严格模式：不可交付时直接 failed（投产前口径校验用；默认关闭 → degraded/待发布）
+require_deliverable: false
+
+# 记录缺少 Token 时进入原始隔离区（#22 应产出 Token；置 false 仅用于专项排查）
+require_token: true
+
+# 单文件媒体随包上限（字节），超过则只登记引用不复制
+max_media_bytes: 33554432
+
+# 旁路台账中内嵌原始记录的上限（字节），超过只记录摘要，避免台账膨胀
+max_embedded_record_bytes: 32768
+
+# 材料自动发现顺序：<输入包>/materials/ → <输入包>/ → 递归
+# 需要固定部署路径时可在此显式指定（请求不可覆盖该段）
+materials:
+  quality_report: null
+  sampling_conclusion: null
+  isolation_list: null
+  version_notes: null
+  training_files: null
+
+transport:
+  # 跨模态统一文件内容对象格式，禁止改动字段语义
+  format: crossmodal-files-v1
+  max_response_bytes: 67108864

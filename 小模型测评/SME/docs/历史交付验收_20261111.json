@@ -1,0 +1,151 @@
+{
+  "date": "2026-11-11",
+  "scope": "delivered directory cold-start with temporary runtime, ASGI APIs, real tiny model runs; not Docker/Linux/Nginx process execution",
+  "operators": 5,
+  "freshDatabaseTaskCount": 0,
+  "total": 12,
+  "passed": 12,
+  "failed": 0,
+  "privateClipForward": "passed",
+  "sharedWeightRequired": false,
+  "noOriginalProjectImport": true,
+  "frontendAssets": "passed",
+  "composeAndProxyStaticChecks": "passed",
+  "sourceCopiesHashMatched": 213,
+  "forbiddenFiles": [],
+  "durationSeconds": 100.375,
+  "results": [
+    {
+      "caseId": "import-benchmark",
+      "type": "benchmark",
+      "method": "导入已有指标",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 2,
+      "rowsOut": 2,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 0.625
+    },
+    {
+      "caseId": "import-image",
+      "type": "image",
+      "method": "导入已有指标",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 3,
+      "rowsOut": 3,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 0.547
+    },
+    {
+      "caseId": "import-text",
+      "type": "text",
+      "method": "导入已有指标",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 3,
+      "rowsOut": 3,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 0.281
+    },
+    {
+      "caseId": "import-video",
+      "type": "video",
+      "method": "导入已有指标",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 2,
+      "rowsOut": 2,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 0.562
+    },
+    {
+      "caseId": "import-audio",
+      "type": "audio",
+      "method": "导入已有指标",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 8,
+      "rowsOut": 8,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 1.391
+    },
+    {
+      "caseId": "engine-image",
+      "type": "image",
+      "method": "引擎测量",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 3,
+      "rowsOut": 3,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 0.938
+    },
+    {
+      "caseId": "engine-text",
+      "type": "text",
+      "method": "引擎测量",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 6,
+      "rowsOut": 1,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 8.562
+    },
+    {
+      "caseId": "engine-video",
+      "type": "video",
+      "method": "引擎测量",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 2,
+      "rowsOut": 2,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 1.25
+    },
+    {
+      "caseId": "engine-audio",
+      "type": "audio",
+      "method": "引擎测量",
+      "businessImport": "passed",
+      "status": "passed",
+      "rowsIn": 8,
+      "rowsOut": 8,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 32.109
+    },
+    {
+      "caseId": "training-text",
+      "type": "text",
+      "method": "训练对比协议",
+      "fixedE": 4,
+      "status": "passed",
+      "rowsIn": 4,
+      "rowsOut": 4,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 10.063
+    },
+    {
+      "caseId": "training-image",
+      "type": "image",
+      "method": "训练对比协议",
+      "fixedE": 20,
+      "status": "passed",
+      "rowsIn": 20,
+      "rowsOut": 20,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 7.687
+    },
+    {
+      "caseId": "training-audio",
+      "type": "audio",
+      "method": "训练对比协议",
+      "fixedE": 2,
+      "status": "passed",
+      "rowsIn": 2,
+      "rowsOut": 2,
+      "portableOutputAfterRemove": true,
+      "durationSeconds": 13.907
+    }
+  ]
+}

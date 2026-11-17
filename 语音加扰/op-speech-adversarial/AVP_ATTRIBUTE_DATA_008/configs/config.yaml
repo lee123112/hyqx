@@ -1,0 +1,56 @@
+# 08 差异归因（avp_attribute_gap）
+# 所有阈值/系数/枚举必须来自本文件，processor.py 里不得出现魔法数字。
+
+operator:
+  id: avp_attribute_gap
+  name: 差异归因
+  tag: 差异归因
+  version: v1.0.0
+  number: 8
+
+io:
+  # 输入：007 的落库产物；传目录时优先找该文件名，其次第一个 .jsonl/.json
+  input_default_name: "007_eval_results.jsonl"
+  output_attribution: "008_attribution.json"
+  output_alerts: "008_alerts.json"
+  output_version_compare: "008_version_compare.json"
+  # 统计/报告里最多列出的明细条数（统计数始终全量）
+  max_listed: 200
+
+attribution:
+  # 默认对比对象类型：model=其他模型同版本，version=上一个已发布版本
+  baseline_type: "model"
+  # 默认归因维度白名单（来源于评测结果的维度名；口音不是加扰维度，不在此列）
+  dimensions: ["噪声", "语速", "环境音"]
+  # 白名单与数据完全对不上时是否退化为「全部维度」参与排名（会在结果里标记 scope_fallback=true）
+  scope_fallback_all: true
+  # 取哪个指标做差值/影响条数/占比/主因（评测结果里 cer/wer/ser 三选一）
+  primary_metric: "cer"
+  # SNR 分桶边界（dB，左闭右开，最后一桶到 +∞）；用于错误样本的 SNR 集中度解释
+  snr_buckets: [0.0, 5.0, 10.0, 15.0, 20.0, 30.0]
+  # 归因链路里最多列出的样本 ID 条数（防止链路膨胀；count 仍是全量）
+  max_trace_samples: 50
+
+checks:
+  # 单维度差值严格大于该值才进告警（1.5pp 本身不告警）
+  alert_pp: 1.5
+  # 主因判定：占比最高且不低于该值
+  main_cause_share: 0.35
+  # 置信度分档：主因样本 <low 低 / low–high 中 / >high 高
+  confidence_bands:
+    low: 100
+    high: 200
+
+stats:
+  # 95% 置信区间半宽：z * sqrt(p(1-p)/n) * 100（pp）；z 为双侧 95% 正态分位
+  z_95: 1.96
+
+precision:
+  # 差值 pp 保留小数位
+  diff_pp_digits: 4
+  # 占比 share 保留小数位
+  share_digits: 4
+  # 文本/报告里百分比展示小数位
+  pct_digits: 2
+  # 置信区间半宽小数位
+  ci_digits: 2

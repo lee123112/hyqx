@@ -1,0 +1,22 @@
+{
+  "python": "3.11.7",
+  "platform": "win32",
+  "directPackageVersions": {
+    "fastapi": "0.142.1",
+    "uvicorn": "0.54.0",
+    "python-multipart": "0.0.32",
+    "pydantic": "2.13.5",
+    "numpy": "2.4.6",
+    "pillow": "10.2.0",
+    "opencv-python-headless": "5.0.0.93",
+    "torch": "2.15.0+cpu",
+    "torchvision": "0.29.2",
+    "transformers": "5.22.1",
+    "scikit-learn": "1.2.2",
+    "scipy": "1.17.1",
+    "PyYAML": "6.0.1",
+    "httpx": "0.28.1",
+    "ftfy": "6.3.1",
+    "regex": "2026.9.29"
+  }
+}

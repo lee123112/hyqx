@@ -1,0 +1,21 @@
+{
+  "format": "crossmodal-version-notes-v1",
+  "dataset_version": "v1.0.0-demo",
+  "enabled_routes": [
+    "image_text",
+    "audio_text",
+    "video_text"
+  ],
+  "annotation_granularity": "whole",
+  "routes_detail": {
+    "image_text": {
+      "granularity": "whole"
+    },
+    "audio_text": {
+      "granularity": "sentence"
+    },
+    "video_text": {
+      "granularity": "whole"
+    }
+  }
+}

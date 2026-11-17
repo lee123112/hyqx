@@ -1,0 +1,13 @@
+{
+  "tags": [
+    "系统功能",
+    "平台提供",
+    "纳入回归"
+  ],
+  "tool_type": "系统功能",
+  "tag_source": "【工具流程】跨模态对齐产线工具分析_v4.2_建议修订版_新.xlsx G列（工具类型=系统功能）",
+  "tagged_on": "2026-10-30",
+  "note": "平台/系统侧提供的功能算子；2026-10-30 业务要求重新纳入测试链路，M22 参与 #21→#22 回归（输入 #21 outputFile.zip，输出 samples.jsonl/22_tokens.jsonl）。",
+  "operator_seq": 22,
+  "operator_package": "CMA_generate_crossmodal_tokens"
+}

@@ -1,0 +1,23 @@
+# 表1 v4.1：兜底默认关闭；业务范围由schema严格限制。
+operator:
+  name: video_keyframes
+  version: v1.1.1                     # v1.1.1：响应上限 64MiB→256MiB + 打包提前失败
+stage_id: S2
+sample_fps: 1.0
+max_frames: 8
+max_duration_seconds: 60.0
+crop_black_borders: false
+probe_timeout_seconds: 15.0
+unsupported_vfr_policy: reject
+io:
+  output_root: output
+server:
+  max_files: 1000
+  max_unpacked_bytes: 67108864
+  # v1.1.1：响应（crossmodal-files-v1 文件内容对象）上限 256 MiB。
+  # 原 64 MiB 因 base64 4/3 膨胀只能装 ~45 MiB 产物，138 条实跑产物 83 MB 会被迫
+  # 走路径引用；提高到 256 MiB 后常规批次直接内联。仍超限时自动落盘
+  # <runDir>_form2.zip 并返回路径引用（response_fallback=output_too_large），不判失败。
+  # 下游接收端若限制更小，可在本行下调；接收端更大时可上调（须为整数、>0）。
+  max_response_bytes: 268435456
+enabled: false

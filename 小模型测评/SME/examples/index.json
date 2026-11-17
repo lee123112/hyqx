@@ -1,0 +1,156 @@
+{
+  "date": "2026-11-11",
+  "cases": [
+    {
+      "id": "import-benchmark",
+      "method": "导入已有指标",
+      "type": "benchmark",
+      "file": "导入已有指标/后训练区分度_2条.zip",
+      "samples": 2,
+      "operatorId": "SME_eval_benchmark",
+      "protocol": false,
+      "size": 520,
+      "sha256": "19b275a4c652ddf357a73f8473e08605f6937ef09edf50e0c285225d6df20b43"
+    },
+    {
+      "id": "import-image",
+      "method": "导入已有指标",
+      "type": "image",
+      "file": "导入已有指标/图像_3条.zip",
+      "samples": 3,
+      "operatorId": "SME_eval_image",
+      "protocol": false,
+      "size": 192357,
+      "sha256": "f99dae2ab046264cc56dbc0d8e8b41a699ad1c2caa63568578300045796f5593"
+    },
+    {
+      "id": "import-text",
+      "method": "导入已有指标",
+      "type": "text",
+      "file": "导入已有指标/文本_3条.zip",
+      "samples": 3,
+      "operatorId": "SME_eval_text",
+      "protocol": false,
+      "size": 2633,
+      "sha256": "c0b674631dede789a0871d3a38214ff2a7107fd75ae70aa35e941a6cef2cdca2"
+    },
+    {
+      "id": "import-video",
+      "method": "导入已有指标",
+      "type": "video",
+      "file": "导入已有指标/视频_2条.zip",
+      "samples": 2,
+      "operatorId": "SME_eval_video",
+      "protocol": false,
+      "size": 263553,
+      "sha256": "863d8de80e539a8a1a311d9cea4cf4e745b3983ac3b573285045c5e1f8f90a32"
+    },
+    {
+      "id": "import-audio",
+      "method": "导入已有指标",
+      "type": "audio",
+      "file": "导入已有指标/音频_8条.zip",
+      "samples": 8,
+      "operatorId": "SME_eval_audio",
+      "protocol": false,
+      "size": 918709,
+      "sha256": "2a26c6d3cd0f4d95748bc67a30cb0b3fa5f9eca11b0f59f3111767460f5c3261"
+    },
+    {
+      "id": "engine-image",
+      "method": "引擎测量",
+      "type": "image",
+      "file": "引擎测量/图像_3条.zip",
+      "samples": 3,
+      "operatorId": "SME_eval_image",
+      "protocol": false,
+      "size": 192103,
+      "sha256": "c58e0c60f764bc41187d870832a0b9ea4ce18ef46e4ef746012e5c9938a8a404"
+    },
+    {
+      "id": "engine-text",
+      "method": "引擎测量",
+      "type": "text",
+      "file": "引擎测量/文本_6条.zip",
+      "samples": 6,
+      "operatorId": "SME_eval_text",
+      "protocol": false,
+      "size": 2157,
+      "sha256": "a436e49109c541faba2ed905af9359590af3630536d7ee7d2ad8430ccc1ffe6b"
+    },
+    {
+      "id": "engine-video",
+      "method": "引擎测量",
+      "type": "video",
+      "file": "引擎测量/视频_2条.zip",
+      "samples": 2,
+      "operatorId": "SME_eval_video",
+      "protocol": false,
+      "size": 263379,
+      "sha256": "996aa00149a633dff23bd9048cf52566ae434bc0a16cd6ba107e5422d7b96518"
+    },
+    {
+      "id": "engine-audio",
+      "method": "引擎测量",
+      "type": "audio",
+      "file": "引擎测量/音频_8条.zip",
+      "samples": 8,
+      "operatorId": "SME_eval_audio",
+      "protocol": false,
+      "size": 918432,
+      "sha256": "8bf1e1350c50eb5a93933567773d5aee86fc5f026f150bf0688525c098488ca0"
+    },
+    {
+      "id": "training-text",
+      "method": "训练对比协议",
+      "type": "text",
+      "file": "训练对比协议/文本_小预算训练.zip",
+      "samples": null,
+      "operatorId": "SME_eval_text",
+      "protocol": true,
+      "dataVolume": {
+        "ours": 6,
+        "ref": 6,
+        "train": 4,
+        "eval": 4
+      },
+      "size": 2269,
+      "sha256": "6bd7fc7f6c3997d3aeb76ec9854c51f7a251ac1b294d25fd65897bbf99dd6cad",
+      "modelBinding": "operator-private-default"
+    },
+    {
+      "id": "training-image",
+      "method": "训练对比协议",
+      "type": "image",
+      "file": "训练对比协议/图像_小预算训练.zip",
+      "samples": null,
+      "operatorId": "SME_eval_image",
+      "protocol": true,
+      "dataVolume": {
+        "ours": 20,
+        "ref": 20,
+        "eval": 20
+      },
+      "size": 144012,
+      "sha256": "228b6cb199ac4bd93afc1ca498e4bbdde1f15d23a64d0204351f210fbc0a5d21",
+      "modelBinding": "operator-private-default"
+    },
+    {
+      "id": "training-audio",
+      "method": "训练对比协议",
+      "type": "audio",
+      "file": "训练对比协议/音频_小预算训练.zip",
+      "samples": null,
+      "operatorId": "SME_eval_audio",
+      "protocol": true,
+      "dataVolume": {
+        "ours": 2,
+        "ref": 2,
+        "eval": 2
+      },
+      "size": 574279,
+      "sha256": "4874a0d21bb6b59a5ce5838e5a4ee9fcdffa852ee03df49be593edd7dcc4a559",
+      "modelBinding": "operator-private-default"
+    }
+  ]
+}

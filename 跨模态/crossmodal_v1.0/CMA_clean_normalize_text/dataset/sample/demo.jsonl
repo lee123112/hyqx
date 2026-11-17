@@ -1,0 +1,13 @@
+{"sample_id": "demo_03_img_001", "text": "<b>红色</b>方块&nbsp; 在桌面上 ", "image": "media/img_001.png", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "图文"}, "processing": {"02": {"status": "success", "reason": null, "metrics": {"passed": 1}}}}
+{"sample_id": "demo_03_av_001", "text": null, "video": "media/vid_001.mp4", "audio": "media/aud_001.wav", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "音视频"}, "processing": {"02": {"status": "success", "reason": null, "metrics": {"passed": 1}}}}
+{"sample_id": "demo_03_text_001", "text": "一只金毛犬在草地上接飞盘", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "纯文本"}}
+{"sample_id": "demo_03_dirty_001", "text": "ＡＢＣ​  \u0007 <p>你好</p> �<script>alert(1)</script>，世界 ！", "image": "media/img_001.png", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "脏文本"}}
+{"sample_id": "demo_03_obj_001", "text": {"content": "已有内容", "original": "已有 原始内容", "lang": "zh"}, "image": "media/img_001.png", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "重跑"}}
+{"sample_id": "demo_03_av_002", "text": "   ", "video": "media/vid_001.mp4", "audio": "media/aud_001.wav", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "音视频"}}
+{"sample_id": "demo_03_empty_001", "text": "<p>   </p>", "image": "media/img_001.png", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "清空"}}
+{"sample_id": "demo_03_img_002", "text": "正常文本但媒体缺失", "image": "media/img_missing.png", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "缺媒体"}}
+{"sample_id": "demo_03_img_003", "text": "正常文本但媒体损坏", "image": "media/img_zero.png", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "坏媒体"}}
+{"sample_id": "demo_03_text_001", "text": "重复样本号", "metadata": {"source": "local_fixture", "license": "CC0", "domain": "重复"}}
+{"sample_id": "demo_03_badtype_001", "text": 12, "metadata": {"source": "local_fixture", "license": "CC0", "domain": "非法类型"}}
+{"text": "缺少 sample_id 的记录"}
+{"sample_id": "demo_03_badjson_001", "text": 

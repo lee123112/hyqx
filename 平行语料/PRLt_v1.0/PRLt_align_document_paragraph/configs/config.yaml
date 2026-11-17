@@ -1,0 +1,49 @@
+# 算子9：文档/段落级对齐配置
+operator:
+  name: document_paragraph_alignment
+  version: v1.0.0
+
+# 严格按 UTF-8 读取计划引用的源/目标文档；上游编码清洗结果不应再出现其他编码。
+input_encodings: [utf-8]
+
+# 候选搜索窗口：源/目标段落起始索引差超过该值不再生成候选。
+candidate_window: 3
+
+# 置信度阈值：低于阈值的候选关系进入 09_paragraph_rejects.jsonl，不写入通过输出。
+min_confidence: 0.45
+
+# 打分权重：长度相似度 + 段落位置先验 + 可比 token 重叠。
+# overlap 不可计算（中英段落没有可比 token）时，前两项权重重新归一化。
+length_weight: 0.55
+position_weight: 0.30
+overlap_weight: 0.15
+
+# 是否允许 1:2 / 2:1 关系（一个源段落对应两个目标段落等）。
+allow_1_to_2: true
+allow_2_to_1: true
+
+# 多段落合并关系的结构惩罚，避免 DP 过度合并；1:1 关系不受惩罚。
+group_penalty: 0.05
+
+# 次优候选与最优候选的置信度差小于该值时，记为“多候选”并写入异常清单。
+ambiguity_margin: 0.10
+
+# [2026-11-05 不静默丢段] 低置信段落关系的去向。
+# 旧行为（drop）只写异常清单、不进通过输出，缺陷段落整段从链路消失，下游 09/10/12
+# 既看不到、也无法判定——Fullflow-Effect-Bench-v1 里算子10 的 16/40、算子12 的 15/30
+# 标签就是因为段落被本算子丢掉而「不可评估」（低置信堆在 0.456–0.553，紧贴 min_confidence）。
+# mark_and_keep 改为写入通过输出并打 review_status=needs_review + low_confidence_reason，
+# 由下游继续判定；异常清单条目照旧保留作审计。自然语料 65 篇 0 条低置信段落，行为不变。
+low_confidence_policy: mark_and_keep
+
+# 模型不可用时的策略：rule_degraded（走规则降级）| fail（结构化失败，不降级）。
+# 本算子不接入语义模型，所有分数均来自长度/位置/重叠的真实计算。
+fallback_policy: rule_degraded
+# 后端：rule_degraded（本次 demo 唯一实现）| model（未接入，配置后直接失败）。
+backend: rule_degraded
+
+# 是否允许计划中的源/目标文档落在任务目录之外。
+# 默认 false：文档只能解析到同一任务目录（或计划文件所在目录这一显式允许根）。
+allow_external_document_paths: false
+
+

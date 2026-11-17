@@ -1,0 +1,7 @@
+# Optional Chinese ASR backend for SME_EVAL_AUDIO_001/models/paraformer-zh.
+#
+# Install into the same interpreter as the service only when that interpreter
+# can use this FunASR build; it may pull a different torch/torchaudio pair.
+# The default Whisper backend does not require this file.
+funasr>=1.2.6
+torchaudio>=2.1
