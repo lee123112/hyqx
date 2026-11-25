@@ -1,0 +1,50 @@
+{
+  "format": "crossmodal-manifest-v1",
+  "entrypoint": "02_scene_verified.jsonl",
+  "artifacts": [
+    {
+      "path": "02_scene_verified.jsonl",
+      "role": "main"
+    },
+    {
+      "path": "media/image/1509786421_f03158adfc.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/2310233145_910cb5b4c8.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/278007543_99f5a91a3e.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/2825483885_3f7c54db3e.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/3044536048_e615466e7f.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/3085973779_29f44fbdaa.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/3286222970_1fa445e38f.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/3325157569_8084ab3293.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/350588129_6aef7b7fe2.jpg",
+      "role": "media"
+    },
+    {
+      "path": "media/image/3758175529_81941e7cc9.jpg",
+      "role": "media"
+    }
+  ]
+}

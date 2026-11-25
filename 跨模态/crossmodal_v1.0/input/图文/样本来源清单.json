@@ -1,0 +1,182 @@
+[
+  {
+    "index": 1,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0002",
+    "source_sample_id": "f8k-0002",
+    "source_line": 3,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/350588129_6aef7b7fe2.jpg",
+    "text": "A black dog is leaping into a swimming pool .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "d7bfacd19a9109ab3a2c289d6cb603f9bb315de4d8f0634505513a0b6d20a8d8",
+    "media_validation": {
+      "width": 381,
+      "height": 500,
+      "decoded": true
+    }
+  },
+  {
+    "index": 2,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0019",
+    "source_sample_id": "f8k-0019",
+    "source_line": 37,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/3286222970_1fa445e38f.jpg",
+    "text": "A little girl runs in the park , looking at somthing out of frame .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "5f74c5e903299bb1a80a162c2a225688bbfe093f35f345827bc9837b619bf0f5",
+    "media_validation": {
+      "width": 500,
+      "height": 358,
+      "decoded": true
+    }
+  },
+  {
+    "index": 3,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0041",
+    "source_sample_id": "f8k-0041",
+    "source_line": 81,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/3044536048_e615466e7f.jpg",
+    "text": "a lone parasurfer surfing a huge wave in the ocean .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "738e045c2569b1c8e456264083b5e9c2bbde035c048320ed379f3d77b85a562d",
+    "media_validation": {
+      "width": 500,
+      "height": 276,
+      "decoded": true
+    }
+  },
+  {
+    "index": 4,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0063",
+    "source_sample_id": "f8k-0063",
+    "source_line": 125,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/278007543_99f5a91a3e.jpg",
+    "text": "A brindle dog runs beside some pilings in ground at the waterside .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "d7b82046e511c03ddfb462a8b43fa98e83b2fcfa2345b45eeca39c44fcf7023b",
+    "media_validation": {
+      "width": 500,
+      "height": 500,
+      "decoded": true
+    }
+  },
+  {
+    "index": 5,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0085",
+    "source_sample_id": "f8k-0085",
+    "source_line": 169,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/1509786421_f03158adfc.jpg",
+    "text": "A boy points .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "2bbdd81b0eeb8b19f3027304bbb74047d350e6f2d9d5826ec3697f15c4267d11",
+    "media_validation": {
+      "width": 500,
+      "height": 333,
+      "decoded": true
+    }
+  },
+  {
+    "index": 6,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0107",
+    "source_sample_id": "f8k-0107",
+    "source_line": 213,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/2825483885_3f7c54db3e.jpg",
+    "text": "A man in a dress suit is riding a bike down the paved road .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "566cd99a030973d48809fd5bf389609b5b5fb818f979330c5b2ebe94675d9242",
+    "media_validation": {
+      "width": 500,
+      "height": 333,
+      "decoded": true
+    }
+  },
+  {
+    "index": 7,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0129",
+    "source_sample_id": "f8k-0129",
+    "source_line": 257,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/3758175529_81941e7cc9.jpg",
+    "text": "A blond boy slides into a green backyard pool .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "031ba4bfa58dec0480eeeccc099484179389f378b2293735bf4dbb229496f074",
+    "media_validation": {
+      "width": 500,
+      "height": 500,
+      "decoded": true
+    }
+  },
+  {
+    "index": 8,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0151",
+    "source_sample_id": "f8k-0151",
+    "source_line": 301,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/3085973779_29f44fbdaa.jpg",
+    "text": "A blond hair boy holding a toy airplane is in front of what looks like a colorful toy monster .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "ef3234d29df3f63157b896ae93fb0d5abe8f18c39f81f5e3ded3574b11fd7592",
+    "media_validation": {
+      "width": 282,
+      "height": 500,
+      "decoded": true
+    }
+  },
+  {
+    "index": 9,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0179",
+    "source_sample_id": "f8k-0179",
+    "source_line": 357,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/2310233145_910cb5b4c8.jpg",
+    "text": "A child in orange walking on wooden walkway built in a body of water .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "6f790d8a068a7b6e9f1fae8155c817abd55bc8022b4aeddd6db84d85420cb151",
+    "media_validation": {
+      "width": 500,
+      "height": 375,
+      "decoded": true
+    }
+  },
+  {
+    "index": 10,
+    "folder": "图文",
+    "modality": "image",
+    "sample_id": "f8k-0200",
+    "source_sample_id": "f8k-0200",
+    "source_line": 399,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/image/3325157569_8084ab3293.jpg",
+    "text": "A basketball player aims for the goal .",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "5bab02640e1d5aa8a460d51064440f4115df1c7bae370ac431bbc7ff3a59c909",
+    "media_validation": {
+      "width": 333,
+      "height": 500,
+      "decoded": true
+    }
+  }
+]

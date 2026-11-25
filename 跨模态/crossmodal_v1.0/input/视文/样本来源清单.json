@@ -1,0 +1,282 @@
+[
+  {
+    "index": 1,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0038",
+    "source_sample_id": "msvd-0038",
+    "source_line": 401,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid842.avi",
+    "text": "someone cuts a piece out of cabbage leaves",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "adc51d4593930ae9f13aa1c0694c2331687da465fcef348b5cb70c07d7ee5e03",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 320,
+          "height": 240,
+          "avg_frame_rate": "359/12"
+        }
+      ],
+      "format": {
+        "duration": "3.008357"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 2,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0058",
+    "source_sample_id": "msvd-0058",
+    "source_line": 403,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid731.avi",
+    "text": "a man in a suit snaps a stick in half",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "6a70be25cdaedc0945a22478735cf50465610dacbe9eb5eb6e9c3ffe586a73e0",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 320,
+          "height": 240,
+          "avg_frame_rate": "30000/1001"
+        }
+      ],
+      "format": {
+        "duration": "3.003000"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 3,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0065",
+    "source_sample_id": "msvd-0065",
+    "source_line": 405,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid981.avi",
+    "text": "a boy plays a trumpet",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "24f7b5d7360c6060c32576d33665fdda9e4f9affd683b4d78370b5afdb8e63e6",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 160,
+          "height": 120,
+          "avg_frame_rate": "15/1"
+        }
+      ],
+      "format": {
+        "duration": "10.066667"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 4,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0067",
+    "source_sample_id": "msvd-0067",
+    "source_line": 407,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid1267.avi",
+    "text": "a black cat runs on it s front paws",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "a32ade86e8d2355e28eb7d03224b3981e20971ff06893a9efd81562fe87da18b",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 320,
+          "height": 240,
+          "avg_frame_rate": "25/1"
+        }
+      ],
+      "format": {
+        "duration": "4.040000"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 5,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0068",
+    "source_sample_id": "msvd-0068",
+    "source_line": 409,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid1033.avi",
+    "text": "a woman cuts a boiled egg in slices",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "10dc0a0e4c3417dbc424c8fe57255983c24b2ff8163f890ec9782fe7f87df388",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 320,
+          "height": 240,
+          "avg_frame_rate": "359/12"
+        }
+      ],
+      "format": {
+        "duration": "4.011142"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 6,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0072",
+    "source_sample_id": "msvd-0072",
+    "source_line": 411,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid844.avi",
+    "text": "someone dices carrots into small pieces and adds them to a salad",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "b7a2cb16857186966946002f9bb998a05cb25fd02c9ab2bff8c64ad93096927b",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 320,
+          "height": 240,
+          "avg_frame_rate": "359/12"
+        }
+      ],
+      "format": {
+        "duration": "4.011142"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 7,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0095",
+    "source_sample_id": "msvd-0095",
+    "source_line": 413,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid1042.avi",
+    "text": "someone rides a bicycle down a street doing a wheelie all the way",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "2a3c6455871875440eeb6ae03253ab1eef0726976f6c431b9f77f0a745810935",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 192,
+          "height": 144,
+          "avg_frame_rate": "30/1"
+        }
+      ],
+      "format": {
+        "duration": "6.033333"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 8,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0096",
+    "source_sample_id": "msvd-0096",
+    "source_line": 415,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid305.avi",
+    "text": "a woman grates a carrot",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "a53898b930136eecf4daa77c4b4a2c628576366ce48eb16dadf2a4e3dd3c31d8",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 320,
+          "height": 240,
+          "avg_frame_rate": "359/12"
+        }
+      ],
+      "format": {
+        "duration": "4.011142"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 9,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0157",
+    "source_sample_id": "msvd-0157",
+    "source_line": 425,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid925.avi",
+    "text": "a young boy is cleaning a wood floor with a sweeper",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "c7e0e04eb26ef7076e05f1d37211c51a3f730593bf20555c9e7746b51cc597d8",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 320,
+          "height": 240,
+          "avg_frame_rate": "10/1"
+        }
+      ],
+      "format": {
+        "duration": "4.100000"
+      },
+      "full_video_decode_passed": true
+    }
+  },
+  {
+    "index": 10,
+    "folder": "视文",
+    "modality": "video",
+    "sample_id": "msvd-0172",
+    "source_sample_id": "msvd-0172",
+    "source_line": 429,
+    "source_dataset": "G:\\HYQX\\算子\\跨模态\\dataset_delivery_test\\deliver_dataset_1029_mixed50",
+    "media": "media/video/vid1753.avi",
+    "text": "a man lifts up the back of a white car and puts it back down",
+    "transformation": "none; complete original source record and media preserved",
+    "media_sha256": "d7240f823c0e8570ba5fe61fe15eee5c09593de656584d96d548edd7b377e265",
+    "media_validation": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 240,
+          "height": 320,
+          "avg_frame_rate": "10/1"
+        }
+      ],
+      "format": {
+        "duration": "6.000000"
+      },
+      "full_video_decode_passed": true
+    }
+  }
+]
