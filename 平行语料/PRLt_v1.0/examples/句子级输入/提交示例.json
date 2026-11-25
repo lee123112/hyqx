@@ -1,0 +1,10 @@
+{
+  "uniqueId": "testsentence_001",
+  "operatorIdScheme": "current",
+  "inputFile": "<替换为上传回包data.inputFile>",
+  "params": {
+    "sampleLimit": 20,
+    "inputMode": "pairs",
+    "executionMode": "stage_batched"
+  }
+}

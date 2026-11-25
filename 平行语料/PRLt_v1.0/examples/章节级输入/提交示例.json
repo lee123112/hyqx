@@ -1,0 +1,11 @@
+{
+  "uniqueId": "testchapter_001",
+  "operatorIdScheme": "current",
+  "inputFile": "<替换为上传回包data.inputFile>",
+  "params": {
+    "sampleLimit": 20,
+    "inputMode": "documents",
+    "planDirectory": "<替换为服务器上章节级输入/plans的绝对路径>",
+    "executionMode": "stage_batched"
+  }
+}

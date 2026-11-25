@@ -1,0 +1,32 @@
+{
+  "plan_version": "chapter-documents-20261106",
+  "source": {
+    "path": "documents/gran-chapter-002/source_zh.txt",
+    "lang": "zh",
+    "document_id": "gran-chapter-002"
+  },
+  "target": {
+    "path": "documents/gran-chapter-002/target_en.txt",
+    "lang": "en",
+    "document_id": "gran-chapter-002"
+  },
+  "granularity": "paragraph",
+  "stages": [
+    {
+      "operator": 9,
+      "granularity": "paragraph"
+    }
+  ],
+  "fallback_policy": "rule_degraded",
+  "metadata": {
+    "dataset_source": "dataset_delivery_csv_20261105",
+    "granularity": "chapter",
+    "domain": "gov.cn",
+    "topic": "food security",
+    "url": "http://www.gov.cn/zhengce/2019-10/14/content_5439410.htm",
+    "license": "官方公开文件（引用需注明来源）",
+    "source_type": "dataset_delivery_csv",
+    "source_paragraphs": 30,
+    "target_paragraphs": 30
+  }
+}
